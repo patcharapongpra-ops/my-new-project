@@ -259,6 +259,19 @@
           </div>
           <h3>Users</h3>
           <div class="table-wrap" style="margin:8px 0 14px;"><table><thead><tr><th>User</th><th>Name</th><th>Role</th><th>Team</th><th>Active</th></tr></thead><tbody id="adminUsersBody"></tbody></table></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;">
+            <h3>Checklist Templates</h3>
+            <button class="btn primary" id="btnOpenTemplate">+ Add Template Step</button>
+          </div>
+          <div class="table-wrap" style="margin:8px 0 14px;">
+            <table>
+              <thead>
+                <tr><th>Type</th><th>Step No</th><th>Step Name</th><th>Required</th><th>Action</th></tr>
+              </thead>
+              <tbody id="adminTemplatesBody"></tbody>
+            </table>
+          </div>
+
           <h3>Work Types</h3>
           <div class="table-wrap" style="margin-top:8px;"><table><thead><tr><th>Type</th><th>Description</th><th>Active</th></tr></thead><tbody id="adminTypesBody"></tbody></table></div>
         </section>
@@ -351,6 +364,24 @@
       <div class="logbox" id="detailComments" style="margin-bottom:14px;"></div>
       <h3>Logs</h3>
       <div class="logbox" id="detailLogs"></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="templateModalBack">
+    <div class="modal small">
+      <div class="section-head">
+        <div><h2>Add Checklist Template Step</h2><div class="muted">เพิ่ม step ใหม่ให้ประเภทงาน</div></div>
+        <div class="spacer"></div><button class="btn" data-close="template">Close</button>
+      </div>
+      <div class="form-grid">
+        <div><label>Work Type</label><select id="tplType"></select></div>
+        <div><label>Step No</label><input id="tplStepNo" type="number" min="1" /></div>
+        <div class="full"><label>Step Name</label><input id="tplStepName" /></div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:14px;">
+        <button class="btn" data-close="template">Cancel</button>
+        <button class="btn primary" id="btnSaveTemplate">Save Template</button>
+      </div>
     </div>
   </div>
 
@@ -469,6 +500,7 @@
       $('newOwner').innerHTML = userOptionsNoAll;
       $('editOwner').innerHTML = userOptionsNoAll;
       $('newType').innerHTML = typeOptionsNoAll;
+      $('tplType').innerHTML = typeOptionsNoAll;
       $('editStatus').innerHTML = STATUS_LIST.map(s=>`<option>${s}</option>`).join('');
       $('editPriority').innerHTML = PRIORITY_LIST.map(s=>`<option>${s}</option>`).join('');
       if(state.user) $('newOwner').value = state.user.userId;
@@ -501,6 +533,7 @@
     }
 
     function renderAdmin(){
+      $('adminTemplatesBody').innerHTML = state.templates.map(t=>`<tr><td>${badge(t.typeId)}</td><td>${esc(t.stepNo)}</td><td>${esc(t.stepName)}</td><td>${esc(t.required)}</td><td><button class="btn danger" data-del-template="${esc(t.templateId)}">Delete</button></td></tr>`).join('') || emptyRow(5,'No templates');
       $('adminUsersBody').innerHTML = state.users.map(u=>`<tr><td>${esc(u.username)}</td><td>${esc(u.displayName)}</td><td>${badge(u.role)}</td><td>${esc(u.team)}</td><td>${esc(u.active)}</td></tr>`).join('') || emptyRow(5,'No users');
       $('adminTypesBody').innerHTML = state.workTypes.map(w=>`<tr><td>${badge(w.typeName)}</td><td>${esc(w.description)}</td><td>${esc(w.active)}</td></tr>`).join('') || emptyRow(3,'No work types');
     }
@@ -670,12 +703,41 @@
       document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active', b.dataset.page===page));
     }
 
+    async function saveTemplate(){
+      const payload = {
+        token: state.token,
+        typeId: $('tplType').value,
+        stepNo: $('tplStepNo').value,
+        stepName: $('tplStepName').value
+      };
+      if(!payload.typeId || !payload.stepNo || !payload.stepName){ toast('กรอกข้อมูล template ให้ครบ'); return; }
+      try{
+        await apiCall('saveTemplate', payload);
+        closeModal('template');
+        $('tplStepNo').value='';
+        $('tplStepName').value='';
+        await bootstrap();
+        toast('เพิ่ม template แล้ว');
+      }catch(e){ toast('Save template failed: ' + e.message); }
+    }
+
+    async function deleteTemplate(templateId){
+      if(!confirm('Delete template step?')) return;
+      try{
+        await apiCall('deleteTemplate', {token: state.token, templateId});
+        await bootstrap();
+        toast('ลบ template แล้ว');
+      }catch(e){ toast('Delete failed: ' + e.message); }
+    }
+
     function bindEvents(){
       $('btnLogin').onclick = login;
       $('btnLogout').onclick = logout;
       $('btnRefreshDash').onclick = loadTasks;
       $('btnRefreshTasks').onclick = loadTasks;
       $('btnRefreshAdmin').onclick = bootstrap;
+      $('btnOpenTemplate').onclick = () => openModal('template');
+      $('btnSaveTemplate').onclick = saveTemplate;
       $('btnOpenCreate').onclick = () => openModal('create');
       $('btnOpenCreate2').onclick = () => openModal('create');
       $('btnCreateTask').onclick = createTask;
@@ -686,7 +748,12 @@
       ['filterKeyword','filterOwner','filterType','filterStatus','filterPriority'].forEach(id=>$(id).addEventListener(id==='filterKeyword'?'input':'change', debounce(loadTasks, 300)));
       document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>switchPage(b.dataset.page));
       document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeModal(b.dataset.close));
-      document.body.addEventListener('click', e=>{ const t=e.target.closest('[data-task]'); if(t) openTaskDetail(t.dataset.task); });
+      document.body.addEventListener('click', e=>{
+        const t=e.target.closest('[data-task]');
+        if(t) openTaskDetail(t.dataset.task);
+        const d=e.target.closest('[data-del-template]');
+        if(d) deleteTemplate(d.dataset.delTemplate);
+      });
       $('detailSteps').addEventListener('change', e=>{ if(e.target.matches('input[type="checkbox"][data-step-id]')) updateStep(e.target); });
       ['loginUsername','loginPassword'].forEach(id=>$(id).addEventListener('keydown', e=>{ if(e.key==='Enter') login(); }));
     }
