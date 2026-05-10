@@ -50,6 +50,15 @@
     .kpi-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:14px}
     .kpi{border:1px solid rgba(36,52,73,.75);background:rgba(15,23,34,.72);border-radius:16px;padding:12px}
     .kpi .num{font-size:24px;font-weight:1000;margin-bottom:3px}.kpi .label{font-size:12px;color:var(--muted)}
+    .dash-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:14px 0}
+    .mini-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+    .mini-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid rgba(36,52,73,.65);background:rgba(15,23,34,.55);padding:9px 10px;border-radius:12px}
+    .mini-row b{font-size:13px}
+    .mini-row span{color:var(--muted);font-size:12px}
+    tr.overdue-row td{background:rgba(255,92,122,.08)!important}
+    .danger-text{color:#ffd1dc;font-weight:1000}
+    .ok-text{color:#d4ffe6;font-weight:1000}
+    .warn-text{color:#ffeac7;font-weight:1000}
     .filters{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr auto;gap:10px;margin-bottom:12px}
     label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-weight:700}
     input,select,textarea{width:100%;border:1px solid rgba(36,52,73,.9);background:rgba(14,21,32,.95);color:var(--text);padding:10px;border-radius:12px;outline:none}
@@ -88,7 +97,7 @@
     .toast{position:fixed;right:16px;bottom:16px;background:#0e1520;border:1px solid rgba(36,52,73,.9);padding:10px 12px;border-radius:12px;z-index:90;display:none}
     .login-screen{position:fixed;inset:0;z-index:80;display:grid;place-items:center;background:rgba(0,0,0,.48);backdrop-filter:blur(8px);padding:16px}
     .login-card{width:min(520px,100%);border:1px solid rgba(36,52,73,.85);background:rgba(16,24,38,.94);border-radius:20px;padding:18px;box-shadow:0 35px 90px rgba(0,0,0,.55)}
-    @media(max-width:1100px){.layout{grid-template-columns:1fr}.sidebar{position:relative;top:auto}.nav{flex-direction:row;overflow:auto}.nav button{white-space:nowrap;width:auto}.kpi-grid{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:1fr 1fr}.filters .filter-actions{grid-column:1/-1}.form-grid{grid-template-columns:1fr}.admin-layout{grid-template-columns:1fr}.type-list{max-height:none}}
+    @media(max-width:1100px){.layout{grid-template-columns:1fr}.sidebar{position:relative;top:auto}.nav{flex-direction:row;overflow:auto}.nav button{white-space:nowrap;width:auto}.kpi-grid{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:1fr 1fr}.filters .filter-actions{grid-column:1/-1}.form-grid{grid-template-columns:1fr}.admin-layout{grid-template-columns:1fr}.type-list{max-height:none}.dash-grid{grid-template-columns:1fr}}
     @media(max-width:640px){.topbar-inner{align-items:flex-start}.brand small{display:none}.kpi-grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr}.container{padding:10px}.card{padding:12px}}
   </style>
 </head>
@@ -124,6 +133,44 @@
             <button class="btn primary" id="btnOpenCreate">+ New Task</button>
           </div>
           <div class="kpi-grid" id="kpiGrid"></div>
+
+          <div class="dash-grid">
+            <div class="card" style="background:rgba(14,21,32,.50);">
+              <h3>Workload per User</h3>
+              <div class="muted">จำนวนงาน active แยกตาม owner</div>
+              <div class="mini-list" id="workloadList"></div>
+            </div>
+            <div class="card" style="background:rgba(14,21,32,.50);">
+              <h3>Tasks by Status</h3>
+              <div class="muted">สถานะงานปัจจุบัน</div>
+              <div class="mini-list" id="statusList"></div>
+            </div>
+            <div class="card" style="background:rgba(14,21,32,.50);">
+              <h3>Tasks by Type</h3>
+              <div class="muted">ปริมาณงานตามประเภท</div>
+              <div class="mini-list" id="typeList"></div>
+            </div>
+          </div>
+
+          <div class="section-head" style="margin-top:6px;">
+            <div>
+              <h3>Attention Needed</h3>
+              <div class="muted">งาน overdue / blocked / due วันนี้</div>
+            </div>
+          </div>
+          <div class="table-wrap" style="margin-bottom:14px;">
+            <table>
+              <thead><tr><th>Task</th><th>Owner</th><th>Type</th><th>Status</th><th>Priority</th><th>Due</th><th>Reason</th></tr></thead>
+              <tbody id="attentionTasksBody"></tbody>
+            </table>
+          </div>
+
+          <div class="section-head" style="margin-top:6px;">
+            <div>
+              <h3>Recent Tasks</h3>
+              <div class="muted">งานล่าสุดตาม updatedAt</div>
+            </div>
+          </div>
           <div class="table-wrap"><table><thead><tr><th>งานล่าสุด</th><th>Owner</th><th>Type</th><th>Status</th><th>Priority</th><th>Progress</th><th>Due</th><th>Install</th></tr></thead><tbody id="recentTasksBody"></tbody></table></div>
         </section>
 
@@ -408,15 +455,108 @@
 
     function renderDashboard(){
       const tasks = state.tasks;
+      const openTasks = tasks.filter(t=>!isClosedStatus(t.status)).length;
       const mine = state.user ? tasks.filter(t=>String(t.ownerUserId)===String(state.user.userId)).length : 0;
       const blocked = tasks.filter(t=>t.status==='BLOCKED' || t.blockerTag).length;
-      const done = tasks.filter(t=>t.status==='DONE').length;
-      const due7 = tasks.filter(t=>isWithinDays(t.dueDate, 7)).length;
-      const install7 = tasks.filter(t=>isWithinDays(t.installDate, 7)).length;
-      const kpis = [['ทั้งหมด', tasks.length], ['ของฉัน', mine], ['Blocked', blocked], ['Due 7 วัน', due7], ['Install 7 วัน', install7], ['Done', done]];
-      $('kpiGrid').innerHTML = kpis.map(k=>`<div class="kpi"><div class="num">${k[1]}</div><div class="label">${esc(k[0])}</div></div>`).join('');
+      const dueToday = tasks.filter(t=>isToday(t.dueDate) && !isClosedStatus(t.status)).length;
+      const overdue = tasks.filter(t=>isOverdue(t) && !isClosedStatus(t.status)).length;
+      const readyInstall = tasks.filter(t=>t.status==='READY_INSTALL').length;
+      const doneToday = tasks.filter(t=>isToday(t.completedAt) || (t.status==='DONE' && isToday(t.updatedAt))).length;
+
+      const kpis = [
+        ['Open Tasks', openTasks],
+        ['ของฉัน', mine],
+        ['Blocked', blocked],
+        ['Due Today', dueToday],
+        ['Overdue', overdue],
+        ['Ready Install', readyInstall],
+        ['Done Today', doneToday]
+      ];
+
+      $('kpiGrid').innerHTML = kpis.map(k=>{
+        const cls = k[0] === 'Overdue' && k[1] > 0 ? 'danger-text' : (k[0] === 'Done Today' ? 'ok-text' : '');
+        return `<div class="kpi"><div class="num ${cls}">${k[1]}</div><div class="label">${esc(k[0])}</div></div>`;
+      }).join('');
+
+      renderMiniList('workloadList', countBy(tasks.filter(t=>!isClosedStatus(t.status)), 'ownerName'), 'No active workload');
+      renderMiniList('statusList', countBy(tasks, 'status'), 'No status data');
+      renderMiniList('typeList', countBy(tasks, 'typeName'), 'No type data');
+
+      const attention = tasks.filter(t => {
+        if(isClosedStatus(t.status)) return false;
+        return isOverdue(t) || t.status === 'BLOCKED' || t.blockerTag || isToday(t.dueDate);
+      }).sort((a,b)=>{
+        if(isOverdue(a) && !isOverdue(b)) return -1;
+        if(!isOverdue(a) && isOverdue(b)) return 1;
+        return String(a.dueDate || '').localeCompare(String(b.dueDate || ''));
+      });
+
+      $('attentionTasksBody').innerHTML = attention.slice(0,12).map(attentionRow).join('') || emptyRow(7, 'ไม่มีงานที่ต้องจับตา');
       $('recentTasksBody').innerHTML = tasks.slice(0,10).map(taskRowRecent).join('') || emptyRow(8, 'ยังไม่มีงาน');
     }
+
+    function countBy(items, field){
+      const map = {};
+      items.forEach(item => {
+        const key = item[field] || '-';
+        map[key] = (map[key] || 0) + 1;
+      });
+      return Object.keys(map).map(key => ({label:key, count:map[key]})).sort((a,b)=>b.count-a.count);
+    }
+
+    function renderMiniList(id, rows, emptyText){
+      const el = $(id);
+      if(!el) return;
+      el.innerHTML = rows.slice(0,8).map(r=>`<div class="mini-row"><b>${esc(r.label)}</b><span>${r.count}</span></div>`).join('') || `<div class="empty-panel">${esc(emptyText)}</div>`;
+    }
+
+    function attentionRow(t){
+      const reasons = [];
+      if(isOverdue(t)) reasons.push('Overdue');
+      if(isToday(t.dueDate)) reasons.push('Due Today');
+      if(t.status === 'BLOCKED') reasons.push('Blocked');
+      if(t.blockerTag) reasons.push(t.blockerTag);
+      return `<tr class="${isOverdue(t)?'overdue-row':''}">
+        <td><span class="linkish" data-task="${esc(t.taskId)}">${esc(t.title)}</span><div class="muted">${esc(t.cid || '')} ${esc(t.sof || '')}</div></td>
+        <td>${esc(t.ownerName)}</td>
+        <td>${badge(t.typeName)}</td>
+        <td>${badge(t.status,'status-'+t.status)}</td>
+        <td>${badge(t.priority,'priority-'+t.priority)}</td>
+        <td>${esc(t.dueDate || '-')}</td>
+        <td>${reasons.map(x=>badge(x, x==='Overdue'?'status-BLOCKED':'')).join(' ')}</td>
+      </tr>`;
+    }
+
+    function isClosedStatus(status){
+      status = String(status || '').toUpperCase();
+      return status === 'DONE' || status === 'CANCELLED';
+    }
+
+    function toDateOnly(value){
+      if(!value) return null;
+      const s = String(value).trim();
+      const d = new Date(s.slice(0,10) + 'T00:00:00');
+      return isNaN(d) ? null : d;
+    }
+
+    function todayDate(){
+      const d = new Date();
+      d.setHours(0,0,0,0);
+      return d;
+    }
+
+    function isToday(value){
+      const d = toDateOnly(value);
+      if(!d) return false;
+      return d.getTime() === todayDate().getTime();
+    }
+
+    function isOverdue(t){
+      const d = toDateOnly(t.dueDate);
+      if(!d) return false;
+      return d.getTime() < todayDate().getTime();
+    }
+
     function renderTasks(){ $('tasksBody').innerHTML = state.tasks.map(taskRowFull).join('') || emptyRow(10, 'ไม่พบงานตาม filter'); }
 
     function renderAdmin(){
@@ -445,10 +585,10 @@
     }
 
     function taskRowRecent(t){
-      return `<tr><td><span class="linkish" data-task="${esc(t.taskId)}">${esc(t.title)}</span><div class="muted">${esc(t.cid || '')} ${esc(t.sof || '')}</div></td><td>${esc(t.ownerName)}</td><td>${badge(t.typeName)}</td><td>${badge(t.status,'status-'+t.status)}</td><td>${badge(t.priority,'priority-'+t.priority)}</td><td>${progressHtml(t.progressPercent)}</td><td>${esc(t.dueDate)}</td><td>${esc(t.installDate)}</td></tr>`;
+      return `<tr class="${isOverdue(t) && !isClosedStatus(t.status) ? 'overdue-row' : ''}"><td><span class="linkish" data-task="${esc(t.taskId)}">${esc(t.title)}</span><div class="muted">${esc(t.cid || '')} ${esc(t.sof || '')}</div></td><td>${esc(t.ownerName)}</td><td>${badge(t.typeName)}</td><td>${badge(t.status,'status-'+t.status)}</td><td>${badge(t.priority,'priority-'+t.priority)}</td><td>${progressHtml(t.progressPercent)}</td><td>${esc(t.dueDate)}</td><td>${esc(t.installDate)}</td></tr>`;
     }
     function taskRowFull(t){
-      return `<tr><td><span class="linkish" data-task="${esc(t.taskId)}">${esc(t.title)}</span><div class="muted">${esc(t.customerName)} ${esc(t.serviceName)}</div></td><td>${esc(t.ownerName)}</td><td>${badge(t.typeName)}</td><td>${badge(t.status,'status-'+t.status)}</td><td>${badge(t.priority,'priority-'+t.priority)}</td><td>${progressHtml(t.progressPercent)}</td><td>${esc(t.cid || '-')}<div class="muted">${esc(t.sof || '')}</div></td><td>${esc(t.dueDate || '-')}</td><td>${esc(t.installDate || '-')}</td><td>${esc(t.updatedAt || '-')}</td></tr>`;
+      return `<tr class="${isOverdue(t) && !isClosedStatus(t.status) ? 'overdue-row' : ''}"><td><span class="linkish" data-task="${esc(t.taskId)}">${esc(t.title)}</span><div class="muted">${esc(t.customerName)} ${esc(t.serviceName)}</div></td><td>${esc(t.ownerName)}</td><td>${badge(t.typeName)}</td><td>${badge(t.status,'status-'+t.status)}</td><td>${badge(t.priority,'priority-'+t.priority)}</td><td>${progressHtml(t.progressPercent)}</td><td>${esc(t.cid || '-')}<div class="muted">${esc(t.sof || '')}</div></td><td>${esc(t.dueDate || '-')}</td><td>${esc(t.installDate || '-')}</td><td>${esc(t.updatedAt || '-')}</td></tr>`;
     }
     function emptyRow(col, text){ return `<tr><td colspan="${col}" class="muted">${esc(text)}</td></tr>`; }
     function isWithinDays(dateStr, days){ if(!dateStr) return false; const d = new Date(dateStr + 'T00:00:00'); if(isNaN(d)) return false; const now = new Date(); now.setHours(0,0,0,0); const diff = (d - now) / 86400000; return diff >= 0 && diff <= days; }
