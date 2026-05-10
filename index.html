@@ -284,7 +284,7 @@
       <div class="brand" style="margin-bottom:12px;"><div class="logo">P</div><div>Provisioning Work Center <small>Sign in to continue</small></div></div>
       <label>API Web App URL</label>
       <input id="apiUrlInput" placeholder="https://script.google.com/macros/s/.../exec" />
-      <div class="muted" style="margin:6px 0 12px;">ใส่ URL ที่ได้จาก Deploy Web App ของ Apps Script v2 แล้วระบบจะจำไว้ใน browser</div>
+      <div class="muted" style="margin:6px 0 12px;">ระบบใส่ API URL ให้แล้ว ถ้าเปลี่ยน deployment ค่อยแก้ช่องนี้</div>
       <div class="form-grid">
         <div><label>Username</label><input id="loginUsername" autocomplete="username" placeholder="admin" /></div>
         <div><label>Password</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="1234" /></div>
@@ -399,7 +399,7 @@
 
     const $ = id => document.getElementById(id);
     const state = {
-      apiUrl: localStorage.getItem(APP.apiUrlKey) || '',
+      apiUrl: localStorage.getItem(APP.apiUrlKey) || 'https://script.google.com/macros/s/AKfycbzavxejayJCJE2rc4tQAUUuKbkwjg4Eekur9teYQYWPaeTIf5cOY7PDW_Hi49B6-bnq/exec',
       token: localStorage.getItem(APP.tokenKey) || '',
       user: readJson(localStorage.getItem(APP.userKey), null),
       users: [],
