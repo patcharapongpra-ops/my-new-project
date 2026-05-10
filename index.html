@@ -51,6 +51,27 @@
     .kpi{border:1px solid rgba(36,52,73,.75);background:rgba(15,23,34,.72);border-radius:16px;padding:12px}
     .kpi .num{font-size:24px;font-weight:1000;margin-bottom:3px}.kpi .label{font-size:12px;color:var(--muted)}
     .dash-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:14px 0}
+    .calendar-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+    .calendar-title{font-size:18px;font-weight:1000}
+    .calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+    .calendar-dow{color:var(--muted);font-size:12px;font-weight:1000;text-align:center;padding:8px 4px}
+    .calendar-day{min-height:132px;border:1px solid rgba(36,52,73,.75);background:rgba(14,21,32,.60);border-radius:14px;padding:8px;overflow:hidden}
+    .calendar-day.muted-month{opacity:.38}
+    .calendar-day.today{border-color:rgba(255,122,24,.75);box-shadow:0 0 0 3px rgba(255,122,24,.10)}
+    .day-num{font-size:12px;color:var(--muted);font-weight:1000;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+    .day-count{font-size:10px;border:1px solid rgba(36,52,73,.75);border-radius:999px;padding:2px 6px;color:#d7e8ff;background:rgba(16,24,38,.8)}
+    .cal-event{display:block;width:100%;border:1px solid rgba(36,52,73,.8);background:rgba(16,24,38,.86);color:var(--text);border-radius:10px;padding:6px;margin-top:5px;text-align:left;font-size:11px;line-height:1.25}
+    .cal-event:hover{border-color:rgba(255,122,24,.55)}
+    .cal-event.install{border-left:4px solid var(--ok)}
+    .cal-event.due{border-left:4px solid var(--warn)}
+    .cal-event.overdue{border-left:4px solid var(--bad);background:rgba(255,92,122,.10)}
+    .cal-event .cal-meta{display:block;color:var(--muted);font-size:10px;margin-top:2px}
+    .calendar-legend{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 12px}
+    .legend-item{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+    .legend-dot{width:10px;height:10px;border-radius:999px;background:var(--muted)}
+    .legend-dot.install{background:var(--ok)}
+    .legend-dot.due{background:var(--warn)}
+    .legend-dot.overdue{background:var(--bad)}
     .mini-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
     .mini-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid rgba(36,52,73,.65);background:rgba(15,23,34,.55);padding:9px 10px;border-radius:12px}
     .mini-row b{font-size:13px}
@@ -97,7 +118,7 @@
     .toast{position:fixed;right:16px;bottom:16px;background:#0e1520;border:1px solid rgba(36,52,73,.9);padding:10px 12px;border-radius:12px;z-index:90;display:none}
     .login-screen{position:fixed;inset:0;z-index:80;display:grid;place-items:center;background:rgba(0,0,0,.48);backdrop-filter:blur(8px);padding:16px}
     .login-card{width:min(520px,100%);border:1px solid rgba(36,52,73,.85);background:rgba(16,24,38,.94);border-radius:20px;padding:18px;box-shadow:0 35px 90px rgba(0,0,0,.55)}
-    @media(max-width:1100px){.layout{grid-template-columns:1fr}.sidebar{position:relative;top:auto}.nav{flex-direction:row;overflow:auto}.nav button{white-space:nowrap;width:auto}.kpi-grid{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:1fr 1fr}.filters .filter-actions{grid-column:1/-1}.form-grid{grid-template-columns:1fr}.admin-layout{grid-template-columns:1fr}.type-list{max-height:none}.dash-grid{grid-template-columns:1fr}}
+    @media(max-width:1100px){.layout{grid-template-columns:1fr}.sidebar{position:relative;top:auto}.nav{flex-direction:row;overflow:auto}.nav button{white-space:nowrap;width:auto}.kpi-grid{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:1fr 1fr}.filters .filter-actions{grid-column:1/-1}.form-grid{grid-template-columns:1fr}.admin-layout{grid-template-columns:1fr}.type-list{max-height:none}.dash-grid{grid-template-columns:1fr}.calendar-grid{gap:5px}.calendar-day{min-height:108px;padding:6px}.cal-event{font-size:10px;padding:5px}}
     @media(max-width:640px){.topbar-inner{align-items:flex-start}.brand small{display:none}.kpi-grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr}.container{padding:10px}.card{padding:12px}}
   </style>
 </head>
@@ -119,6 +140,7 @@
         <div class="nav">
           <button class="btn active" data-page="dashboard">Dashboard</button>
           <button class="btn" data-page="tasks">Tasks</button>
+          <button class="btn" data-page="calendar">Calendar</button>
           <button class="btn" data-page="admin" id="navAdmin">Admin</button>
         </div>
         <div class="muted" style="margin-top:12px;">v2.3: Role permissions + User Management</div>
@@ -190,6 +212,43 @@
             <div class="filter-actions" style="display:flex;align-items:flex-end;gap:8px;"><button class="btn" id="btnClearFilters">Clear</button></div>
           </div>
           <div class="table-wrap"><table><thead><tr><th>Task</th><th>Owner</th><th>Type</th><th>Status</th><th>Priority</th><th>Progress</th><th>CID/SOF</th><th>Due</th><th>Install</th><th>Updated</th></tr></thead><tbody id="tasksBody"></tbody></table></div>
+        </section>
+
+        <section class="card hidden" id="page-calendar">
+          <div class="section-head">
+            <div>
+              <h1>Calendar</h1>
+              <div class="muted">ดูงานตามวันติดตั้งและ due date จาก task ทั้งหมดที่มองเห็นตามสิทธิ์ของผู้ใช้</div>
+            </div>
+            <div class="spacer"></div>
+            <button class="btn" id="btnCalendarToday">Today</button>
+            <button class="btn" id="btnRefreshCalendar">Refresh</button>
+          </div>
+
+          <div class="calendar-head">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <button class="btn" id="btnCalPrev">‹ Prev</button>
+              <button class="btn" id="btnCalNext">Next ›</button>
+            </div>
+            <div class="calendar-title" id="calendarTitle">-</div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <select id="calendarMode" style="width:auto;">
+                <option value="both">Install + Due</option>
+                <option value="install">Install Date only</option>
+                <option value="due">Due Date only</option>
+              </select>
+              <select id="calendarOwner" style="width:auto;"></select>
+            </div>
+          </div>
+
+          <div class="calendar-legend">
+            <div class="legend-item"><span class="legend-dot install"></span> Install Date</div>
+            <div class="legend-item"><span class="legend-dot due"></span> Due Date</div>
+            <div class="legend-item"><span class="legend-dot overdue"></span> Overdue</div>
+          </div>
+
+          <div class="calendar-grid" id="calendarDow"></div>
+          <div class="calendar-grid" id="calendarGrid"></div>
         </section>
 
         <section class="card hidden" id="page-admin">
@@ -336,7 +395,7 @@
       user: readJson(localStorage.getItem(APP.userKey), null),
       permissions: {},
       users: [], workTypes: [], templates: [], tasks: [],
-      selectedAdminTypeId: '', currentTaskId: '', currentTask: null
+      selectedAdminTypeId: '', calendarDate: new Date(), currentTaskId: '', currentTask: null
     };
 
     function readJson(s, fallback){ try{return JSON.parse(s)}catch{return fallback} }
@@ -396,7 +455,7 @@
     async function loadTasks(){
       const res = await apiCall('getTasks', {token: state.token, filters: getFilters()});
       state.tasks = res.tasks || [];
-      renderDashboard(); renderTasks();
+      renderDashboard(); renderTasks(); renderCalendar();
     }
 
     function getFilters(){
@@ -415,6 +474,7 @@
       const typeOptions = ['<option value="">All</option>'].concat(state.workTypes.map(w=>`<option value="${esc(w.typeId)}">${esc(w.typeName)}</option>`)).join('');
       const typeOptionsNoAll = state.workTypes.map(w=>`<option value="${esc(w.typeId)}">${esc(w.typeName)}</option>`).join('');
       $('filterOwner').innerHTML = userOptions; $('filterType').innerHTML = typeOptions;
+      if($('calendarOwner')) $('calendarOwner').innerHTML = userOptions;
       $('filterStatus').innerHTML = '<option value="">All</option>' + STATUS_LIST.map(s=>`<option>${s}</option>`).join('');
       $('filterPriority').innerHTML = '<option value="">All</option>' + PRIORITY_LIST.map(s=>`<option>${s}</option>`).join('');
       $('newOwner').innerHTML = userOptionsNoAll; $('editOwner').innerHTML = userOptionsNoAll;
@@ -451,6 +511,87 @@
       $('userPill').textContent = state.user ? `${state.user.displayName || state.user.username} · ${state.user.role}` : 'Not logged in';
       $('userPill').className = 'pill ' + (state.user ? 'ok' : 'bad');
       $('btnLogout').classList.toggle('hidden', !state.user); applyRoleUI();
+    }
+
+    function renderCalendar(){
+      if(!$('calendarGrid')) return;
+
+      const dows = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      $('calendarDow').innerHTML = dows.map(d=>`<div class="calendar-dow">${d}</div>`).join('');
+
+      const base = state.calendarDate || new Date();
+      const year = base.getFullYear();
+      const month = base.getMonth();
+      const first = new Date(year, month, 1);
+      const start = new Date(year, month, 1 - first.getDay());
+      const title = base.toLocaleDateString('en-US', {month:'long', year:'numeric'});
+      $('calendarTitle').textContent = title;
+
+      const mode = $('calendarMode') ? $('calendarMode').value : 'both';
+      const owner = $('calendarOwner') ? $('calendarOwner').value : '';
+      const cells = [];
+
+      for(let i=0;i<42;i++){
+        const day = new Date(start);
+        day.setDate(start.getDate() + i);
+        const dateKey = toDateKey(day);
+        const inMonth = day.getMonth() === month;
+        const today = dateKey === toDateKey(new Date());
+        const events = getCalendarEvents(dateKey, mode, owner);
+
+        cells.push(`<div class="calendar-day ${inMonth?'':'muted-month'} ${today?'today':''}">
+          <div class="day-num"><span>${day.getDate()}</span>${events.length?`<span class="day-count">${events.length}</span>`:''}</div>
+          ${events.slice(0,4).map(calendarEventHtml).join('')}
+          ${events.length>4?`<button class="cal-event" style="opacity:.75;">+${events.length-4} more</button>`:''}
+        </div>`);
+      }
+
+      $('calendarGrid').innerHTML = cells.join('');
+    }
+
+    function getCalendarEvents(dateKey, mode, ownerUserId){
+      const events = [];
+      state.tasks.forEach(t=>{
+        if(ownerUserId && String(t.ownerUserId) !== String(ownerUserId)) return;
+
+        if((mode === 'both' || mode === 'install') && normalizeDateKey(t.installDate) === dateKey){
+          events.push({kind:'install', task:t});
+        }
+
+        if((mode === 'both' || mode === 'due') && normalizeDateKey(t.dueDate) === dateKey){
+          events.push({kind:isOverdue(t) && !isClosedStatus(t.status) ? 'overdue' : 'due', task:t});
+        }
+      });
+
+      return events.sort((a,b)=>{
+        const pa = a.kind === 'overdue' ? 0 : (a.kind === 'due' ? 1 : 2);
+        const pb = b.kind === 'overdue' ? 0 : (b.kind === 'due' ? 1 : 2);
+        if(pa !== pb) return pa - pb;
+        return String(a.task.priority || '').localeCompare(String(b.task.priority || ''));
+      });
+    }
+
+    function calendarEventHtml(ev){
+      const t = ev.task;
+      const label = ev.kind === 'install' ? 'Install' : (ev.kind === 'overdue' ? 'Overdue' : 'Due');
+      return `<button class="cal-event ${ev.kind}" data-task="${esc(t.taskId)}">
+        <b>${esc(label)}:</b> ${esc(t.title || '-')}
+        <span class="cal-meta">${esc(t.ownerName || '-')} · ${esc(t.status || '-')} · ${esc(t.typeName || '-')}</span>
+      </button>`;
+    }
+
+    function normalizeDateKey(value){
+      if(!value) return '';
+      const s = String(value).trim();
+      if(!s) return '';
+      return s.slice(0,10);
+    }
+
+    function toDateKey(date){
+      const y = date.getFullYear();
+      const m = String(date.getMonth()+1).padStart(2,'0');
+      const d = String(date.getDate()).padStart(2,'0');
+      return `${y}-${m}-${d}`;
     }
 
     function renderDashboard(){
@@ -666,10 +807,16 @@
     function isTrue(v){ return v === true || String(v).toUpperCase() === 'TRUE'; }
     function openModal(name){ $(name+'ModalBack').classList.add('show'); }
     function closeModal(name){ $(name+'ModalBack').classList.remove('show'); }
-    function switchPage(page){ if(page==='admin' && !canAdmin()){ toast('ไม่มีสิทธิ์เข้า Admin'); page='dashboard'; } document.querySelectorAll('[id^="page-"]').forEach(x=>x.classList.add('hidden')); $('page-'+page).classList.remove('hidden'); document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active', b.dataset.page===page)); applyRoleUI(); }
+    function switchPage(page){ if(page==='admin' && !canAdmin()){ toast('ไม่มีสิทธิ์เข้า Admin'); page='dashboard'; } document.querySelectorAll('[id^="page-"]').forEach(x=>x.classList.add('hidden')); $('page-'+page).classList.remove('hidden'); document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active', b.dataset.page===page)); if(page==='calendar') renderCalendar(); applyRoleUI(); }
 
     function bindEvents(){
       $('btnLogin').onclick=login; $('btnLogout').onclick=logout; $('btnRefreshDash').onclick=loadTasks; $('btnRefreshTasks').onclick=loadTasks; $('btnRefreshAdmin').onclick=bootstrap;
+      $('btnRefreshCalendar').onclick=loadTasks;
+      $('btnCalendarToday').onclick=()=>{ state.calendarDate = new Date(); renderCalendar(); };
+      $('btnCalPrev').onclick=()=>{ state.calendarDate = new Date(state.calendarDate.getFullYear(), state.calendarDate.getMonth()-1, 1); renderCalendar(); };
+      $('btnCalNext').onclick=()=>{ state.calendarDate = new Date(state.calendarDate.getFullYear(), state.calendarDate.getMonth()+1, 1); renderCalendar(); };
+      $('calendarMode').onchange=renderCalendar;
+      $('calendarOwner').onchange=renderCalendar;
       $('btnOpenUser').onclick=()=>openUserModal(''); $('btnSaveUser').onclick=saveUser; $('btnSaveResetPass').onclick=saveResetPassword;
       $('btnOpenTemplate').onclick=()=>openTemplateModal(''); $('btnSaveTemplate').onclick=saveTemplate;
       $('btnOpenWorkType').onclick=()=>openWorkTypeModal(''); $('btnSaveWorkType').onclick=saveWorkType; $('wtTypeName').addEventListener('input',()=>{ if(!$('wtTypeId').value) $('wtColor').value=autoColorFromText($('wtTypeName').value); });
