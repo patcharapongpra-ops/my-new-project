@@ -272,8 +272,16 @@
             </table>
           </div>
 
-          <h3>Work Types</h3>
-          <div class="table-wrap" style="margin-top:8px;"><table><thead><tr><th>Type</th><th>Description</th><th>Active</th></tr></thead><tbody id="adminTypesBody"></tbody></table></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;">
+            <h3>Work Types</h3>
+            <button class="btn primary" id="btnOpenWorkType">+ Add Work Type</button>
+          </div>
+          <div class="table-wrap" style="margin-top:8px;">
+            <table>
+              <thead><tr><th>Type ID</th><th>Type Name</th><th>Description</th><th>Color</th><th>Active</th><th>Action</th></tr></thead>
+              <tbody id="adminTypesBody"></tbody>
+            </table>
+          </div>
         </section>
       </main>
     </div>
@@ -282,9 +290,7 @@
   <div class="login-screen" id="loginScreen">
     <div class="login-card">
       <div class="brand" style="margin-bottom:12px;"><div class="logo">P</div><div>Provisioning Work Center <small>Sign in to continue</small></div></div>
-      <label>API Web App URL</label>
-      <input id="apiUrlInput" placeholder="https://script.google.com/macros/s/.../exec" />
-      <div class="muted" style="margin:6px 0 12px;">ระบบใส่ API URL ให้แล้ว ถ้าเปลี่ยน deployment ค่อยแก้ช่องนี้</div>
+      <input id="apiUrlInput" type="hidden" value="https://script.google.com/macros/s/AKfycbzavxejayJCJE2rc4tQAUUuKbkwjg4Eekur9teYQYWPaeTIf5cOY7PDW_Hi49B6-bnq/exec" />
       <div class="form-grid">
         <div><label>Username</label><input id="loginUsername" autocomplete="username" placeholder="admin" /></div>
         <div><label>Password</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="1234" /></div>
@@ -367,10 +373,29 @@
     </div>
   </div>
 
+  <div class="modal-backdrop" id="workTypeModalBack">
+    <div class="modal small">
+      <div class="section-head">
+        <div><h2 id="workTypeModalTitle">Add Work Type</h2><div class="muted">เพิ่มหรือแก้ประเภทงาน</div></div>
+        <div class="spacer"></div><button class="btn" data-close="workType">Close</button>
+      </div>
+      <div class="form-grid">
+        <div><label>Type ID</label><input id="wtTypeId" placeholder="ปล่อยว่างถ้าสร้างใหม่" /></div>
+        <div><label>Type Name *</label><input id="wtTypeName" placeholder="เช่น Survey" /></div>
+        <div><label>Color</label><input id="wtColor" placeholder="#64748b" /></div>
+        <div class="full"><label>Description</label><input id="wtDescription" placeholder="รายละเอียดประเภทงาน" /></div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:14px;">
+        <button class="btn" data-close="workType">Cancel</button>
+        <button class="btn primary" id="btnSaveWorkType">Save Work Type</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-backdrop" id="templateModalBack">
     <div class="modal small">
       <div class="section-head">
-        <div><h2>Add Checklist Template Step</h2><div class="muted">เพิ่ม step ใหม่ให้ประเภทงาน</div></div>
+        <div><h2 id="templateModalTitle">Add Checklist Template Step</h2><div class="muted">ถ้า Work Type + Step No เดิมมีอยู่แล้ว ระบบจะแก้ step เดิม ไม่สร้างซ้ำ</div></div>
         <div class="spacer"></div><button class="btn" data-close="template">Close</button>
       </div>
       <div class="form-grid">
@@ -433,7 +458,7 @@
     }
 
     async function login(){
-      const apiUrl = $('apiUrlInput').value.trim();
+      const apiUrl = (($('apiUrlInput') && $('apiUrlInput').value) || state.apiUrl).trim();
       const username = $('loginUsername').value.trim();
       const password = $('loginPassword').value.trim();
       if(!apiUrl || !username || !password){ $('loginMsg').textContent='กรอก API URL, username, password ให้ครบ'; return; }
@@ -533,9 +558,9 @@
     }
 
     function renderAdmin(){
-      $('adminTemplatesBody').innerHTML = state.templates.map(t=>`<tr><td>${badge(t.typeId)}</td><td>${esc(t.stepNo)}</td><td>${esc(t.stepName)}</td><td>${esc(t.required)}</td><td><button class="btn danger" data-del-template="${esc(t.templateId)}">Delete</button></td></tr>`).join('') || emptyRow(5,'No templates');
+      $('adminTemplatesBody').innerHTML = state.templates.map(t=>`<tr><td>${badge(t.typeId)}</td><td>${esc(t.stepNo)}</td><td>${esc(t.stepName)}</td><td>${esc(t.required)}</td><td><button class="btn" data-edit-template="${esc(t.templateId)}">Edit</button> <button class="btn danger" data-del-template="${esc(t.templateId)}">Delete</button></td></tr>`).join('') || emptyRow(5,'No templates');
       $('adminUsersBody').innerHTML = state.users.map(u=>`<tr><td>${esc(u.username)}</td><td>${esc(u.displayName)}</td><td>${badge(u.role)}</td><td>${esc(u.team)}</td><td>${esc(u.active)}</td></tr>`).join('') || emptyRow(5,'No users');
-      $('adminTypesBody').innerHTML = state.workTypes.map(w=>`<tr><td>${badge(w.typeName)}</td><td>${esc(w.description)}</td><td>${esc(w.active)}</td></tr>`).join('') || emptyRow(3,'No work types');
+      $('adminTypesBody').innerHTML = state.workTypes.map(w=>`<tr><td>${esc(w.typeId)}</td><td>${badge(w.typeName)}</td><td>${esc(w.description)}</td><td>${esc(w.color || '')}</td><td>${esc(w.active)}</td><td><button class="btn" data-edit-worktype="${esc(w.typeId)}">Edit</button> <button class="btn danger" data-del-worktype="${esc(w.typeId)}">Delete</button></td></tr>`).join('') || emptyRow(6,'No work types');
     }
 
     function taskRowRecent(t){
@@ -703,6 +728,15 @@
       document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active', b.dataset.page===page));
     }
 
+    function openTemplateModal(templateId){
+      const t = templateId ? state.templates.find(x=>String(x.templateId)===String(templateId)) : null;
+      $('templateModalTitle').textContent = t ? 'Edit Checklist Template Step' : 'Add Checklist Template Step';
+      $('tplType').value = t ? t.typeId : ($('tplType').value || '');
+      $('tplStepNo').value = t ? t.stepNo : '';
+      $('tplStepName').value = t ? t.stepName : '';
+      openModal('template');
+    }
+
     async function saveTemplate(){
       const payload = {
         token: state.token,
@@ -730,14 +764,57 @@
       }catch(e){ toast('Delete failed: ' + e.message); }
     }
 
+    function openWorkTypeModal(typeId){
+      const w = typeId ? state.workTypes.find(x=>String(x.typeId)===String(typeId)) : null;
+      $('workTypeModalTitle').textContent = w ? 'Edit Work Type' : 'Add Work Type';
+      $('wtTypeId').value = w ? (w.typeId || '') : '';
+      $('wtTypeId').readOnly = !!w;
+      $('wtTypeName').value = w ? (w.typeName || '') : '';
+      $('wtDescription').value = w ? (w.description || '') : '';
+      $('wtColor').value = w ? (w.color || '#64748b') : '#64748b';
+      openModal('workType');
+    }
+
+    async function saveWorkType(){
+      const payload = {
+        token: state.token,
+        typeId: $('wtTypeId').value,
+        typeName: $('wtTypeName').value,
+        description: $('wtDescription').value,
+        color: $('wtColor').value
+      };
+      if(!payload.typeName){ toast('กรอก Type Name'); return; }
+      try{
+        await apiCall('saveWorkType', payload);
+        closeModal('workType');
+        $('wtTypeId').value='';
+        $('wtTypeName').value='';
+        $('wtDescription').value='';
+        $('wtColor').value='#64748b';
+        await bootstrap();
+        toast('บันทึก Work Type แล้ว');
+      }catch(e){ toast('Save work type failed: ' + e.message); }
+    }
+
+    async function deleteWorkType(typeId){
+      if(!confirm('Delete work type? งานเดิมจะยังอยู่ แต่จะไม่เลือกประเภทนี้สำหรับงานใหม่')) return;
+      try{
+        await apiCall('deleteWorkType', {token: state.token, typeId});
+        await bootstrap();
+        toast('ลบ Work Type แล้ว');
+      }catch(e){ toast('Delete work type failed: ' + e.message); }
+    }
+
     function bindEvents(){
       $('btnLogin').onclick = login;
       $('btnLogout').onclick = logout;
       $('btnRefreshDash').onclick = loadTasks;
       $('btnRefreshTasks').onclick = loadTasks;
       $('btnRefreshAdmin').onclick = bootstrap;
-      $('btnOpenTemplate').onclick = () => openModal('template');
+      $('btnOpenTemplate').onclick = () => openTemplateModal('');
       $('btnSaveTemplate').onclick = saveTemplate;
+      $('btnOpenWorkType').onclick = () => openWorkTypeModal('');
+      $('btnSaveWorkType').onclick = saveWorkType;
       $('btnOpenCreate').onclick = () => openModal('create');
       $('btnOpenCreate2').onclick = () => openModal('create');
       $('btnCreateTask').onclick = createTask;
@@ -751,8 +828,14 @@
       document.body.addEventListener('click', e=>{
         const t=e.target.closest('[data-task]');
         if(t) openTaskDetail(t.dataset.task);
+        const et=e.target.closest('[data-edit-template]');
+        if(et) openTemplateModal(et.dataset.editTemplate);
         const d=e.target.closest('[data-del-template]');
         if(d) deleteTemplate(d.dataset.delTemplate);
+        const ew=e.target.closest('[data-edit-worktype]');
+        if(ew) openWorkTypeModal(ew.dataset.editWorktype);
+        const dw=e.target.closest('[data-del-worktype]');
+        if(dw) deleteWorkType(dw.dataset.delWorktype);
       });
       $('detailSteps').addEventListener('change', e=>{ if(e.target.matches('input[type="checkbox"][data-step-id]')) updateStep(e.target); });
       ['loginUsername','loginPassword'].forEach(id=>$(id).addEventListener('keydown', e=>{ if(e.key==='Enter') login(); }));
