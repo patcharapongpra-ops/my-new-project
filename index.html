@@ -594,6 +594,7 @@
     }
 
     function openEditModal(){
+      closeModal('detail');
       const t = state.currentTask;
       if(!t){ toast('ยังไม่มี task ที่เลือก'); return; }
       $('editTitle').value = t.title || '';
