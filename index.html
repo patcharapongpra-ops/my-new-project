@@ -3,192 +3,101 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Provisioning Work Center v2</title>
+  <title>Provisioning Work Center v2.3</title>
   <style>
     :root{
-      --bg:#0b0f14;
-      --panel:#101826;
-      --panel2:#0f1722;
-      --card:#121a24;
-      --line:#243449;
-      --text:#eaf2ff;
-      --muted:#8fa4be;
-      --accent:#ff7a18;
-      --accent2:#ff9a3c;
-      --ok:#37d67a;
-      --warn:#ffd089;
-      --bad:#ff5c7a;
-      --blue:#38bdf8;
-      --radius:16px;
+      --bg:#0b0f14; --panel:#101826; --card:#121a24; --line:#243449;
+      --text:#eaf2ff; --muted:#8fa4be; --accent:#ff7a18; --accent2:#ff9a3c;
+      --ok:#37d67a; --warn:#ffd089; --bad:#ff5c7a; --blue:#38bdf8;
     }
     *{box-sizing:border-box}
     body{
-      margin:0;
-      min-height:100vh;
+      margin:0; min-height:100vh; color:var(--text);
       font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
       background:
         radial-gradient(1100px 520px at 8% 0%, rgba(255,122,24,.15), transparent 55%),
         radial-gradient(900px 480px at 92% 15%, rgba(56,189,248,.08), transparent 55%),
-        linear-gradient(180deg, #0b0f14, #070a0d);
-      color:var(--text);
+        linear-gradient(180deg,#0b0f14,#070a0d);
     }
     button,input,select,textarea{font:inherit}
     button{cursor:pointer}
     .hidden{display:none!important}
-
-    .topbar{
-      position:sticky;top:0;z-index:20;
-      border-bottom:1px solid rgba(36,52,73,.75);
-      background:rgba(11,15,20,.82);
-      backdrop-filter:blur(10px);
-    }
-    .topbar-inner{
-      max-width:1500px;margin:0 auto;padding:12px 16px;
-      display:flex;align-items:center;gap:12px;
-    }
+    .topbar{position:sticky;top:0;z-index:20;border-bottom:1px solid rgba(36,52,73,.75);background:rgba(11,15,20,.82);backdrop-filter:blur(10px)}
+    .topbar-inner{max-width:1500px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px}
     .brand{display:flex;align-items:center;gap:10px;font-weight:950;letter-spacing:.02em}
-    .logo{
-      width:36px;height:36px;border-radius:13px;
-      display:grid;place-items:center;
-      background:linear-gradient(180deg,var(--accent),#d85f0f);
-      color:#1a0d05;font-weight:1000;
-      box-shadow:0 12px 30px rgba(255,122,24,.18);
-    }
-    .brand small{display:block;color:var(--muted);font-size:12px;font-weight:700;margin-top:2px;letter-spacing:0}
+    .logo{width:36px;height:36px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(180deg,var(--accent),#d85f0f);color:#1a0d05;font-weight:1000}
+    .brand small{display:block;color:var(--muted);font-size:12px;font-weight:700;margin-top:2px}
     .spacer{flex:1}
-    .pill{
-      display:inline-flex;align-items:center;gap:6px;
-      border:1px solid rgba(36,52,73,.85);
-      background:rgba(16,24,38,.65);
-      color:var(--muted);
-      padding:6px 10px;border-radius:999px;font-size:12px;white-space:nowrap;
-    }
-    .pill.ok{border-color:rgba(55,214,122,.45);color:#d4ffe6}
-    .pill.warn{border-color:rgba(255,208,137,.45);color:#ffeac7}
-    .pill.bad{border-color:rgba(255,92,122,.45);color:#ffd1dc}
-
-    .btn{
-      border:1px solid rgba(36,52,73,.9);
-      background:rgba(16,24,38,.72);
-      color:var(--text);
-      padding:9px 12px;border-radius:12px;font-weight:900;
-      display:inline-flex;align-items:center;justify-content:center;gap:8px;
-    }
+    .pill{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(36,52,73,.85);background:rgba(16,24,38,.65);color:var(--muted);padding:6px 10px;border-radius:999px;font-size:12px;white-space:nowrap}
+    .pill.ok{border-color:rgba(55,214,122,.45);color:#d4ffe6}.pill.bad{border-color:rgba(255,92,122,.45);color:#ffd1dc}
+    .btn{border:1px solid rgba(36,52,73,.9);background:rgba(16,24,38,.72);color:var(--text);padding:9px 12px;border-radius:12px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;gap:8px}
     .btn:hover{border-color:rgba(255,122,24,.45)}
-    .btn.primary{
-      background:linear-gradient(180deg,rgba(255,122,24,.95),rgba(216,95,15,.95));
-      border-color:rgba(255,122,24,.55);
-      color:#1a0d05;
-    }
+    .btn.primary{background:linear-gradient(180deg,rgba(255,122,24,.95),rgba(216,95,15,.95));border-color:rgba(255,122,24,.55);color:#1a0d05}
     .btn.danger{background:rgba(255,92,122,.12);border-color:rgba(255,92,122,.35);color:#ffd1dc}
     .btn:disabled{opacity:.5;cursor:not-allowed}
-
     .container{max-width:1500px;margin:0 auto;padding:16px}
     .layout{display:grid;grid-template-columns:260px 1fr;gap:14px;align-items:start}
-    .sidebar{
-      position:sticky;top:74px;
-      border:1px solid rgba(36,52,73,.75);
-      background:rgba(16,24,38,.60);
-      border-radius:18px;padding:14px;
-    }
+    .sidebar{position:sticky;top:74px;border:1px solid rgba(36,52,73,.75);background:rgba(16,24,38,.60);border-radius:18px;padding:14px}
     .nav-title{font-size:11px;color:var(--muted);letter-spacing:.13em;text-transform:uppercase;margin:0 0 10px}
     .nav{display:flex;flex-direction:column;gap:8px}
-    .nav button{
-      text-align:left;justify-content:flex-start;width:100%;
-      border-radius:14px;padding:11px 12px;
-    }
+    .nav button{text-align:left;justify-content:flex-start;width:100%;border-radius:14px;padding:11px 12px}
     .nav button.active{border-color:rgba(255,122,24,.55);background:rgba(255,122,24,.11)}
-
     .main{min-height:640px}
-    .card{
-      border:1px solid rgba(36,52,73,.75);
-      background:rgba(16,24,38,.58);
-      border-radius:18px;padding:14px;
-      box-shadow:0 12px 35px rgba(0,0,0,.20);
-    }
+    .card{border:1px solid rgba(36,52,73,.75);background:rgba(16,24,38,.58);border-radius:18px;padding:14px;box-shadow:0 12px 35px rgba(0,0,0,.20)}
     .section-head{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px}
-    h1,h2,h3{margin:0}
-    h1{font-size:20px}
-    h2{font-size:16px}
-    h3{font-size:14px}
+    h1,h2,h3{margin:0} h1{font-size:20px} h2{font-size:16px} h3{font-size:14px}
     .muted{color:var(--muted);font-size:12px;line-height:1.45}
-
     .kpi-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:14px}
-    .kpi{
-      border:1px solid rgba(36,52,73,.75);
-      background:rgba(15,23,34,.72);
-      border-radius:16px;padding:12px;
-    }
-    .admin-layout{display:grid;grid-template-columns:360px 1fr;gap:14px;align-items:start}
-    .type-list{display:flex;flex-direction:column;gap:8px;max-height:620px;overflow:auto;padding-right:4px}
-    .type-card{width:100%;border:1px solid rgba(36,52,73,.75);background:rgba(15,23,34,.72);color:var(--text);border-radius:16px;padding:12px;text-align:left;display:block}
-    .type-card:hover{border-color:rgba(255,122,24,.45)}
-    .type-card.active{border-color:rgba(255,122,24,.65);background:rgba(255,122,24,.10)}
-    .type-card .type-top{display:flex;align-items:center;gap:8px;justify-content:space-between}
-    .type-dot{width:12px;height:12px;border-radius:999px;background:#64748b;display:inline-block;box-shadow:0 0 0 4px rgba(255,255,255,.04)}
-    .type-name{font-weight:1000;font-size:14px}
-    .admin-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:10px}
-    .empty-panel{border:1px dashed rgba(36,52,73,.9);border-radius:16px;padding:20px;text-align:center;color:var(--muted);background:rgba(14,21,32,.50)}
-    .kpi .num{font-size:24px;font-weight:1000;margin-bottom:3px}
-    .kpi .label{font-size:12px;color:var(--muted)}
-
+    .kpi{border:1px solid rgba(36,52,73,.75);background:rgba(15,23,34,.72);border-radius:16px;padding:12px}
+    .kpi .num{font-size:24px;font-weight:1000;margin-bottom:3px}.kpi .label{font-size:12px;color:var(--muted)}
     .filters{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr auto;gap:10px;margin-bottom:12px}
     label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-weight:700}
-    input,select,textarea{
-      width:100%;border:1px solid rgba(36,52,73,.9);
-      background:rgba(14,21,32,.95);
-      color:var(--text);padding:10px;border-radius:12px;outline:none;
-    }
+    input,select,textarea{width:100%;border:1px solid rgba(36,52,73,.9);background:rgba(14,21,32,.95);color:var(--text);padding:10px;border-radius:12px;outline:none}
     textarea{min-height:74px;resize:vertical}
     input:focus,select:focus,textarea:focus{border-color:rgba(255,122,24,.70);box-shadow:0 0 0 3px rgba(255,122,24,.13)}
-
     .table-wrap{overflow:auto;border:1px solid rgba(36,52,73,.75);border-radius:16px;background:rgba(14,21,32,.72)}
     table{width:100%;border-collapse:collapse;min-width:980px}
     th,td{padding:10px 9px;border-bottom:1px solid rgba(36,52,73,.75);font-size:12px;text-align:left;vertical-align:top}
     th{position:sticky;top:0;background:#101826;color:#cfe3ff;font-weight:1000;z-index:1}
     tr:hover td{background:rgba(255,122,24,.035)}
     .linkish{color:#ffd7bf;font-weight:900;cursor:pointer;text-decoration:none}
-    .progress{
-      height:8px;border:1px solid rgba(36,52,73,.8);background:#0b0f14;border-radius:999px;overflow:hidden;margin-top:5px;width:100px;
-    }
+    .progress{height:8px;border:1px solid rgba(36,52,73,.8);background:#0b0f14;border-radius:999px;overflow:hidden;margin-top:5px;width:100px}
     .progress>div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%}
     .badge{display:inline-flex;align-items:center;border:1px solid rgba(36,52,73,.75);background:rgba(16,24,38,.7);border-radius:999px;padding:4px 8px;font-size:11px;white-space:nowrap;color:#d7e8ff}
     .badge.status-BLOCKED,.badge.priority-URGENT{border-color:rgba(255,92,122,.50);color:#ffd1dc;background:rgba(255,92,122,.10)}
     .badge.status-DONE{border-color:rgba(55,214,122,.50);color:#d4ffe6;background:rgba(55,214,122,.09)}
     .badge.status-WAITING{border-color:rgba(255,208,137,.50);color:#ffeac7;background:rgba(255,208,137,.08)}
-    .badge.priority-HIGH{border-color:rgba(255,208,137,.45);color:#ffeac7}
-
+    .admin-layout{display:grid;grid-template-columns:360px 1fr;gap:14px;align-items:start}
+    .type-list{display:flex;flex-direction:column;gap:8px;max-height:620px;overflow:auto;padding-right:4px}
+    .type-card{width:100%;border:1px solid rgba(36,52,73,.75);background:rgba(15,23,34,.72);color:var(--text);border-radius:16px;padding:12px;text-align:left;display:block}
+    .type-card:hover{border-color:rgba(255,122,24,.45)}.type-card.active{border-color:rgba(255,122,24,.65);background:rgba(255,122,24,.10)}
+    .type-card .type-top{display:flex;align-items:center;gap:8px;justify-content:space-between}
+    .type-dot{width:12px;height:12px;border-radius:999px;background:#64748b;display:inline-block;box-shadow:0 0 0 4px rgba(255,255,255,.04)}
+    .type-name{font-weight:1000;font-size:14px}
+    .admin-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .empty-panel{border:1px dashed rgba(36,52,73,.9);border-radius:16px;padding:20px;text-align:center;color:var(--muted);background:rgba(14,21,32,.50)}
     .modal-backdrop{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.58);display:none;align-items:center;justify-content:center;padding:16px}
     .modal-backdrop.show{display:flex}
     .modal{width:min(980px,96vw);max-height:92vh;overflow:auto;background:#0e1520;border:1px solid rgba(36,52,73,.9);border-radius:20px;padding:16px;box-shadow:0 35px 90px rgba(0,0,0,.55)}
     .modal.small{width:min(720px,96vw)}
-    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .form-grid .full{grid-column:1/-1}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.form-grid .full{grid-column:1/-1}
     .step{display:flex;gap:10px;align-items:flex-start;border:1px solid rgba(36,52,73,.75);background:#0b0f14;border-radius:14px;padding:10px;margin-top:8px}
     .step input[type="checkbox"]{width:18px;height:18px;margin-top:2px;accent-color:#ff7a18}
-    .step .name{font-weight:900;font-size:13px}
-    .step .meta{font-size:11px;color:var(--muted);margin-top:3px}
+    .step .name{font-weight:900;font-size:13px}.step .meta{font-size:11px;color:var(--muted);margin-top:3px}
     .logbox{border:1px solid rgba(36,52,73,.75);background:#0b0f14;border-radius:14px;padding:10px;max-height:220px;overflow:auto}
     .toast{position:fixed;right:16px;bottom:16px;background:#0e1520;border:1px solid rgba(36,52,73,.9);padding:10px 12px;border-radius:12px;z-index:90;display:none}
-
     .login-screen{position:fixed;inset:0;z-index:80;display:grid;place-items:center;background:rgba(0,0,0,.48);backdrop-filter:blur(8px);padding:16px}
     .login-card{width:min(520px,100%);border:1px solid rgba(36,52,73,.85);background:rgba(16,24,38,.94);border-radius:20px;padding:18px;box-shadow:0 35px 90px rgba(0,0,0,.55)}
-
-    @media(max-width:1100px){
-      .layout{grid-template-columns:1fr}.sidebar{position:relative;top:auto}.nav{flex-direction:row;overflow:auto}.nav button{white-space:nowrap;width:auto}.kpi-grid{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:1fr 1fr}.filters .filter-actions{grid-column:1/-1}.form-grid{grid-template-columns:1fr}.admin-layout{grid-template-columns:1fr}.type-list{max-height:none}
-    }
+    @media(max-width:1100px){.layout{grid-template-columns:1fr}.sidebar{position:relative;top:auto}.nav{flex-direction:row;overflow:auto}.nav button{white-space:nowrap;width:auto}.kpi-grid{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:1fr 1fr}.filters .filter-actions{grid-column:1/-1}.form-grid{grid-template-columns:1fr}.admin-layout{grid-template-columns:1fr}.type-list{max-height:none}}
     @media(max-width:640px){.topbar-inner{align-items:flex-start}.brand small{display:none}.kpi-grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr}.container{padding:10px}.card{padding:12px}}
   </style>
 </head>
 <body>
   <div class="topbar">
     <div class="topbar-inner">
-      <div class="brand">
-        <div class="logo">P</div>
-        <div>Provisioning Work Center <small>Team Dashboard • Multi Checklist • Google Sheet DB</small></div>
-      </div>
+      <div class="brand"><div class="logo">P</div><div>Provisioning Work Center <small>Team Dashboard • Multi Checklist • Google Sheet DB</small></div></div>
       <div class="spacer"></div>
-      <span class="pill" id="apiStatus">API: not set</span>
+      <span class="pill" id="apiStatus">API: connected</span>
       <span class="pill" id="userPill">Not logged in</span>
       <button class="btn hidden" id="btnLogout">Logout</button>
     </div>
@@ -201,44 +110,30 @@
         <div class="nav">
           <button class="btn active" data-page="dashboard">Dashboard</button>
           <button class="btn" data-page="tasks">Tasks</button>
-          <button class="btn" data-page="admin">Admin</button>
+          <button class="btn" data-page="admin" id="navAdmin">Admin</button>
         </div>
-        <div class="muted" style="margin-top:12px;">
-          v2 เริ่มต้น: ใช้ Sheet ใหม่เท่านั้น ไม่แตะข้อมูลระบบเดิม
-        </div>
+        <div class="muted" style="margin-top:12px;">v2.3: Role permissions + User Management</div>
       </aside>
 
       <main class="main">
         <section class="card" id="page-dashboard">
           <div class="section-head">
-            <div>
-              <h1>Dashboard รวมทุกคน</h1>
-              <div class="muted">ดูภาพรวมงาน, blocker, due date และงานใกล้ install</div>
-            </div>
+            <div><h1>Dashboard รวมทุกคน</h1><div class="muted">ดูภาพรวมงาน, blocker, due date และงานใกล้ install</div></div>
             <div class="spacer"></div>
             <button class="btn" id="btnRefreshDash">Refresh</button>
             <button class="btn primary" id="btnOpenCreate">+ New Task</button>
           </div>
           <div class="kpi-grid" id="kpiGrid"></div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>งานล่าสุด</th><th>Owner</th><th>Type</th><th>Status</th><th>Priority</th><th>Progress</th><th>Due</th><th>Install</th></tr></thead>
-              <tbody id="recentTasksBody"></tbody>
-            </table>
-          </div>
+          <div class="table-wrap"><table><thead><tr><th>งานล่าสุด</th><th>Owner</th><th>Type</th><th>Status</th><th>Priority</th><th>Progress</th><th>Due</th><th>Install</th></tr></thead><tbody id="recentTasksBody"></tbody></table></div>
         </section>
 
         <section class="card hidden" id="page-tasks">
           <div class="section-head">
-            <div>
-              <h1>Tasks</h1>
-              <div class="muted">ค้นหาและกรองงานทั้งหมดในทีม</div>
-            </div>
+            <div><h1>Tasks</h1><div class="muted">ค้นหาและกรองงานทั้งหมดในทีม</div></div>
             <div class="spacer"></div>
             <button class="btn" id="btnRefreshTasks">Refresh</button>
             <button class="btn primary" id="btnOpenCreate2">+ New Task</button>
           </div>
-
           <div class="filters">
             <div><label>Keyword</label><input id="filterKeyword" placeholder="ค้นหา title / CID / SOF / customer / owner" /></div>
             <div><label>Owner</label><select id="filterOwner"></select></div>
@@ -247,60 +142,27 @@
             <div><label>Priority</label><select id="filterPriority"></select></div>
             <div class="filter-actions" style="display:flex;align-items:flex-end;gap:8px;"><button class="btn" id="btnClearFilters">Clear</button></div>
           </div>
-
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr><th>Task</th><th>Owner</th><th>Type</th><th>Status</th><th>Priority</th><th>Progress</th><th>CID/SOF</th><th>Due</th><th>Install</th><th>Updated</th></tr>
-              </thead>
-              <tbody id="tasksBody"></tbody>
-            </table>
-          </div>
+          <div class="table-wrap"><table><thead><tr><th>Task</th><th>Owner</th><th>Type</th><th>Status</th><th>Priority</th><th>Progress</th><th>CID/SOF</th><th>Due</th><th>Install</th><th>Updated</th></tr></thead><tbody id="tasksBody"></tbody></table></div>
         </section>
 
         <section class="card hidden" id="page-admin">
           <div class="section-head">
-            <div>
-              <h1>Admin / Master Data</h1>
-              <div class="muted">รอบแรกแสดงข้อมูลตั้งต้นจาก Sheet ก่อน การแก้ไข template จะทำเฟสถัดไป</div>
-            </div>
-            <div class="spacer"></div>
-            <button class="btn" id="btnRefreshAdmin">Refresh</button>
+            <div><h1>Admin / Master Data</h1><div class="muted">Admin จัดการ Users, Work Types และ Checklist Templates</div></div>
+            <div class="spacer"></div><button class="btn" id="btnRefreshAdmin">Refresh</button>
           </div>
           <div class="admin-layout">
             <aside class="card" style="background:rgba(14,21,32,.50);">
-              <div class="admin-toolbar">
-                <div>
-                  <h3>Work Types</h3>
-                  <div class="muted">เลือกประเภทงานก่อน แล้วค่อยแก้ checklist</div>
-                </div>
-                <button class="btn primary" id="btnOpenWorkType">+ Add</button>
-              </div>
+              <div class="admin-toolbar"><div><h3>Work Types</h3><div class="muted">เลือกประเภทงานก่อน แล้วค่อยแก้ checklist</div></div><button class="btn primary" id="btnOpenWorkType">+ Add</button></div>
               <div id="adminTypesBody" class="type-list"></div>
             </aside>
-
             <section>
               <div class="card" style="background:rgba(14,21,32,.50);margin-bottom:14px;">
-                <div class="admin-toolbar">
-                  <div>
-                    <h3 id="selectedTypeTitle">Checklist Templates</h3>
-                    <div class="muted" id="selectedTypeSub">เลือก Work Type ทางซ้ายเพื่อดู step</div>
-                  </div>
-                  <button class="btn primary" id="btnOpenTemplate">+ Add Step</button>
-                </div>
-                <div class="table-wrap">
-                  <table>
-                    <thead>
-                      <tr><th>Step No</th><th>Step Name</th><th>Required</th><th>Action</th></tr>
-                    </thead>
-                    <tbody id="adminTemplatesBody"></tbody>
-                  </table>
-                </div>
+                <div class="admin-toolbar"><div><h3 id="selectedTypeTitle">Checklist Templates</h3><div class="muted" id="selectedTypeSub">เลือก Work Type ทางซ้ายเพื่อดู step</div></div><button class="btn primary" id="btnOpenTemplate">+ Add Step</button></div>
+                <div class="table-wrap"><table><thead><tr><th>Step No</th><th>Step Name</th><th>Required</th><th>Action</th></tr></thead><tbody id="adminTemplatesBody"></tbody></table></div>
               </div>
-
               <div class="card" style="background:rgba(14,21,32,.50);">
-                <h3>Users</h3>
-                <div class="table-wrap" style="margin-top:8px;"><table><thead><tr><th>User</th><th>Name</th><th>Role</th><th>Team</th><th>Active</th></tr></thead><tbody id="adminUsersBody"></tbody></table></div>
+                <div class="admin-toolbar"><div><h3>Users</h3><div class="muted">เพิ่ม/แก้/ปิดผู้ใช้ และ reset password</div></div><button class="btn primary" id="btnOpenUser">+ Add User</button></div>
+                <div class="table-wrap"><table><thead><tr><th>User</th><th>Name</th><th>Role</th><th>Team</th><th>Active</th><th>Action</th></tr></thead><tbody id="adminUsersBody"></tbody></table></div>
               </div>
             </section>
           </div>
@@ -317,120 +179,97 @@
         <div><label>Username</label><input id="loginUsername" autocomplete="username" placeholder="admin" /></div>
         <div><label>Password</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="1234" /></div>
       </div>
-      <div style="display:flex;gap:10px;margin-top:14px;align-items:center;">
-        <button class="btn primary" id="btnLogin">Sign in</button>
-        <span class="muted" id="loginMsg">Demo: admin / 1234</span>
-      </div>
+      <div style="display:flex;gap:10px;margin-top:14px;align-items:center;"><button class="btn primary" id="btnLogin">Sign in</button><span class="muted" id="loginMsg">Login เพื่อเริ่มใช้งาน</span></div>
     </div>
   </div>
 
-  <div class="modal-backdrop" id="createModalBack">
-    <div class="modal small">
-      <div class="section-head">
-        <div><h2>สร้างงานใหม่</h2><div class="muted">เลือกประเภทงาน แล้วระบบจะสร้าง checklist ตาม template ให้อัตโนมัติ</div></div>
-        <div class="spacer"></div><button class="btn" data-close="create">Close</button>
-      </div>
-      <div class="form-grid">
-        <div class="full"><label>Title *</label><input id="newTitle" placeholder="เช่น C1234 - Customer ABC DIA" /></div>
-        <div><label>Work Type *</label><select id="newType"></select></div>
-        <div><label>Owner *</label><select id="newOwner"></select></div>
-        <div><label>Priority</label><select id="newPriority"><option>NORMAL</option><option>LOW</option><option>HIGH</option><option>URGENT</option></select></div>
-        <div><label>Status</label><select id="newStatus"><option>NEW</option><option>IN_PROGRESS</option><option>WAITING</option><option>BLOCKED</option><option>READY_INSTALL</option></select></div>
-        <div><label>SOF</label><input id="newSof" /></div>
-        <div><label>CID</label><input id="newCid" /></div>
-        <div><label>Customer Name</label><input id="newCustomer" /></div>
-        <div><label>Service Name</label><input id="newService" /></div>
-        <div><label>Due Date</label><input id="newDue" type="date" /></div>
-        <div><label>Install Date</label><input id="newInstall" type="date" /></div>
-        <div class="full"><label>Remark</label><textarea id="newRemark" placeholder="รายละเอียดเพิ่มเติม"></textarea></div>
-      </div>
-      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px;">
-        <button class="btn" data-close="create">Cancel</button>
-        <button class="btn primary" id="btnCreateTask">Create Task</button>
-      </div>
+  <!-- Create Task -->
+  <div class="modal-backdrop" id="createModalBack"><div class="modal small">
+    <div class="section-head"><div><h2>สร้างงานใหม่</h2><div class="muted">เลือกประเภทงาน แล้วระบบจะสร้าง checklist ตาม template ให้อัตโนมัติ</div></div><div class="spacer"></div><button class="btn" data-close="create">Close</button></div>
+    <div class="form-grid">
+      <div class="full"><label>Title *</label><input id="newTitle" placeholder="เช่น C1234 - Customer ABC DIA" /></div>
+      <div><label>Work Type *</label><select id="newType"></select></div><div><label>Owner *</label><select id="newOwner"></select></div>
+      <div><label>Priority</label><select id="newPriority"><option>NORMAL</option><option>LOW</option><option>HIGH</option><option>URGENT</option></select></div>
+      <div><label>Status</label><select id="newStatus"><option>NEW</option><option>IN_PROGRESS</option><option>WAITING</option><option>BLOCKED</option><option>READY_INSTALL</option></select></div>
+      <div><label>SOF</label><input id="newSof" /></div><div><label>CID</label><input id="newCid" /></div>
+      <div><label>Customer Name</label><input id="newCustomer" /></div><div><label>Service Name</label><input id="newService" /></div>
+      <div><label>Due Date</label><input id="newDue" type="date" /></div><div><label>Install Date</label><input id="newInstall" type="date" /></div>
+      <div class="full"><label>Remark</label><textarea id="newRemark" placeholder="รายละเอียดเพิ่มเติม"></textarea></div>
     </div>
-  </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px;"><button class="btn" data-close="create">Cancel</button><button class="btn primary" id="btnCreateTask">Create Task</button></div>
+  </div></div>
 
-  <div class="modal-backdrop" id="editModalBack">
-    <div class="modal small">
-      <div class="section-head">
-        <div><h2>แก้ไขงาน</h2><div class="muted">แก้ข้อมูลหลักของ task โดยไม่กระทบ checklist/log เดิม</div></div>
-        <div class="spacer"></div><button class="btn" data-close="edit">Close</button>
-      </div>
-      <div class="form-grid">
-        <div class="full"><label>Title *</label><input id="editTitle" /></div>
-        <div><label>Owner</label><select id="editOwner"></select></div>
-        <div><label>Status</label><select id="editStatus"></select></div>
-        <div><label>Priority</label><select id="editPriority"></select></div>
-        <div><label>SOF</label><input id="editSof" /></div>
-        <div><label>CID</label><input id="editCid" /></div>
-        <div><label>Customer Name</label><input id="editCustomer" /></div>
-        <div><label>Service Name</label><input id="editService" /></div>
-        <div><label>Due Date</label><input id="editDue" type="date" /></div>
-        <div><label>Install Date</label><input id="editInstall" type="date" /></div>
-        <div class="full"><label>Blocker Tag</label><input id="editBlocker" placeholder="เช่น รอ IP / รอของ / รอลูกค้า" /></div>
-        <div class="full"><label>Remark</label><textarea id="editRemark"></textarea></div>
-      </div>
-      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px;">
-        <button class="btn" data-close="edit">Cancel</button>
-        <button class="btn primary" id="btnSaveEdit">Save Changes</button>
-      </div>
+  <!-- Edit Task -->
+  <div class="modal-backdrop" id="editModalBack"><div class="modal small">
+    <div class="section-head"><div><h2>แก้ไขงาน</h2><div class="muted">แก้ข้อมูลหลักของ task</div></div><div class="spacer"></div><button class="btn" data-close="edit">Close</button></div>
+    <div class="form-grid">
+      <div class="full"><label>Title *</label><input id="editTitle" /></div>
+      <div><label>Owner</label><select id="editOwner"></select></div><div><label>Status</label><select id="editStatus"></select></div>
+      <div><label>Priority</label><select id="editPriority"></select></div><div><label>SOF</label><input id="editSof" /></div>
+      <div><label>CID</label><input id="editCid" /></div><div><label>Customer Name</label><input id="editCustomer" /></div>
+      <div><label>Service Name</label><input id="editService" /></div><div><label>Due Date</label><input id="editDue" type="date" /></div>
+      <div><label>Install Date</label><input id="editInstall" type="date" /></div>
+      <div class="full"><label>Blocker Tag</label><input id="editBlocker" placeholder="เช่น รอ IP / รอของ / รอลูกค้า" /></div>
+      <div class="full"><label>Remark</label><textarea id="editRemark"></textarea></div>
     </div>
-  </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px;"><button class="btn" data-close="edit">Cancel</button><button class="btn primary" id="btnSaveEdit">Save Changes</button></div>
+  </div></div>
 
-  <div class="modal-backdrop" id="detailModalBack">
-    <div class="modal">
-      <div class="section-head">
-        <div><h2 id="detailTitle">Task Detail</h2><div class="muted" id="detailSub">-</div></div>
-        <div class="spacer"></div><button class="btn" id="btnOpenEdit">Edit Task</button><button class="btn" data-close="detail">Close</button>
-      </div>
-      <div class="kpi-grid" style="grid-template-columns:repeat(4,minmax(0,1fr));" id="detailKpis"></div>
-      <h3>Checklist</h3>
-      <div id="detailSteps" style="margin-bottom:14px;"></div>
-      <h3>Comments</h3>
-      <div style="display:flex;gap:8px;margin:8px 0;"><input id="commentInput" placeholder="เพิ่ม comment" /><button class="btn primary" id="btnAddComment">Add</button></div>
-      <div class="logbox" id="detailComments" style="margin-bottom:14px;"></div>
-      <h3>Logs</h3>
-      <div class="logbox" id="detailLogs"></div>
-    </div>
-  </div>
+  <!-- Detail -->
+  <div class="modal-backdrop" id="detailModalBack"><div class="modal">
+    <div class="section-head"><div><h2 id="detailTitle">Task Detail</h2><div class="muted" id="detailSub">-</div></div><div class="spacer"></div><button class="btn" id="btnOpenEdit">Edit Task</button><button class="btn" data-close="detail">Close</button></div>
+    <div class="kpi-grid" style="grid-template-columns:repeat(4,minmax(0,1fr));" id="detailKpis"></div>
+    <h3>Checklist</h3><div id="detailSteps" style="margin-bottom:14px;"></div>
+    <h3>Comments</h3><div style="display:flex;gap:8px;margin:8px 0;"><input id="commentInput" placeholder="เพิ่ม comment" /><button class="btn primary" id="btnAddComment">Add</button></div>
+    <div class="logbox" id="detailComments" style="margin-bottom:14px;"></div>
+    <h3>Logs</h3><div class="logbox" id="detailLogs"></div>
+  </div></div>
 
-  <div class="modal-backdrop" id="workTypeModalBack">
-    <div class="modal small">
-      <div class="section-head">
-        <div><h2 id="workTypeModalTitle">Add Work Type</h2><div class="muted">เพิ่มหรือแก้ประเภทงาน</div></div>
-        <div class="spacer"></div><button class="btn" data-close="workType">Close</button>
-      </div>
-      <div class="form-grid">
-        <input id="wtTypeId" type="hidden" />
-        <div><label>Type Name *</label><input id="wtTypeName" placeholder="เช่น Survey" /></div>
-        <div><label>Color</label><input id="wtColor" placeholder="Auto" readonly /></div>
-        <div class="full"><label>Description</label><input id="wtDescription" placeholder="รายละเอียดประเภทงาน" /></div>
-      </div>
-      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:14px;">
-        <button class="btn" data-close="workType">Cancel</button>
-        <button class="btn primary" id="btnSaveWorkType">Save Work Type</button>
-      </div>
+  <!-- User Modal -->
+  <div class="modal-backdrop" id="userModalBack"><div class="modal small">
+    <div class="section-head"><div><h2 id="userModalTitle">Add User</h2><div class="muted">เพิ่มหรือแก้ไขผู้ใช้งาน</div></div><div class="spacer"></div><button class="btn" data-close="user">Close</button></div>
+    <div class="form-grid">
+      <input id="userIdEdit" type="hidden" />
+      <div><label>Username *</label><input id="userUsername" autocomplete="off" /></div>
+      <div><label>Password <span class="muted">(ใส่เฉพาะตอนสร้าง/เปลี่ยน)</span></label><input id="userPassword" type="password" autocomplete="new-password" /></div>
+      <div><label>Display Name *</label><input id="userDisplayName" /></div>
+      <div><label>Role *</label><select id="userRole"><option>admin</option><option>leader</option><option>staff</option><option>viewer</option></select></div>
+      <div><label>Team</label><input id="userTeam" value="Provi" /></div>
+      <div><label>Active</label><select id="userActive"><option value="true">TRUE</option><option value="false">FALSE</option></select></div>
     </div>
-  </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:14px;"><button class="btn" data-close="user">Cancel</button><button class="btn primary" id="btnSaveUser">Save User</button></div>
+  </div></div>
 
-  <div class="modal-backdrop" id="templateModalBack">
-    <div class="modal small">
-      <div class="section-head">
-        <div><h2 id="templateModalTitle">Add Checklist Template Step</h2><div class="muted">ถ้า Work Type + Step No เดิมมีอยู่แล้ว ระบบจะแก้ step เดิม ไม่สร้างซ้ำ</div></div>
-        <div class="spacer"></div><button class="btn" data-close="template">Close</button>
-      </div>
-      <div class="form-grid">
-        <div><label>Work Type</label><select id="tplType"></select></div>
-        <div><label>Step No</label><input id="tplStepNo" type="number" min="1" /></div>
-        <div class="full"><label>Step Name</label><input id="tplStepName" /></div>
-      </div>
-      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:14px;">
-        <button class="btn" data-close="template">Cancel</button>
-        <button class="btn primary" id="btnSaveTemplate">Save Template</button>
-      </div>
+  <!-- Reset Password -->
+  <div class="modal-backdrop" id="resetPassModalBack"><div class="modal small">
+    <div class="section-head"><div><h2>Reset Password</h2><div class="muted" id="resetPassUserLabel">-</div></div><div class="spacer"></div><button class="btn" data-close="resetPass">Close</button></div>
+    <input id="resetPassUserId" type="hidden" />
+    <label>New Password</label><input id="resetPassValue" type="password" autocomplete="new-password" />
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:14px;"><button class="btn" data-close="resetPass">Cancel</button><button class="btn primary" id="btnSaveResetPass">Save Password</button></div>
+  </div></div>
+
+  <!-- Work Type -->
+  <div class="modal-backdrop" id="workTypeModalBack"><div class="modal small">
+    <div class="section-head"><div><h2 id="workTypeModalTitle">Add Work Type</h2><div class="muted">เพิ่มหรือแก้ประเภทงาน</div></div><div class="spacer"></div><button class="btn" data-close="workType">Close</button></div>
+    <div class="form-grid">
+      <input id="wtTypeId" type="hidden" />
+      <div><label>Type Name *</label><input id="wtTypeName" placeholder="เช่น Survey" /></div>
+      <div><label>Color</label><input id="wtColor" placeholder="Auto" readonly /></div>
+      <div class="full"><label>Description</label><input id="wtDescription" placeholder="รายละเอียดประเภทงาน" /></div>
     </div>
-  </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:14px;"><button class="btn" data-close="workType">Cancel</button><button class="btn primary" id="btnSaveWorkType">Save Work Type</button></div>
+  </div></div>
+
+  <!-- Template -->
+  <div class="modal-backdrop" id="templateModalBack"><div class="modal small">
+    <div class="section-head"><div><h2 id="templateModalTitle">Add Checklist Template Step</h2><div class="muted">ถ้า Work Type + Step No เดิมมีอยู่แล้ว ระบบจะแก้ step เดิม ไม่สร้างซ้ำ</div></div><div class="spacer"></div><button class="btn" data-close="template">Close</button></div>
+    <div class="form-grid">
+      <div><label>Work Type</label><select id="tplType"></select></div>
+      <div><label>Step No</label><input id="tplStepNo" type="number" min="1" /></div>
+      <div class="full"><label>Step Name</label><input id="tplStepName" /></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:14px;"><button class="btn" data-close="template">Cancel</button><button class="btn primary" id="btnSaveTemplate">Save Template</button></div>
+  </div></div>
 
   <div class="toast" id="toast"></div>
 
@@ -438,24 +277,19 @@
     const APP = {
       apiUrlKey: 'provi_wc_v2_api_url',
       tokenKey: 'provi_wc_v2_token',
-      userKey: 'provi_wc_v2_user'
+      userKey: 'provi_wc_v2_user',
+      defaultApiUrl: 'https://script.google.com/macros/s/AKfycbzavxejayJCJE2rc4tQAUUuKbkwjg4Eekur9teYQYWPaeTIf5cOY7PDW_Hi49B6-bnq/exec'
     };
-
     const STATUS_LIST = ['NEW','IN_PROGRESS','WAITING','BLOCKED','READY_INSTALL','INSTALLED','DONE','CANCELLED'];
     const PRIORITY_LIST = ['LOW','NORMAL','HIGH','URGENT'];
-
     const $ = id => document.getElementById(id);
     const state = {
-      apiUrl: localStorage.getItem(APP.apiUrlKey) || 'https://script.google.com/macros/s/AKfycbzavxejayJCJE2rc4tQAUUuKbkwjg4Eekur9teYQYWPaeTIf5cOY7PDW_Hi49B6-bnq/exec',
+      apiUrl: localStorage.getItem(APP.apiUrlKey) || APP.defaultApiUrl,
       token: localStorage.getItem(APP.tokenKey) || '',
       user: readJson(localStorage.getItem(APP.userKey), null),
-      users: [],
-      workTypes: [],
-      templates: [],
-      tasks: [],
-      selectedAdminTypeId: '',
-      currentTaskId: '',
-      currentTask: null
+      permissions: {},
+      users: [], workTypes: [], templates: [], tasks: [],
+      selectedAdminTypeId: '', currentTaskId: '', currentTask: null
     };
 
     function readJson(s, fallback){ try{return JSON.parse(s)}catch{return fallback} }
@@ -481,49 +315,41 @@
     }
 
     async function login(){
-      const apiUrl = (($('apiUrlInput') && $('apiUrlInput').value) || state.apiUrl).trim();
+      const apiUrl = (($('apiUrlInput') && $('apiUrlInput').value) || state.apiUrl || APP.defaultApiUrl).trim();
       const username = $('loginUsername').value.trim();
       const password = $('loginPassword').value.trim();
-      if(!apiUrl || !username || !password){ $('loginMsg').textContent='กรอก API URL, username, password ให้ครบ'; return; }
-      state.apiUrl = apiUrl;
-      localStorage.setItem(APP.apiUrlKey, apiUrl);
+      if(!username || !password){ $('loginMsg').textContent='กรอก username และ password'; return; }
+      state.apiUrl = apiUrl; localStorage.setItem(APP.apiUrlKey, apiUrl);
       setLoading($('btnLogin'), true);
       try{
         const res = await apiCall('login', {username, password});
-        state.token = res.token;
-        state.user = res.user;
-        localStorage.setItem(APP.tokenKey, state.token);
-        localStorage.setItem(APP.userKey, JSON.stringify(state.user));
-        $('loginScreen').classList.add('hidden');
-        await bootstrap();
-        toast('Login สำเร็จ');
+        state.token = res.token; state.user = res.user; state.permissions = permissionsFromUser(state.user);
+        localStorage.setItem(APP.tokenKey, state.token); localStorage.setItem(APP.userKey, JSON.stringify(state.user));
+        $('loginScreen').classList.add('hidden'); await bootstrap(); toast('Login สำเร็จ');
       }catch(e){ $('loginMsg').textContent = 'Login failed: ' + e.message; }
       finally{ setLoading($('btnLogin'), false); }
     }
 
     function logout(){
       localStorage.removeItem(APP.tokenKey); localStorage.removeItem(APP.userKey);
-      state.token=''; state.user=null; state.tasks=[];
-      $('loginScreen').classList.remove('hidden');
-      refreshTopbar();
+      state.token=''; state.user=null; state.tasks=[]; state.permissions={};
+      $('loginScreen').classList.remove('hidden'); refreshTopbar();
     }
 
     async function bootstrap(){
       refreshTopbar();
       const res = await apiCall('bootstrap', {token: state.token});
       state.users = res.users || [];
+      state.permissions = res.permissions || permissionsFromUser(state.user);
       state.workTypes = res.workTypes || [];
       state.templates = res.checklistTemplates || [];
-      fillSelects();
-      renderAdmin();
-      await loadTasks();
+      fillSelects(); renderAdmin(); await loadTasks(); applyRoleUI();
     }
 
     async function loadTasks(){
       const res = await apiCall('getTasks', {token: state.token, filters: getFilters()});
       state.tasks = res.tasks || [];
-      renderDashboard();
-      renderTasks();
+      renderDashboard(); renderTasks();
     }
 
     function getFilters(){
@@ -541,25 +367,43 @@
       const userOptionsNoAll = state.users.map(u=>`<option value="${esc(u.userId)}">${esc(u.displayName || u.username)}</option>`).join('');
       const typeOptions = ['<option value="">All</option>'].concat(state.workTypes.map(w=>`<option value="${esc(w.typeId)}">${esc(w.typeName)}</option>`)).join('');
       const typeOptionsNoAll = state.workTypes.map(w=>`<option value="${esc(w.typeId)}">${esc(w.typeName)}</option>`).join('');
-      $('filterOwner').innerHTML = userOptions;
-      $('filterType').innerHTML = typeOptions;
+      $('filterOwner').innerHTML = userOptions; $('filterType').innerHTML = typeOptions;
       $('filterStatus').innerHTML = '<option value="">All</option>' + STATUS_LIST.map(s=>`<option>${s}</option>`).join('');
       $('filterPriority').innerHTML = '<option value="">All</option>' + PRIORITY_LIST.map(s=>`<option>${s}</option>`).join('');
-      $('newOwner').innerHTML = userOptionsNoAll;
-      $('editOwner').innerHTML = userOptionsNoAll;
-      $('newType').innerHTML = typeOptionsNoAll;
-      $('tplType').innerHTML = typeOptionsNoAll;
+      $('newOwner').innerHTML = userOptionsNoAll; $('editOwner').innerHTML = userOptionsNoAll;
+      $('newType').innerHTML = typeOptionsNoAll; $('tplType').innerHTML = typeOptionsNoAll;
       $('editStatus').innerHTML = STATUS_LIST.map(s=>`<option>${s}</option>`).join('');
       $('editPriority').innerHTML = PRIORITY_LIST.map(s=>`<option>${s}</option>`).join('');
       if(state.user) $('newOwner').value = state.user.userId;
     }
 
+    function permissionsFromUser(user){
+      const role = String((user && user.role) || '').toLowerCase();
+      return {
+        canManageUsers: role === 'admin',
+        canManageMasterData: role === 'admin',
+        canEditAllTasks: role === 'admin' || role === 'leader',
+        canCreateTask: role === 'admin' || role === 'leader' || role === 'staff',
+        canEditOwnTasks: role === 'staff',
+        canViewOnly: role === 'viewer'
+      };
+    }
+    function canAdmin(){ return String((state.user && state.user.role) || '').toLowerCase() === 'admin'; }
+    function canCreateTask(){ return !!(state.permissions && state.permissions.canCreateTask); }
+    function isViewer(){ return String((state.user && state.user.role) || '').toLowerCase() === 'viewer'; }
+    function applyRoleUI(){
+      if($('navAdmin')) $('navAdmin').classList.toggle('hidden', !canAdmin());
+      ['btnOpenCreate','btnOpenCreate2'].forEach(id=>{ if($(id)) $(id).classList.toggle('hidden', !canCreateTask()); });
+      if($('btnOpenEdit')) $('btnOpenEdit').classList.toggle('hidden', isViewer());
+      if($('btnAddComment')) $('btnAddComment').classList.toggle('hidden', isViewer());
+      if(!canAdmin() && $('page-admin') && !$('page-admin').classList.contains('hidden')) switchPage('dashboard');
+    }
     function refreshTopbar(){
       $('apiStatus').textContent = state.apiUrl ? 'API: connected' : 'API: not set';
       $('apiStatus').className = 'pill ' + (state.apiUrl ? 'ok' : 'bad');
       $('userPill').textContent = state.user ? `${state.user.displayName || state.user.username} · ${state.user.role}` : 'Not logged in';
       $('userPill').className = 'pill ' + (state.user ? 'ok' : 'bad');
-      $('btnLogout').classList.toggle('hidden', !state.user);
+      $('btnLogout').classList.toggle('hidden', !state.user); applyRoleUI();
     }
 
     function renderDashboard(){
@@ -569,21 +413,15 @@
       const done = tasks.filter(t=>t.status==='DONE').length;
       const due7 = tasks.filter(t=>isWithinDays(t.dueDate, 7)).length;
       const install7 = tasks.filter(t=>isWithinDays(t.installDate, 7)).length;
-      const kpis = [
-        ['ทั้งหมด', tasks.length], ['ของฉัน', mine], ['Blocked', blocked], ['Due 7 วัน', due7], ['Install 7 วัน', install7], ['Done', done]
-      ];
+      const kpis = [['ทั้งหมด', tasks.length], ['ของฉัน', mine], ['Blocked', blocked], ['Due 7 วัน', due7], ['Install 7 วัน', install7], ['Done', done]];
       $('kpiGrid').innerHTML = kpis.map(k=>`<div class="kpi"><div class="num">${k[1]}</div><div class="label">${esc(k[0])}</div></div>`).join('');
       $('recentTasksBody').innerHTML = tasks.slice(0,10).map(taskRowRecent).join('') || emptyRow(8, 'ยังไม่มีงาน');
     }
-
-    function renderTasks(){
-      $('tasksBody').innerHTML = state.tasks.map(taskRowFull).join('') || emptyRow(10, 'ไม่พบงานตาม filter');
-    }
+    function renderTasks(){ $('tasksBody').innerHTML = state.tasks.map(taskRowFull).join('') || emptyRow(10, 'ไม่พบงานตาม filter'); }
 
     function renderAdmin(){
-      if(!state.selectedAdminTypeId && state.workTypes.length){
-        state.selectedAdminTypeId = state.workTypes[0].typeId;
-      }
+      if(!canAdmin()) return;
+      if(!state.selectedAdminTypeId && state.workTypes.length) state.selectedAdminTypeId = state.workTypes[0].typeId;
       const selectedType = state.workTypes.find(w=>String(w.typeId)===String(state.selectedAdminTypeId));
       $('selectedTypeTitle').textContent = selectedType ? `Checklist: ${selectedType.typeName}` : 'Checklist Templates';
       $('selectedTypeSub').textContent = selectedType ? `${selectedType.typeId} · ${selectedType.description || ''}` : 'เลือก Work Type ทางซ้ายเพื่อดู step';
@@ -603,7 +441,7 @@
 
       const filteredTemplates = state.templates.filter(t=>String(t.typeId)===String(state.selectedAdminTypeId));
       $('adminTemplatesBody').innerHTML = filteredTemplates.map(t=>`<tr><td>${esc(t.stepNo)}</td><td>${esc(t.stepName)}</td><td>${esc(t.required)}</td><td><button class="btn" data-edit-template="${esc(t.templateId)}">Edit</button> <button class="btn danger" data-del-template="${esc(t.templateId)}">Delete</button></td></tr>`).join('') || emptyRow(4,'ยังไม่มี checklist step สำหรับ Work Type นี้');
-      $('adminUsersBody').innerHTML = state.users.map(u=>`<tr><td>${esc(u.username)}</td><td>${esc(u.displayName)}</td><td>${badge(u.role)}</td><td>${esc(u.team)}</td><td>${esc(u.active)}</td></tr>`).join('') || emptyRow(5,'No users');
+      $('adminUsersBody').innerHTML = state.users.map(u=>`<tr><td>${esc(u.username)}</td><td>${esc(u.displayName)}</td><td>${badge(u.role)}</td><td>${esc(u.team)}</td><td>${esc(u.active)}</td><td><button class="btn" data-edit-user="${esc(u.userId)}">Edit</button> <button class="btn" data-reset-user="${esc(u.userId)}">Reset Pass</button> <button class="btn danger" data-del-user="${esc(u.userId)}">Disable</button></td></tr>`).join('') || emptyRow(6,'No users');
     }
 
     function taskRowRecent(t){
@@ -613,300 +451,111 @@
       return `<tr><td><span class="linkish" data-task="${esc(t.taskId)}">${esc(t.title)}</span><div class="muted">${esc(t.customerName)} ${esc(t.serviceName)}</div></td><td>${esc(t.ownerName)}</td><td>${badge(t.typeName)}</td><td>${badge(t.status,'status-'+t.status)}</td><td>${badge(t.priority,'priority-'+t.priority)}</td><td>${progressHtml(t.progressPercent)}</td><td>${esc(t.cid || '-')}<div class="muted">${esc(t.sof || '')}</div></td><td>${esc(t.dueDate || '-')}</td><td>${esc(t.installDate || '-')}</td><td>${esc(t.updatedAt || '-')}</td></tr>`;
     }
     function emptyRow(col, text){ return `<tr><td colspan="${col}" class="muted">${esc(text)}</td></tr>`; }
-
-    function isWithinDays(dateStr, days){
-      if(!dateStr) return false;
-      const d = new Date(dateStr + 'T00:00:00'); if(isNaN(d)) return false;
-      const now = new Date(); now.setHours(0,0,0,0);
-      const diff = (d - now) / 86400000;
-      return diff >= 0 && diff <= days;
-    }
+    function isWithinDays(dateStr, days){ if(!dateStr) return false; const d = new Date(dateStr + 'T00:00:00'); if(isNaN(d)) return false; const now = new Date(); now.setHours(0,0,0,0); const diff = (d - now) / 86400000; return diff >= 0 && diff <= days; }
 
     async function createTask(){
-      const body = {
-        token: state.token,
-        title: $('newTitle').value,
-        typeId: $('newType').value,
-        ownerUserId: $('newOwner').value,
-        status: $('newStatus').value,
-        priority: $('newPriority').value,
-        sof: $('newSof').value,
-        cid: $('newCid').value,
-        customerName: $('newCustomer').value,
-        serviceName: $('newService').value,
-        dueDate: $('newDue').value,
-        installDate: $('newInstall').value,
-        remark: $('newRemark').value
-      };
+      const body = {token: state.token,title:$('newTitle').value,typeId:$('newType').value,ownerUserId:$('newOwner').value,status:$('newStatus').value,priority:$('newPriority').value,sof:$('newSof').value,cid:$('newCid').value,customerName:$('newCustomer').value,serviceName:$('newService').value,dueDate:$('newDue').value,installDate:$('newInstall').value,remark:$('newRemark').value};
       if(!body.title || !body.typeId || !body.ownerUserId){ toast('กรอก Title, Type, Owner ให้ครบ'); return; }
       setLoading($('btnCreateTask'), true);
-      try{
-        await apiCall('createTask', body);
-        closeModal('create');
-        clearCreateForm();
-        await loadTasks();
-        toast('สร้างงานแล้ว');
-      }catch(e){ toast('Create failed: ' + e.message); }
+      try{ await apiCall('createTask', body); closeModal('create'); clearCreateForm(); await loadTasks(); toast('สร้างงานแล้ว'); }
+      catch(e){ toast('Create failed: ' + e.message); }
       finally{ setLoading($('btnCreateTask'), false); }
     }
-
-    function clearCreateForm(){
-      ['newTitle','newSof','newCid','newCustomer','newService','newDue','newInstall','newRemark'].forEach(id=>$(id).value='');
-      $('newPriority').value='NORMAL'; $('newStatus').value='NEW'; if(state.user) $('newOwner').value=state.user.userId;
-    }
+    function clearCreateForm(){ ['newTitle','newSof','newCid','newCustomer','newService','newDue','newInstall','newRemark'].forEach(id=>$(id).value=''); $('newPriority').value='NORMAL'; $('newStatus').value='NEW'; if(state.user) $('newOwner').value=state.user.userId; }
 
     async function openTaskDetail(taskId){
-      state.currentTaskId = taskId;
-      $('detailSteps').innerHTML = '<div class="muted">Loading...</div>';
-      openModal('detail');
-      try{
-        const res = await apiCall('getTaskDetail', {token: state.token, taskId});
-        renderDetail(res.task, res.steps || [], res.logs || [], res.comments || []);
-      }catch(e){ $('detailSteps').innerHTML = `<div class="muted">Load failed: ${esc(e.message)}</div>`; }
+      state.currentTaskId = taskId; $('detailSteps').innerHTML = '<div class="muted">Loading...</div>'; openModal('detail');
+      try{ const res = await apiCall('getTaskDetail', {token: state.token, taskId}); renderDetail(res.task, res.steps || [], res.logs || [], res.comments || []); }
+      catch(e){ $('detailSteps').innerHTML = `<div class="muted">Load failed: ${esc(e.message)}</div>`; }
     }
-
     function renderDetail(task, steps, logs, comments){
-      state.currentTask = task;
-      $('detailTitle').textContent = task.title || 'Task Detail';
-      $('detailSub').textContent = `${task.taskId} · ${task.status} · ${task.priority}`;
-      $('detailKpis').innerHTML = [
-        ['Status', task.status], ['Priority', task.priority], ['Progress', (task.progressPercent || 0) + '%'], ['Owner', findUserName(task.ownerUserId)]
-      ].map(k=>`<div class="kpi"><div class="label">${esc(k[0])}</div><div style="font-weight:1000;margin-top:4px;">${esc(k[1])}</div></div>`).join('');
-      $('detailSteps').innerHTML = steps.map(s=>`
-        <label class="step">
-          <input type="checkbox" ${isTrue(s.done) ? 'checked' : ''} data-step-id="${esc(s.stepId)}" />
-          <div><div class="name">${esc(s.stepNo)}. ${esc(s.stepName)}</div><div class="meta">${isTrue(s.done) ? 'Done by ' + esc(findUserName(s.doneBy)) + ' at ' + esc(s.doneAt) : 'Pending'} ${s.note ? ' · ' + esc(s.note) : ''}</div></div>
-        </label>`).join('') || '<div class="muted">ไม่มี checklist</div>';
+      state.currentTask = task; applyRoleUI();
+      $('detailTitle').textContent = task.title || 'Task Detail'; $('detailSub').textContent = `${task.taskId} · ${task.status} · ${task.priority}`;
+      $('detailKpis').innerHTML = [['Status', task.status], ['Priority', task.priority], ['Progress', (task.progressPercent || 0) + '%'], ['Owner', findUserName(task.ownerUserId)]].map(k=>`<div class="kpi"><div class="label">${esc(k[0])}</div><div style="font-weight:1000;margin-top:4px;">${esc(k[1])}</div></div>`).join('');
+      $('detailSteps').innerHTML = steps.map(s=>`<label class="step"><input type="checkbox" ${isTrue(s.done) ? 'checked' : ''} data-step-id="${esc(s.stepId)}" ${isViewer()?'disabled':''}/><div><div class="name">${esc(s.stepNo)}. ${esc(s.stepName)}</div><div class="meta">${isTrue(s.done) ? 'Done by ' + esc(findUserName(s.doneBy)) + ' at ' + esc(s.doneAt) : 'Pending'} ${s.note ? ' · ' + esc(s.note) : ''}</div></div></label>`).join('') || '<div class="muted">ไม่มี checklist</div>';
       $('detailLogs').innerHTML = logs.map(l=>`<div style="margin-bottom:8px;"><b>${esc(l.action)}</b> <span class="muted">${esc(l.createdAt)} · ${esc(findUserName(l.actorUserId))}</span><div class="muted">${esc(l.detail)}</div></div>`).join('') || '<div class="muted">ยังไม่มี log</div>';
       $('detailComments').innerHTML = comments.map(c=>`<div style="margin-bottom:8px;"><b>${esc(findUserName(c.actorUserId))}</b> <span class="muted">${esc(c.createdAt)}</span><div>${esc(c.comment)}</div></div>`).join('') || '<div class="muted">ยังไม่มี comment</div>';
     }
 
-    async function updateStep(el){
-      const stepId = el.dataset.stepId;
-      const done = el.checked;
-      el.disabled = true;
-      try{
-        await apiCall('updateStep', {token: state.token, stepId, done});
-        await openTaskDetail(state.currentTaskId);
-        await loadTasks();
-        toast('อัปเดต checklist แล้ว');
-      }catch(e){ toast('Update step failed: ' + e.message); el.checked = !done; }
-      finally{ el.disabled = false; }
-    }
+    async function updateStep(el){ const stepId=el.dataset.stepId; const done=el.checked; el.disabled=true; try{ await apiCall('updateStep',{token:state.token,stepId,done}); await openTaskDetail(state.currentTaskId); await loadTasks(); toast('อัปเดต checklist แล้ว'); }catch(e){ toast('Update step failed: '+e.message); el.checked=!done; }finally{ el.disabled=false; } }
 
     function openEditModal(){
-      closeModal('detail');
-      const t = state.currentTask;
-      if(!t){ toast('ยังไม่มี task ที่เลือก'); return; }
-      $('editTitle').value = t.title || '';
-      $('editOwner').value = t.ownerUserId || '';
-      $('editStatus').value = t.status || 'NEW';
-      $('editPriority').value = t.priority || 'NORMAL';
-      $('editSof').value = t.sof || '';
-      $('editCid').value = t.cid || '';
-      $('editCustomer').value = t.customerName || '';
-      $('editService').value = t.serviceName || '';
-      $('editDue').value = normalizeDateInput(t.dueDate);
-      $('editInstall').value = normalizeDateInput(t.installDate);
-      $('editBlocker').value = t.blockerTag || '';
-      $('editRemark').value = t.remark || '';
-      openModal('edit');
+      closeModal('detail'); const t=state.currentTask; if(!t){ toast('ยังไม่มี task ที่เลือก'); return; }
+      $('editTitle').value=t.title||''; $('editOwner').value=t.ownerUserId||''; $('editStatus').value=t.status||'NEW'; $('editPriority').value=t.priority||'NORMAL';
+      $('editSof').value=t.sof||''; $('editCid').value=t.cid||''; $('editCustomer').value=t.customerName||''; $('editService').value=t.serviceName||'';
+      $('editDue').value=normalizeDateInput(t.dueDate); $('editInstall').value=normalizeDateInput(t.installDate); $('editBlocker').value=t.blockerTag||''; $('editRemark').value=t.remark||''; openModal('edit');
     }
-
     async function saveEditTask(){
       if(!state.currentTaskId){ toast('ไม่พบ taskId'); return; }
-      const body = {
-        token: state.token,
-        taskId: state.currentTaskId,
-        title: $('editTitle').value,
-        ownerUserId: $('editOwner').value,
-        status: $('editStatus').value,
-        priority: $('editPriority').value,
-        sof: $('editSof').value,
-        cid: $('editCid').value,
-        customerName: $('editCustomer').value,
-        serviceName: $('editService').value,
-        dueDate: $('editDue').value,
-        installDate: $('editInstall').value,
-        blockerTag: $('editBlocker').value,
-        remark: $('editRemark').value
-      };
+      const body = {token:state.token,taskId:state.currentTaskId,title:$('editTitle').value,ownerUserId:$('editOwner').value,status:$('editStatus').value,priority:$('editPriority').value,sof:$('editSof').value,cid:$('editCid').value,customerName:$('editCustomer').value,serviceName:$('editService').value,dueDate:$('editDue').value,installDate:$('editInstall').value,blockerTag:$('editBlocker').value,remark:$('editRemark').value};
       if(!body.title){ toast('Title ห้ามว่าง'); return; }
       setLoading($('btnSaveEdit'), true);
-      try{
-        await apiCall('updateTask', body);
-        closeModal('edit');
-        await openTaskDetail(state.currentTaskId);
-        await loadTasks();
-        toast('บันทึกการแก้ไขแล้ว');
-      }catch(e){ toast('Save failed: ' + e.message); }
+      try{ await apiCall('updateTask', body); closeModal('edit'); await openTaskDetail(state.currentTaskId); await loadTasks(); toast('บันทึกการแก้ไขแล้ว'); }
+      catch(e){ toast('Save failed: ' + e.message); }
       finally{ setLoading($('btnSaveEdit'), false); }
     }
+    function normalizeDateInput(v){ if(!v) return ''; const s=String(v).trim(); return /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(s) ? s : ''; }
+    async function addComment(){ const comment=$('commentInput').value.trim(); if(!comment) return; try{ await apiCall('addComment',{token:state.token,taskId:state.currentTaskId,comment}); $('commentInput').value=''; await openTaskDetail(state.currentTaskId); toast('เพิ่ม comment แล้ว'); }catch(e){ toast('Comment failed: '+e.message); } }
 
-    function normalizeDateInput(v){
-      if(!v) return '';
-      const s = String(v).trim();
-      return /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(s) ? s : '';
+    function openUserModal(userId){
+      const u=userId?state.users.find(x=>String(x.userId)===String(userId)):null;
+      $('userModalTitle').textContent = u ? 'Edit User' : 'Add User'; $('userIdEdit').value=u?(u.userId||''):'';
+      $('userUsername').value=u?(u.username||''):''; $('userPassword').value=''; $('userDisplayName').value=u?(u.displayName||''):'';
+      $('userRole').value=u?(u.role||'staff'):'staff'; $('userTeam').value=u?(u.team||'Provi'):'Provi'; $('userActive').value = u && u.active === false ? 'false' : 'true'; openModal('user');
     }
+    async function saveUser(){
+      const payload={token:state.token,userId:$('userIdEdit').value,username:$('userUsername').value,password:$('userPassword').value,displayName:$('userDisplayName').value,role:$('userRole').value,team:$('userTeam').value,active:$('userActive').value==='true'};
+      if(!payload.username || !payload.displayName){ toast('กรอก Username และ Display Name'); return; }
+      if(!payload.userId && !payload.password){ toast('User ใหม่ต้องใส่ Password'); return; }
+      try{ await apiCall('saveUser',payload); closeModal('user'); await bootstrap(); toast('บันทึก User แล้ว'); }catch(e){ toast('Save user failed: '+e.message); }
+    }
+    async function disableUser(userId){ if(!confirm('Disable user นี้?')) return; try{ await apiCall('deleteUser',{token:state.token,userId}); await bootstrap(); toast('Disable user แล้ว'); }catch(e){ toast('Disable failed: '+e.message); } }
+    function openResetPasswordModal(userId){ const u=state.users.find(x=>String(x.userId)===String(userId)); $('resetPassUserId').value=userId; $('resetPassValue').value=''; $('resetPassUserLabel').textContent = u ? `${u.username} · ${u.displayName}` : userId; openModal('resetPass'); }
+    async function saveResetPassword(){ const userId=$('resetPassUserId').value; const password=$('resetPassValue').value; if(!password){ toast('กรอก Password ใหม่'); return; } try{ await apiCall('resetPassword',{token:state.token,userId,password}); closeModal('resetPass'); toast('Reset password แล้ว'); }catch(e){ toast('Reset failed: '+e.message); } }
 
-    async function addComment(){
-      const comment = $('commentInput').value.trim();
-      if(!comment) return;
-      try{
-        await apiCall('addComment', {token: state.token, taskId: state.currentTaskId, comment});
-        $('commentInput').value = '';
-        await openTaskDetail(state.currentTaskId);
-        toast('เพิ่ม comment แล้ว');
-      }catch(e){ toast('Comment failed: ' + e.message); }
-    }
+    function openTemplateModal(templateId){ const t=templateId?state.templates.find(x=>String(x.templateId)===String(templateId)):null; $('templateModalTitle').textContent=t?'Edit Checklist Template Step':'Add Checklist Template Step'; $('tplType').value=t?t.typeId:(state.selectedAdminTypeId||$('tplType').value||''); $('tplStepNo').value=t?t.stepNo:''; $('tplStepName').value=t?t.stepName:''; openModal('template'); }
+    async function saveTemplate(){ const payload={token:state.token,typeId:$('tplType').value,stepNo:$('tplStepNo').value,stepName:$('tplStepName').value}; if(!payload.typeId||!payload.stepNo||!payload.stepName){ toast('กรอกข้อมูล template ให้ครบ'); return; } try{ await apiCall('saveTemplate',payload); closeModal('template'); $('tplStepNo').value=''; $('tplStepName').value=''; await bootstrap(); toast('บันทึก template แล้ว'); }catch(e){ toast('Save template failed: '+e.message); } }
+    async function deleteTemplate(templateId){ if(!confirm('Delete template step?')) return; try{ await apiCall('deleteTemplate',{token:state.token,templateId}); await bootstrap(); toast('ลบ template แล้ว'); }catch(e){ toast('Delete failed: '+e.message); } }
+
+    function openWorkTypeModal(typeId){ const w=typeId?state.workTypes.find(x=>String(x.typeId)===String(typeId)):null; $('workTypeModalTitle').textContent=w?'Edit Work Type':'Add Work Type'; $('wtTypeId').value=w?(w.typeId||''):''; $('wtTypeName').value=w?(w.typeName||''):''; $('wtDescription').value=w?(w.description||''):''; $('wtColor').value=w?(w.color||autoColorFromText(w.typeName||'')):autoColorFromText(''); openModal('workType'); }
+    async function saveWorkType(){ const payload={token:state.token,typeId:$('wtTypeId').value,typeName:$('wtTypeName').value,description:$('wtDescription').value,color:$('wtColor').value||autoColorFromText($('wtTypeName').value)}; if(!payload.typeName){ toast('กรอก Type Name'); return; } try{ await apiCall('saveWorkType',payload); closeModal('workType'); await bootstrap(); const found=state.workTypes.find(w=>String(w.typeName).toLowerCase()===String(payload.typeName).toLowerCase()); if(found) state.selectedAdminTypeId=found.typeId; renderAdmin(); toast('บันทึก Work Type แล้ว'); }catch(e){ toast('Save work type failed: '+e.message); } }
+    async function deleteWorkType(typeId){ if(!confirm('Delete work type? งานเดิมจะยังอยู่ แต่จะไม่เลือกประเภทนี้สำหรับงานใหม่')) return; try{ await apiCall('deleteWorkType',{token:state.token,typeId}); await bootstrap(); toast('ลบ Work Type แล้ว'); }catch(e){ toast('Delete work type failed: '+e.message); } }
+    function autoColorFromText(text){ const palette=['#ff7a18','#38bdf8','#22c55e','#a855f7','#ef4444','#f59e0b','#14b8a6','#64748b']; const s=String(text||'new'); let sum=0; for(let i=0;i<s.length;i++) sum+=s.charCodeAt(i); return palette[sum%palette.length]; }
 
     function findUserName(userId){ const u=state.users.find(x=>String(x.userId)===String(userId)); return u ? (u.displayName || u.username) : (userId || '-'); }
     function isTrue(v){ return v === true || String(v).toUpperCase() === 'TRUE'; }
-
     function openModal(name){ $(name+'ModalBack').classList.add('show'); }
     function closeModal(name){ $(name+'ModalBack').classList.remove('show'); }
-    function switchPage(page){
-      document.querySelectorAll('[id^="page-"]').forEach(x=>x.classList.add('hidden'));
-      $('page-'+page).classList.remove('hidden');
-      document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active', b.dataset.page===page));
-    }
-
-    function openTemplateModal(templateId){
-      const t = templateId ? state.templates.find(x=>String(x.templateId)===String(templateId)) : null;
-      $('templateModalTitle').textContent = t ? 'Edit Checklist Template Step' : 'Add Checklist Template Step';
-      $('tplType').value = t ? t.typeId : (state.selectedAdminTypeId || $('tplType').value || '');
-      $('tplStepNo').value = t ? t.stepNo : '';
-      $('tplStepName').value = t ? t.stepName : '';
-      openModal('template');
-    }
-
-    async function saveTemplate(){
-      const payload = {
-        token: state.token,
-        typeId: $('tplType').value,
-        stepNo: $('tplStepNo').value,
-        stepName: $('tplStepName').value
-      };
-      if(!payload.typeId || !payload.stepNo || !payload.stepName){ toast('กรอกข้อมูล template ให้ครบ'); return; }
-      try{
-        await apiCall('saveTemplate', payload);
-        closeModal('template');
-        $('tplStepNo').value='';
-        $('tplStepName').value='';
-        await bootstrap();
-        toast('เพิ่ม template แล้ว');
-      }catch(e){ toast('Save template failed: ' + e.message); }
-    }
-
-    async function deleteTemplate(templateId){
-      if(!confirm('Delete template step?')) return;
-      try{
-        await apiCall('deleteTemplate', {token: state.token, templateId});
-        await bootstrap();
-        toast('ลบ template แล้ว');
-      }catch(e){ toast('Delete failed: ' + e.message); }
-    }
-
-    function openWorkTypeModal(typeId){
-      const w = typeId ? state.workTypes.find(x=>String(x.typeId)===String(typeId)) : null;
-      $('workTypeModalTitle').textContent = w ? 'Edit Work Type' : 'Add Work Type';
-      $('wtTypeId').value = w ? (w.typeId || '') : '';
-      $('wtTypeName').value = w ? (w.typeName || '') : '';
-      $('wtDescription').value = w ? (w.description || '') : '';
-      $('wtColor').value = w ? (w.color || autoColorFromText(w.typeName || '')) : autoColorFromText('');
-      openModal('workType');
-    }
-
-    async function saveWorkType(){
-      const payload = {
-        token: state.token,
-        typeId: $('wtTypeId').value,
-        typeName: $('wtTypeName').value,
-        description: $('wtDescription').value,
-        color: $('wtColor').value || autoColorFromText($('wtTypeName').value)
-      };
-      if(!payload.typeName){ toast('กรอก Type Name'); return; }
-      try{
-        await apiCall('saveWorkType', payload);
-        closeModal('workType');
-        $('wtTypeId').value='';
-        $('wtTypeName').value='';
-        $('wtDescription').value='';
-        $('wtColor').value='#64748b';
-        await bootstrap();
-        const savedTypeName = payload.typeName;
-        const found = state.workTypes.find(w=>String(w.typeName).toLowerCase()===String(savedTypeName).toLowerCase());
-        if(found) state.selectedAdminTypeId = found.typeId;
-        renderAdmin();
-        toast('บันทึก Work Type แล้ว');
-      }catch(e){ toast('Save work type failed: ' + e.message); }
-    }
-
-    async function deleteWorkType(typeId){
-      if(!confirm('Delete work type? งานเดิมจะยังอยู่ แต่จะไม่เลือกประเภทนี้สำหรับงานใหม่')) return;
-      try{
-        await apiCall('deleteWorkType', {token: state.token, typeId});
-        await bootstrap();
-        toast('ลบ Work Type แล้ว');
-      }catch(e){ toast('Delete work type failed: ' + e.message); }
-    }
-
-    function autoColorFromText(text){
-      const palette = ['#ff7a18','#38bdf8','#22c55e','#a855f7','#ef4444','#f59e0b','#14b8a6','#64748b'];
-      const s = String(text || 'new');
-      let sum = 0;
-      for(let i=0;i<s.length;i++) sum += s.charCodeAt(i);
-      return palette[sum % palette.length];
-    }
+    function switchPage(page){ if(page==='admin' && !canAdmin()){ toast('ไม่มีสิทธิ์เข้า Admin'); page='dashboard'; } document.querySelectorAll('[id^="page-"]').forEach(x=>x.classList.add('hidden')); $('page-'+page).classList.remove('hidden'); document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active', b.dataset.page===page)); applyRoleUI(); }
 
     function bindEvents(){
-      $('btnLogin').onclick = login;
-      $('btnLogout').onclick = logout;
-      $('btnRefreshDash').onclick = loadTasks;
-      $('btnRefreshTasks').onclick = loadTasks;
-      $('btnRefreshAdmin').onclick = bootstrap;
-      $('btnOpenTemplate').onclick = () => openTemplateModal('');
-      $('btnSaveTemplate').onclick = saveTemplate;
-      $('btnOpenWorkType').onclick = () => openWorkTypeModal('');
-      $('btnSaveWorkType').onclick = saveWorkType;
-      $('wtTypeName').addEventListener('input', ()=>{ if(!$('wtTypeId').value) $('wtColor').value = autoColorFromText($('wtTypeName').value); });
-      $('btnOpenCreate').onclick = () => openModal('create');
-      $('btnOpenCreate2').onclick = () => openModal('create');
-      $('btnCreateTask').onclick = createTask;
-      $('btnAddComment').onclick = addComment;
-      $('btnOpenEdit').onclick = openEditModal;
-      $('btnSaveEdit').onclick = saveEditTask;
-      $('btnClearFilters').onclick = () => { ['filterKeyword','filterOwner','filterType','filterStatus','filterPriority'].forEach(id=>$(id).value=''); loadTasks(); };
-      ['filterKeyword','filterOwner','filterType','filterStatus','filterPriority'].forEach(id=>$(id).addEventListener(id==='filterKeyword'?'input':'change', debounce(loadTasks, 300)));
-      document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>switchPage(b.dataset.page));
-      document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeModal(b.dataset.close));
+      $('btnLogin').onclick=login; $('btnLogout').onclick=logout; $('btnRefreshDash').onclick=loadTasks; $('btnRefreshTasks').onclick=loadTasks; $('btnRefreshAdmin').onclick=bootstrap;
+      $('btnOpenUser').onclick=()=>openUserModal(''); $('btnSaveUser').onclick=saveUser; $('btnSaveResetPass').onclick=saveResetPassword;
+      $('btnOpenTemplate').onclick=()=>openTemplateModal(''); $('btnSaveTemplate').onclick=saveTemplate;
+      $('btnOpenWorkType').onclick=()=>openWorkTypeModal(''); $('btnSaveWorkType').onclick=saveWorkType; $('wtTypeName').addEventListener('input',()=>{ if(!$('wtTypeId').value) $('wtColor').value=autoColorFromText($('wtTypeName').value); });
+      $('btnOpenCreate').onclick=()=>openModal('create'); $('btnOpenCreate2').onclick=()=>openModal('create'); $('btnCreateTask').onclick=createTask; $('btnAddComment').onclick=addComment; $('btnOpenEdit').onclick=openEditModal; $('btnSaveEdit').onclick=saveEditTask;
+      $('btnClearFilters').onclick=()=>{ ['filterKeyword','filterOwner','filterType','filterStatus','filterPriority'].forEach(id=>$(id).value=''); loadTasks(); };
+      ['filterKeyword','filterOwner','filterType','filterStatus','filterPriority'].forEach(id=>$(id).addEventListener(id==='filterKeyword'?'input':'change', debounce(loadTasks,300)));
+      document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>switchPage(b.dataset.page)); document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeModal(b.dataset.close));
       document.body.addEventListener('click', e=>{
-        const t=e.target.closest('[data-task]');
-        if(t) openTaskDetail(t.dataset.task);
-        const sw=e.target.closest('[data-select-worktype]');
-        if(sw && !e.target.closest('[data-edit-worktype]') && !e.target.closest('[data-del-worktype]')){ state.selectedAdminTypeId = sw.dataset.selectWorktype; renderAdmin(); }
-        const et=e.target.closest('[data-edit-template]');
-        if(et) openTemplateModal(et.dataset.editTemplate);
-        const d=e.target.closest('[data-del-template]');
-        if(d) deleteTemplate(d.dataset.delTemplate);
-        const ew=e.target.closest('[data-edit-worktype]');
-        if(ew) openWorkTypeModal(ew.dataset.editWorktype);
-        const dw=e.target.closest('[data-del-worktype]');
-        if(dw) deleteWorkType(dw.dataset.delWorktype);
+        const eu=e.target.closest('[data-edit-user]'); if(eu) openUserModal(eu.dataset.editUser);
+        const du=e.target.closest('[data-del-user]'); if(du) disableUser(du.dataset.delUser);
+        const ru=e.target.closest('[data-reset-user]'); if(ru) openResetPasswordModal(ru.dataset.resetUser);
+        const sw=e.target.closest('[data-select-worktype]'); if(sw && !e.target.closest('[data-edit-worktype]') && !e.target.closest('[data-del-worktype]')){ state.selectedAdminTypeId=sw.dataset.selectWorktype; renderAdmin(); }
+        const et=e.target.closest('[data-edit-template]'); if(et) openTemplateModal(et.dataset.editTemplate);
+        const dt=e.target.closest('[data-del-template]'); if(dt) deleteTemplate(dt.dataset.delTemplate);
+        const ew=e.target.closest('[data-edit-worktype]'); if(ew) openWorkTypeModal(ew.dataset.editWorktype);
+        const dw=e.target.closest('[data-del-worktype]'); if(dw) deleteWorkType(dw.dataset.delWorktype);
+        const task=e.target.closest('[data-task]'); if(task) openTaskDetail(task.dataset.task);
       });
-      $('detailSteps').addEventListener('change', e=>{ if(e.target.matches('input[type="checkbox"][data-step-id]')) updateStep(e.target); });
+      $('detailSteps').addEventListener('change', e=>{ if(e.target.matches('input[type="checkbox"][data-step-id]')){ if(isViewer()){ e.target.checked=!e.target.checked; toast('Viewer ไม่มีสิทธิ์แก้ checklist'); return; } updateStep(e.target); } });
       ['loginUsername','loginPassword'].forEach(id=>$(id).addEventListener('keydown', e=>{ if(e.key==='Enter') login(); }));
     }
-    function debounce(fn, ms){ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args),ms); }; }
+    function debounce(fn,ms){ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args),ms); }; }
 
     async function init(){
-      bindEvents();
-      $('apiUrlInput').value = state.apiUrl;
-      refreshTopbar();
-      if(state.apiUrl && state.token && state.user){
-        $('loginScreen').classList.add('hidden');
-        try{ await bootstrap(); }catch(e){ toast('Session expired / API error: ' + e.message); logout(); }
-      }
+      bindEvents(); $('apiUrlInput').value=state.apiUrl; refreshTopbar();
+      if(state.apiUrl && state.token && state.user){ $('loginScreen').classList.add('hidden'); try{ await bootstrap(); }catch(e){ toast('Session expired / API error: '+e.message); logout(); } }
     }
     init();
   </script>
