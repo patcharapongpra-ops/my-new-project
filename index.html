@@ -119,6 +119,16 @@
       background:rgba(15,23,34,.72);
       border-radius:16px;padding:12px;
     }
+    .admin-layout{display:grid;grid-template-columns:360px 1fr;gap:14px;align-items:start}
+    .type-list{display:flex;flex-direction:column;gap:8px;max-height:620px;overflow:auto;padding-right:4px}
+    .type-card{width:100%;border:1px solid rgba(36,52,73,.75);background:rgba(15,23,34,.72);color:var(--text);border-radius:16px;padding:12px;text-align:left;display:block}
+    .type-card:hover{border-color:rgba(255,122,24,.45)}
+    .type-card.active{border-color:rgba(255,122,24,.65);background:rgba(255,122,24,.10)}
+    .type-card .type-top{display:flex;align-items:center;gap:8px;justify-content:space-between}
+    .type-dot{width:12px;height:12px;border-radius:999px;background:#64748b;display:inline-block;box-shadow:0 0 0 4px rgba(255,255,255,.04)}
+    .type-name{font-weight:1000;font-size:14px}
+    .admin-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .empty-panel{border:1px dashed rgba(36,52,73,.9);border-radius:16px;padding:20px;text-align:center;color:var(--muted);background:rgba(14,21,32,.50)}
     .kpi .num{font-size:24px;font-weight:1000;margin-bottom:3px}
     .kpi .label{font-size:12px;color:var(--muted)}
 
@@ -165,7 +175,7 @@
     .login-card{width:min(520px,100%);border:1px solid rgba(36,52,73,.85);background:rgba(16,24,38,.94);border-radius:20px;padding:18px;box-shadow:0 35px 90px rgba(0,0,0,.55)}
 
     @media(max-width:1100px){
-      .layout{grid-template-columns:1fr}.sidebar{position:relative;top:auto}.nav{flex-direction:row;overflow:auto}.nav button{white-space:nowrap;width:auto}.kpi-grid{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:1fr 1fr}.filters .filter-actions{grid-column:1/-1}.form-grid{grid-template-columns:1fr}
+      .layout{grid-template-columns:1fr}.sidebar{position:relative;top:auto}.nav{flex-direction:row;overflow:auto}.nav button{white-space:nowrap;width:auto}.kpi-grid{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:1fr 1fr}.filters .filter-actions{grid-column:1/-1}.form-grid{grid-template-columns:1fr}.admin-layout{grid-template-columns:1fr}.type-list{max-height:none}
     }
     @media(max-width:640px){.topbar-inner{align-items:flex-start}.brand small{display:none}.kpi-grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr}.container{padding:10px}.card{padding:12px}}
   </style>
@@ -257,30 +267,42 @@
             <div class="spacer"></div>
             <button class="btn" id="btnRefreshAdmin">Refresh</button>
           </div>
-          <h3>Users</h3>
-          <div class="table-wrap" style="margin:8px 0 14px;"><table><thead><tr><th>User</th><th>Name</th><th>Role</th><th>Team</th><th>Active</th></tr></thead><tbody id="adminUsersBody"></tbody></table></div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;">
-            <h3>Checklist Templates</h3>
-            <button class="btn primary" id="btnOpenTemplate">+ Add Template Step</button>
-          </div>
-          <div class="table-wrap" style="margin:8px 0 14px;">
-            <table>
-              <thead>
-                <tr><th>Type</th><th>Step No</th><th>Step Name</th><th>Required</th><th>Action</th></tr>
-              </thead>
-              <tbody id="adminTemplatesBody"></tbody>
-            </table>
-          </div>
+          <div class="admin-layout">
+            <aside class="card" style="background:rgba(14,21,32,.50);">
+              <div class="admin-toolbar">
+                <div>
+                  <h3>Work Types</h3>
+                  <div class="muted">เลือกประเภทงานก่อน แล้วค่อยแก้ checklist</div>
+                </div>
+                <button class="btn primary" id="btnOpenWorkType">+ Add</button>
+              </div>
+              <div id="adminTypesBody" class="type-list"></div>
+            </aside>
 
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;">
-            <h3>Work Types</h3>
-            <button class="btn primary" id="btnOpenWorkType">+ Add Work Type</button>
-          </div>
-          <div class="table-wrap" style="margin-top:8px;">
-            <table>
-              <thead><tr><th>Type ID</th><th>Type Name</th><th>Description</th><th>Color</th><th>Active</th><th>Action</th></tr></thead>
-              <tbody id="adminTypesBody"></tbody>
-            </table>
+            <section>
+              <div class="card" style="background:rgba(14,21,32,.50);margin-bottom:14px;">
+                <div class="admin-toolbar">
+                  <div>
+                    <h3 id="selectedTypeTitle">Checklist Templates</h3>
+                    <div class="muted" id="selectedTypeSub">เลือก Work Type ทางซ้ายเพื่อดู step</div>
+                  </div>
+                  <button class="btn primary" id="btnOpenTemplate">+ Add Step</button>
+                </div>
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr><th>Step No</th><th>Step Name</th><th>Required</th><th>Action</th></tr>
+                    </thead>
+                    <tbody id="adminTemplatesBody"></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="card" style="background:rgba(14,21,32,.50);">
+                <h3>Users</h3>
+                <div class="table-wrap" style="margin-top:8px;"><table><thead><tr><th>User</th><th>Name</th><th>Role</th><th>Team</th><th>Active</th></tr></thead><tbody id="adminUsersBody"></tbody></table></div>
+              </div>
+            </section>
           </div>
         </section>
       </main>
@@ -380,9 +402,9 @@
         <div class="spacer"></div><button class="btn" data-close="workType">Close</button>
       </div>
       <div class="form-grid">
-        <div><label>Type ID</label><input id="wtTypeId" placeholder="ปล่อยว่างถ้าสร้างใหม่" /></div>
+        <input id="wtTypeId" type="hidden" />
         <div><label>Type Name *</label><input id="wtTypeName" placeholder="เช่น Survey" /></div>
-        <div><label>Color</label><input id="wtColor" placeholder="#64748b" /></div>
+        <div><label>Color</label><input id="wtColor" placeholder="Auto" readonly /></div>
         <div class="full"><label>Description</label><input id="wtDescription" placeholder="รายละเอียดประเภทงาน" /></div>
       </div>
       <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:14px;">
@@ -431,6 +453,7 @@
       workTypes: [],
       templates: [],
       tasks: [],
+      selectedAdminTypeId: '',
       currentTaskId: '',
       currentTask: null
     };
@@ -558,9 +581,29 @@
     }
 
     function renderAdmin(){
-      $('adminTemplatesBody').innerHTML = state.templates.map(t=>`<tr><td>${badge(t.typeId)}</td><td>${esc(t.stepNo)}</td><td>${esc(t.stepName)}</td><td>${esc(t.required)}</td><td><button class="btn" data-edit-template="${esc(t.templateId)}">Edit</button> <button class="btn danger" data-del-template="${esc(t.templateId)}">Delete</button></td></tr>`).join('') || emptyRow(5,'No templates');
+      if(!state.selectedAdminTypeId && state.workTypes.length){
+        state.selectedAdminTypeId = state.workTypes[0].typeId;
+      }
+      const selectedType = state.workTypes.find(w=>String(w.typeId)===String(state.selectedAdminTypeId));
+      $('selectedTypeTitle').textContent = selectedType ? `Checklist: ${selectedType.typeName}` : 'Checklist Templates';
+      $('selectedTypeSub').textContent = selectedType ? `${selectedType.typeId} · ${selectedType.description || ''}` : 'เลือก Work Type ทางซ้ายเพื่อดู step';
+
+      $('adminTypesBody').innerHTML = state.workTypes.map(w=>`
+        <button class="type-card ${String(w.typeId)===String(state.selectedAdminTypeId)?'active':''}" data-select-worktype="${esc(w.typeId)}">
+          <div class="type-top">
+            <div style="display:flex;align-items:center;gap:8px;"><span class="type-dot" style="background:${esc(w.color || '#64748b')}"></span><span class="type-name">${esc(w.typeName)}</span></div>
+            <span class="badge">${esc(w.typeId)}</span>
+          </div>
+          <div class="muted" style="margin-top:6px;">${esc(w.description || '-')}</div>
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <span class="btn" data-edit-worktype="${esc(w.typeId)}">Edit</span>
+            <span class="btn danger" data-del-worktype="${esc(w.typeId)}">Delete</span>
+          </div>
+        </button>`).join('') || '<div class="empty-panel">No work types</div>';
+
+      const filteredTemplates = state.templates.filter(t=>String(t.typeId)===String(state.selectedAdminTypeId));
+      $('adminTemplatesBody').innerHTML = filteredTemplates.map(t=>`<tr><td>${esc(t.stepNo)}</td><td>${esc(t.stepName)}</td><td>${esc(t.required)}</td><td><button class="btn" data-edit-template="${esc(t.templateId)}">Edit</button> <button class="btn danger" data-del-template="${esc(t.templateId)}">Delete</button></td></tr>`).join('') || emptyRow(4,'ยังไม่มี checklist step สำหรับ Work Type นี้');
       $('adminUsersBody').innerHTML = state.users.map(u=>`<tr><td>${esc(u.username)}</td><td>${esc(u.displayName)}</td><td>${badge(u.role)}</td><td>${esc(u.team)}</td><td>${esc(u.active)}</td></tr>`).join('') || emptyRow(5,'No users');
-      $('adminTypesBody').innerHTML = state.workTypes.map(w=>`<tr><td>${esc(w.typeId)}</td><td>${badge(w.typeName)}</td><td>${esc(w.description)}</td><td>${esc(w.color || '')}</td><td>${esc(w.active)}</td><td><button class="btn" data-edit-worktype="${esc(w.typeId)}">Edit</button> <button class="btn danger" data-del-worktype="${esc(w.typeId)}">Delete</button></td></tr>`).join('') || emptyRow(6,'No work types');
     }
 
     function taskRowRecent(t){
@@ -731,7 +774,7 @@
     function openTemplateModal(templateId){
       const t = templateId ? state.templates.find(x=>String(x.templateId)===String(templateId)) : null;
       $('templateModalTitle').textContent = t ? 'Edit Checklist Template Step' : 'Add Checklist Template Step';
-      $('tplType').value = t ? t.typeId : ($('tplType').value || '');
+      $('tplType').value = t ? t.typeId : (state.selectedAdminTypeId || $('tplType').value || '');
       $('tplStepNo').value = t ? t.stepNo : '';
       $('tplStepName').value = t ? t.stepName : '';
       openModal('template');
@@ -768,10 +811,9 @@
       const w = typeId ? state.workTypes.find(x=>String(x.typeId)===String(typeId)) : null;
       $('workTypeModalTitle').textContent = w ? 'Edit Work Type' : 'Add Work Type';
       $('wtTypeId').value = w ? (w.typeId || '') : '';
-      $('wtTypeId').readOnly = !!w;
       $('wtTypeName').value = w ? (w.typeName || '') : '';
       $('wtDescription').value = w ? (w.description || '') : '';
-      $('wtColor').value = w ? (w.color || '#64748b') : '#64748b';
+      $('wtColor').value = w ? (w.color || autoColorFromText(w.typeName || '')) : autoColorFromText('');
       openModal('workType');
     }
 
@@ -781,7 +823,7 @@
         typeId: $('wtTypeId').value,
         typeName: $('wtTypeName').value,
         description: $('wtDescription').value,
-        color: $('wtColor').value
+        color: $('wtColor').value || autoColorFromText($('wtTypeName').value)
       };
       if(!payload.typeName){ toast('กรอก Type Name'); return; }
       try{
@@ -792,6 +834,10 @@
         $('wtDescription').value='';
         $('wtColor').value='#64748b';
         await bootstrap();
+        const savedTypeName = payload.typeName;
+        const found = state.workTypes.find(w=>String(w.typeName).toLowerCase()===String(savedTypeName).toLowerCase());
+        if(found) state.selectedAdminTypeId = found.typeId;
+        renderAdmin();
         toast('บันทึก Work Type แล้ว');
       }catch(e){ toast('Save work type failed: ' + e.message); }
     }
@@ -805,6 +851,14 @@
       }catch(e){ toast('Delete work type failed: ' + e.message); }
     }
 
+    function autoColorFromText(text){
+      const palette = ['#ff7a18','#38bdf8','#22c55e','#a855f7','#ef4444','#f59e0b','#14b8a6','#64748b'];
+      const s = String(text || 'new');
+      let sum = 0;
+      for(let i=0;i<s.length;i++) sum += s.charCodeAt(i);
+      return palette[sum % palette.length];
+    }
+
     function bindEvents(){
       $('btnLogin').onclick = login;
       $('btnLogout').onclick = logout;
@@ -815,6 +869,7 @@
       $('btnSaveTemplate').onclick = saveTemplate;
       $('btnOpenWorkType').onclick = () => openWorkTypeModal('');
       $('btnSaveWorkType').onclick = saveWorkType;
+      $('wtTypeName').addEventListener('input', ()=>{ if(!$('wtTypeId').value) $('wtColor').value = autoColorFromText($('wtTypeName').value); });
       $('btnOpenCreate').onclick = () => openModal('create');
       $('btnOpenCreate2').onclick = () => openModal('create');
       $('btnCreateTask').onclick = createTask;
@@ -828,6 +883,8 @@
       document.body.addEventListener('click', e=>{
         const t=e.target.closest('[data-task]');
         if(t) openTaskDetail(t.dataset.task);
+        const sw=e.target.closest('[data-select-worktype]');
+        if(sw && !e.target.closest('[data-edit-worktype]') && !e.target.closest('[data-del-worktype]')){ state.selectedAdminTypeId = sw.dataset.selectWorktype; renderAdmin(); }
         const et=e.target.closest('[data-edit-template]');
         if(et) openTemplateModal(et.dataset.editTemplate);
         const d=e.target.closest('[data-del-template]');
