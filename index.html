@@ -3,12 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Provisioning Portal</title>
+  <title>Provisioning Work Center v2</title>
   <style>
     :root{
       --bg:#0b0f14;
       --panel:#101826;
       --panel2:#0f1722;
+      --card:#121a24;
       --line:#243449;
       --text:#eaf2ff;
       --muted:#8fa4be;
@@ -17,380 +18,599 @@
       --ok:#37d67a;
       --warn:#ffd089;
       --bad:#ff5c7a;
+      --blue:#38bdf8;
+      --radius:16px;
     }
     *{box-sizing:border-box}
     body{
       margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-      background: radial-gradient(1200px 600px at 10% 0%, rgba(255,122,24,.16), transparent 55%),
-                  radial-gradient(900px 500px at 90% 20%, rgba(255,154,60,.10), transparent 55%),
-                  linear-gradient(180deg, #0b0f14, #070a0d);
-      color:var(--text);
       min-height:100vh;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:
+        radial-gradient(1100px 520px at 8% 0%, rgba(255,122,24,.15), transparent 55%),
+        radial-gradient(900px 480px at 92% 15%, rgba(56,189,248,.08), transparent 55%),
+        linear-gradient(180deg, #0b0f14, #070a0d);
+      color:var(--text);
     }
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    .hidden{display:none!important}
 
     .topbar{
-      position:sticky; top:0; z-index:10;
-      backdrop-filter: blur(10px);
-      background: rgba(11,15,20,.65);
-      border-bottom:1px solid rgba(36,52,73,.65);
+      position:sticky;top:0;z-index:20;
+      border-bottom:1px solid rgba(36,52,73,.75);
+      background:rgba(11,15,20,.82);
+      backdrop-filter:blur(10px);
     }
     .topbar-inner{
-      max-width:1200px; margin:0 auto;
-      display:flex; align-items:center; gap:12px;
-      padding:12px 16px;
+      max-width:1500px;margin:0 auto;padding:12px 16px;
+      display:flex;align-items:center;gap:12px;
     }
-    .brand{display:flex; align-items:center; gap:10px; font-weight:900; letter-spacing:.2px;}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:950;letter-spacing:.02em}
     .logo{
-      width:34px; height:34px; border-radius:12px;
-      background: linear-gradient(180deg, var(--accent), #d85f0f);
-      box-shadow: 0 10px 30px rgba(255,122,24,.18);
-      display:grid; place-items:center;
-      font-weight:1000; color:#1a0d05;
+      width:36px;height:36px;border-radius:13px;
+      display:grid;place-items:center;
+      background:linear-gradient(180deg,var(--accent),#d85f0f);
+      color:#1a0d05;font-weight:1000;
+      box-shadow:0 12px 30px rgba(255,122,24,.18);
     }
-    .brand small{display:block; font-weight:700; color:var(--muted); margin-top:2px; letter-spacing:0}
+    .brand small{display:block;color:var(--muted);font-size:12px;font-weight:700;margin-top:2px;letter-spacing:0}
     .spacer{flex:1}
-    .userbox{display:flex; align-items:center; gap:10px; color:var(--muted); font-size:13px;}
     .pill{
-      border:1px solid rgba(36,52,73,.9);
-      background: rgba(16,24,38,.75);
-      padding:6px 10px;
-      border-radius:999px;
+      display:inline-flex;align-items:center;gap:6px;
+      border:1px solid rgba(36,52,73,.85);
+      background:rgba(16,24,38,.65);
       color:var(--muted);
-      font-size:12px;
+      padding:6px 10px;border-radius:999px;font-size:12px;white-space:nowrap;
     }
-    .pill.ok{border-color: rgba(55,214,122,.45); color:#d4ffe6;}
-    .pill.bad{border-color: rgba(255,92,122,.45); color:#ffd1dc;}
+    .pill.ok{border-color:rgba(55,214,122,.45);color:#d4ffe6}
+    .pill.warn{border-color:rgba(255,208,137,.45);color:#ffeac7}
+    .pill.bad{border-color:rgba(255,92,122,.45);color:#ffd1dc}
+
     .btn{
       border:1px solid rgba(36,52,73,.9);
-      background: rgba(16,24,38,.75);
+      background:rgba(16,24,38,.72);
       color:var(--text);
-      padding:9px 12px;
-      border-radius:12px;
-      cursor:pointer;
-      font-weight:900;
+      padding:9px 12px;border-radius:12px;font-weight:900;
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
     }
+    .btn:hover{border-color:rgba(255,122,24,.45)}
     .btn.primary{
-      background: linear-gradient(180deg, rgba(255,122,24,.95), rgba(216,95,15,.95));
-      border-color: rgba(255,122,24,.55);
+      background:linear-gradient(180deg,rgba(255,122,24,.95),rgba(216,95,15,.95));
+      border-color:rgba(255,122,24,.55);
       color:#1a0d05;
     }
-    .btn.ghost{background: rgba(16,24,38,.35);}
-    .btn:disabled{opacity:.55;cursor:not-allowed}
+    .btn.danger{background:rgba(255,92,122,.12);border-color:rgba(255,92,122,.35);color:#ffd1dc}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
 
-    .container{max-width:1200px; margin:0 auto; padding:16px;}
-    .layout{display:grid; grid-template-columns: 260px 1fr; gap:14px; align-items:start;}
-
+    .container{max-width:1500px;margin:0 auto;padding:16px}
+    .layout{display:grid;grid-template-columns:260px 1fr;gap:14px;align-items:start}
     .sidebar{
+      position:sticky;top:74px;
       border:1px solid rgba(36,52,73,.75);
-      background: rgba(16,24,38,.65);
-      border-radius:18px;
-      padding:14px;
-      position:sticky; top:76px;
+      background:rgba(16,24,38,.60);
+      border-radius:18px;padding:14px;
     }
-    .nav-title{
-      font-size:12px; color:var(--muted);
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      margin:2px 0 10px;
+    .nav-title{font-size:11px;color:var(--muted);letter-spacing:.13em;text-transform:uppercase;margin:0 0 10px}
+    .nav{display:flex;flex-direction:column;gap:8px}
+    .nav button{
+      text-align:left;justify-content:flex-start;width:100%;
+      border-radius:14px;padding:11px 12px;
     }
-    .nav{display:flex; flex-direction:column; gap:8px;}
-    .nav a{
-      text-decoration:none;
-      color:var(--text);
-      border:1px solid rgba(36,52,73,.75);
-      background: rgba(15,23,34,.6);
-      padding:10px 12px;
-      border-radius:14px;
-      display:flex; align-items:center; justify-content:space-between;
-      transition: transform .05s ease, border-color .2s ease;
-    }
-    .nav a:hover{border-color: rgba(255,122,24,.55); transform: translateY(-1px);}
-    .nav a .tag{
-      font-size:11px; color:var(--muted);
-      border:1px solid rgba(36,52,73,.75);
-      padding:2px 8px; border-radius:999px;
-      background: rgba(16,24,38,.55);
-    }
+    .nav button.active{border-color:rgba(255,122,24,.55);background:rgba(255,122,24,.11)}
 
-    .main{
+    .main{min-height:640px}
+    .card{
       border:1px solid rgba(36,52,73,.75);
-      background: rgba(16,24,38,.55);
-      border-radius:18px;
-      padding:18px;
-      min-height:520px;
+      background:rgba(16,24,38,.58);
+      border-radius:18px;padding:14px;
+      box-shadow:0 12px 35px rgba(0,0,0,.20);
     }
-    .hero{
-      border:1px solid rgba(255,122,24,.25);
-      background: radial-gradient(800px 260px at 20% 0%, rgba(255,122,24,.14), transparent 55%),
-                  rgba(15,23,34,.55);
-      border-radius:18px;
-      padding:16px;
-    }
-    .hero h2{margin:0; font-size:18px;}
-    .hero p{margin:6px 0 0; color:var(--muted); font-size:13px; line-height:1.5}
-    .grid{margin-top:14px; display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:12px;}
-    .card{border:1px solid rgba(36,52,73,.75); background: rgba(15,23,34,.55); border-radius:16px; padding:14px;}
-    .card h3{margin:0; font-size:14px;}
-    .card p{margin:6px 0 0; font-size:12px; color:var(--muted); line-height:1.5}
-    .hidden{display:none !important;}
+    .section-head{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+    h1,h2,h3{margin:0}
+    h1{font-size:20px}
+    h2{font-size:16px}
+    h3{font-size:14px}
+    .muted{color:var(--muted);font-size:12px;line-height:1.45}
 
-    .overlay{
-      position:fixed; inset:0;
-      display:grid; place-items:center;
-      padding:16px;
-      background: rgba(0,0,0,.45);
-      backdrop-filter: blur(6px);
-      z-index:50;
+    .kpi-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:14px}
+    .kpi{
+      border:1px solid rgba(36,52,73,.75);
+      background:rgba(15,23,34,.72);
+      border-radius:16px;padding:12px;
     }
-    .login{
-      width:min(520px, 100%);
-      border:1px solid rgba(36,52,73,.85);
-      background: rgba(16,24,38,.92);
-      border-radius:18px;
-      padding:18px;
-      box-shadow: 0 30px 80px rgba(0,0,0,.45);
-    }
-    .login h2{margin:0; font-size:18px;}
-    .login .sub{margin-top:6px; font-size:13px; color:var(--muted); line-height:1.5}
-    .row{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; align-items:center}
-    input{
-      background: rgba(14,21,32,.95);
-      border:1px solid rgba(36,52,73,.9);
-      color:var(--text);
-      padding:10px 10px;
-      border-radius:12px;
-      outline:none;
-      min-width:200px;
-    }
-    input::placeholder{color:#6f859d}
-    pre{
-      margin-top:10px;
-      white-space:pre-wrap;word-break:break-word;
-      background: rgba(14,21,32,.95);
-      border:1px solid rgba(36,52,73,.9);
-      padding:10px;border-radius:12px;
-      color:#cfe3ff;font-size:12px;
-    }
+    .kpi .num{font-size:24px;font-weight:1000;margin-bottom:3px}
+    .kpi .label{font-size:12px;color:var(--muted)}
 
-    @media (max-width: 980px){
-      .layout{grid-template-columns: 1fr;}
-      .sidebar{position:relative; top:auto;}
-      .grid{grid-template-columns: 1fr;}
+    .filters{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr auto;gap:10px;margin-bottom:12px}
+    label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-weight:700}
+    input,select,textarea{
+      width:100%;border:1px solid rgba(36,52,73,.9);
+      background:rgba(14,21,32,.95);
+      color:var(--text);padding:10px;border-radius:12px;outline:none;
     }
+    textarea{min-height:74px;resize:vertical}
+    input:focus,select:focus,textarea:focus{border-color:rgba(255,122,24,.70);box-shadow:0 0 0 3px rgba(255,122,24,.13)}
+
+    .table-wrap{overflow:auto;border:1px solid rgba(36,52,73,.75);border-radius:16px;background:rgba(14,21,32,.72)}
+    table{width:100%;border-collapse:collapse;min-width:980px}
+    th,td{padding:10px 9px;border-bottom:1px solid rgba(36,52,73,.75);font-size:12px;text-align:left;vertical-align:top}
+    th{position:sticky;top:0;background:#101826;color:#cfe3ff;font-weight:1000;z-index:1}
+    tr:hover td{background:rgba(255,122,24,.035)}
+    .linkish{color:#ffd7bf;font-weight:900;cursor:pointer;text-decoration:none}
+    .progress{
+      height:8px;border:1px solid rgba(36,52,73,.8);background:#0b0f14;border-radius:999px;overflow:hidden;margin-top:5px;width:100px;
+    }
+    .progress>div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%}
+    .badge{display:inline-flex;align-items:center;border:1px solid rgba(36,52,73,.75);background:rgba(16,24,38,.7);border-radius:999px;padding:4px 8px;font-size:11px;white-space:nowrap;color:#d7e8ff}
+    .badge.status-BLOCKED,.badge.priority-URGENT{border-color:rgba(255,92,122,.50);color:#ffd1dc;background:rgba(255,92,122,.10)}
+    .badge.status-DONE{border-color:rgba(55,214,122,.50);color:#d4ffe6;background:rgba(55,214,122,.09)}
+    .badge.status-WAITING{border-color:rgba(255,208,137,.50);color:#ffeac7;background:rgba(255,208,137,.08)}
+    .badge.priority-HIGH{border-color:rgba(255,208,137,.45);color:#ffeac7}
+
+    .modal-backdrop{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.58);display:none;align-items:center;justify-content:center;padding:16px}
+    .modal-backdrop.show{display:flex}
+    .modal{width:min(980px,96vw);max-height:92vh;overflow:auto;background:#0e1520;border:1px solid rgba(36,52,73,.9);border-radius:20px;padding:16px;box-shadow:0 35px 90px rgba(0,0,0,.55)}
+    .modal.small{width:min(720px,96vw)}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .form-grid .full{grid-column:1/-1}
+    .step{display:flex;gap:10px;align-items:flex-start;border:1px solid rgba(36,52,73,.75);background:#0b0f14;border-radius:14px;padding:10px;margin-top:8px}
+    .step input[type="checkbox"]{width:18px;height:18px;margin-top:2px;accent-color:#ff7a18}
+    .step .name{font-weight:900;font-size:13px}
+    .step .meta{font-size:11px;color:var(--muted);margin-top:3px}
+    .logbox{border:1px solid rgba(36,52,73,.75);background:#0b0f14;border-radius:14px;padding:10px;max-height:220px;overflow:auto}
+    .toast{position:fixed;right:16px;bottom:16px;background:#0e1520;border:1px solid rgba(36,52,73,.9);padding:10px 12px;border-radius:12px;z-index:90;display:none}
+
+    .login-screen{position:fixed;inset:0;z-index:80;display:grid;place-items:center;background:rgba(0,0,0,.48);backdrop-filter:blur(8px);padding:16px}
+    .login-card{width:min(520px,100%);border:1px solid rgba(36,52,73,.85);background:rgba(16,24,38,.94);border-radius:20px;padding:18px;box-shadow:0 35px 90px rgba(0,0,0,.55)}
+
+    @media(max-width:1100px){
+      .layout{grid-template-columns:1fr}.sidebar{position:relative;top:auto}.nav{flex-direction:row;overflow:auto}.nav button{white-space:nowrap;width:auto}.kpi-grid{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:1fr 1fr}.filters .filter-actions{grid-column:1/-1}.form-grid{grid-template-columns:1fr}
+    }
+    @media(max-width:640px){.topbar-inner{align-items:flex-start}.brand small{display:none}.kpi-grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr}.container{padding:10px}.card{padding:12px}}
   </style>
 </head>
 <body>
-
   <div class="topbar">
     <div class="topbar-inner">
       <div class="brand">
         <div class="logo">P</div>
-        <div>
-          Provisioning Portal
-          <small>Daily work tracking • Sync to Drive</small>
-        </div>
+        <div>Provisioning Work Center <small>Team Dashboard • Multi Checklist • Google Sheet DB</small></div>
       </div>
-
       <div class="spacer"></div>
-
-      <div class="userbox">
-        <span class="pill" id="who">Not logged in</span>
-        <button class="btn ghost hidden" id="btnLogout">Logout</button>
-      </div>
+      <span class="pill" id="apiStatus">API: not set</span>
+      <span class="pill" id="userPill">Not logged in</span>
+      <button class="btn hidden" id="btnLogout">Logout</button>
     </div>
   </div>
 
   <div class="container">
     <div class="layout">
-
       <aside class="sidebar">
-        <div class="nav-title">Navigation</div>
-        <nav class="nav" id="nav">
-          <a href="provi-daily-checklist.html">
-            <span>Provi Daily Checklist</span>
-            <span class="tag">Work</span>
-          </a>
-          <a href="temp_configuration.html">
-            <span>Temp Configuration</span>
-            <span class="tag">Tools</span>
-          </a>
-          <a href="#" id="openDrive">
-            <span>Open Drive Folder</span>
-            <span class="tag">Files</span>
-          </a>
-        </nav>
-
-        <div style="margin-top:12px;color:var(--muted);font-size:12px;line-height:1.5;">
-          * เมนูเพิ่มได้ในอนาคต<br/>
-          * Login แล้วถึงใช้งานได้
+        <div class="nav-title">Menu</div>
+        <div class="nav">
+          <button class="btn active" data-page="dashboard">Dashboard</button>
+          <button class="btn" data-page="tasks">Tasks</button>
+          <button class="btn" data-page="admin">Admin</button>
+        </div>
+        <div class="muted" style="margin-top:12px;">
+          v2 เริ่มต้น: ใช้ Sheet ใหม่เท่านั้น ไม่แตะข้อมูลระบบเดิม
         </div>
       </aside>
 
       <main class="main">
-        <div class="hero">
-          <h2>Announcement / Dashboard</h2>
-          <p>พื้นที่ตรงกลางไว้ประกาศงาน / แจ้งเตือน / หรือสรุปสถานะภาพรวมในอนาคต</p>
-          <div style="margin-top:10px;">
-            <span class="pill" id="userHint">Login เพื่อเริ่มใช้งาน</span>
+        <section class="card" id="page-dashboard">
+          <div class="section-head">
+            <div>
+              <h1>Dashboard รวมทุกคน</h1>
+              <div class="muted">ดูภาพรวมงาน, blocker, due date และงานใกล้ install</div>
+            </div>
+            <div class="spacer"></div>
+            <button class="btn" id="btnRefreshDash">Refresh</button>
+            <button class="btn primary" id="btnOpenCreate">+ New Task</button>
           </div>
-        </div>
+          <div class="kpi-grid" id="kpiGrid"></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>งานล่าสุด</th><th>Owner</th><th>Type</th><th>Status</th><th>Priority</th><th>Progress</th><th>Due</th><th>Install</th></tr></thead>
+              <tbody id="recentTasksBody"></tbody>
+            </table>
+          </div>
+        </section>
 
-        <div class="grid">
-          <div class="card">
-            <h3>Today focus</h3>
-            <p>ไว้สรุปงานค้าง/งานด่วน/ใกล้วันติดตั้ง (ทำต่อในเฟสถัดไป)</p>
+        <section class="card hidden" id="page-tasks">
+          <div class="section-head">
+            <div>
+              <h1>Tasks</h1>
+              <div class="muted">ค้นหาและกรองงานทั้งหมดในทีม</div>
+            </div>
+            <div class="spacer"></div>
+            <button class="btn" id="btnRefreshTasks">Refresh</button>
+            <button class="btn primary" id="btnOpenCreate2">+ New Task</button>
           </div>
-          <div class="card">
-            <h3>Policy</h3>
-            <p>Sync ผ่าน Apps Script → Drive/Sheet รายเดือนแยก user</p>
+
+          <div class="filters">
+            <div><label>Keyword</label><input id="filterKeyword" placeholder="ค้นหา title / CID / SOF / customer / owner" /></div>
+            <div><label>Owner</label><select id="filterOwner"></select></div>
+            <div><label>Type</label><select id="filterType"></select></div>
+            <div><label>Status</label><select id="filterStatus"></select></div>
+            <div><label>Priority</label><select id="filterPriority"></select></div>
+            <div class="filter-actions" style="display:flex;align-items:flex-end;gap:8px;"><button class="btn" id="btnClearFilters">Clear</button></div>
           </div>
-          <div class="card">
-            <h3>Notes</h3>
-            <p>พี่แก้ข้อความประกาศตรงกลางได้ตามต้องการ</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Task</th><th>Owner</th><th>Type</th><th>Status</th><th>Priority</th><th>Progress</th><th>CID/SOF</th><th>Due</th><th>Install</th><th>Updated</th></tr>
+              </thead>
+              <tbody id="tasksBody"></tbody>
+            </table>
           </div>
-        </div>
+        </section>
+
+        <section class="card hidden" id="page-admin">
+          <div class="section-head">
+            <div>
+              <h1>Admin / Master Data</h1>
+              <div class="muted">รอบแรกแสดงข้อมูลตั้งต้นจาก Sheet ก่อน การแก้ไข template จะทำเฟสถัดไป</div>
+            </div>
+            <div class="spacer"></div>
+            <button class="btn" id="btnRefreshAdmin">Refresh</button>
+          </div>
+          <h3>Users</h3>
+          <div class="table-wrap" style="margin:8px 0 14px;"><table><thead><tr><th>User</th><th>Name</th><th>Role</th><th>Team</th><th>Active</th></tr></thead><tbody id="adminUsersBody"></tbody></table></div>
+          <h3>Work Types</h3>
+          <div class="table-wrap" style="margin-top:8px;"><table><thead><tr><th>Type</th><th>Description</th><th>Active</th></tr></thead><tbody id="adminTypesBody"></tbody></table></div>
+        </section>
       </main>
-
     </div>
   </div>
 
-  <div class="overlay" id="overlay">
-    <div class="login">
-      <h2>Login</h2>
-      <div class="sub">กรอกชื่อผู้ใช้และรหัสผ่าน เพื่อเข้าใช้งาน Provisioning Portal</div>
-
-      <div class="row">
-        <input id="userPick" placeholder="Username" autocomplete="username" />
-        <input id="pass" type="password" placeholder="Password" autocomplete="current-password" />
+  <div class="login-screen" id="loginScreen">
+    <div class="login-card">
+      <div class="brand" style="margin-bottom:12px;"><div class="logo">P</div><div>Provisioning Work Center <small>Sign in to continue</small></div></div>
+      <label>API Web App URL</label>
+      <input id="apiUrlInput" placeholder="https://script.google.com/macros/s/.../exec" />
+      <div class="muted" style="margin:6px 0 12px;">ใส่ URL ที่ได้จาก Deploy Web App ของ Apps Script v2 แล้วระบบจะจำไว้ใน browser</div>
+      <div class="form-grid">
+        <div><label>Username</label><input id="loginUsername" autocomplete="username" placeholder="admin" /></div>
+        <div><label>Password</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="1234" /></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:14px;align-items:center;">
         <button class="btn primary" id="btnLogin">Sign in</button>
+        <span class="muted" id="loginMsg">Demo: admin / 1234</span>
       </div>
-
-      <div class="sub" style="margin-top:10px;">
-        * Login แล้ว กล่องนี้จะหายไป เหลือ Logout มุมขวาบน
-      </div>
-
-      <pre id="loginDebug">-</pre>
     </div>
   </div>
+
+  <div class="modal-backdrop" id="createModalBack">
+    <div class="modal small">
+      <div class="section-head">
+        <div><h2>สร้างงานใหม่</h2><div class="muted">เลือกประเภทงาน แล้วระบบจะสร้าง checklist ตาม template ให้อัตโนมัติ</div></div>
+        <div class="spacer"></div><button class="btn" data-close="create">Close</button>
+      </div>
+      <div class="form-grid">
+        <div class="full"><label>Title *</label><input id="newTitle" placeholder="เช่น C1234 - Customer ABC DIA" /></div>
+        <div><label>Work Type *</label><select id="newType"></select></div>
+        <div><label>Owner *</label><select id="newOwner"></select></div>
+        <div><label>Priority</label><select id="newPriority"><option>NORMAL</option><option>LOW</option><option>HIGH</option><option>URGENT</option></select></div>
+        <div><label>Status</label><select id="newStatus"><option>NEW</option><option>IN_PROGRESS</option><option>WAITING</option><option>BLOCKED</option><option>READY_INSTALL</option></select></div>
+        <div><label>SOF</label><input id="newSof" /></div>
+        <div><label>CID</label><input id="newCid" /></div>
+        <div><label>Customer Name</label><input id="newCustomer" /></div>
+        <div><label>Service Name</label><input id="newService" /></div>
+        <div><label>Due Date</label><input id="newDue" type="date" /></div>
+        <div><label>Install Date</label><input id="newInstall" type="date" /></div>
+        <div class="full"><label>Remark</label><textarea id="newRemark" placeholder="รายละเอียดเพิ่มเติม"></textarea></div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px;">
+        <button class="btn" data-close="create">Cancel</button>
+        <button class="btn primary" id="btnCreateTask">Create Task</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="detailModalBack">
+    <div class="modal">
+      <div class="section-head">
+        <div><h2 id="detailTitle">Task Detail</h2><div class="muted" id="detailSub">-</div></div>
+        <div class="spacer"></div><button class="btn" data-close="detail">Close</button>
+      </div>
+      <div class="kpi-grid" style="grid-template-columns:repeat(4,minmax(0,1fr));" id="detailKpis"></div>
+      <h3>Checklist</h3>
+      <div id="detailSteps" style="margin-bottom:14px;"></div>
+      <h3>Comments</h3>
+      <div style="display:flex;gap:8px;margin:8px 0;"><input id="commentInput" placeholder="เพิ่ม comment" /><button class="btn primary" id="btnAddComment">Add</button></div>
+      <div class="logbox" id="detailComments" style="margin-bottom:14px;"></div>
+      <h3>Logs</h3>
+      <div class="logbox" id="detailLogs"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
 
   <script>
-    /** ===== CONFIG ===== */
-    const API_URL = "https://script.google.com/macros/s/AKfycbwBHkVJ6TWyG0-pefvL1alAlB5RZVsix_g7kdM4TfGp_qiyKLll7lof5iZZfjASBy3pvg/exec";
-    const ROOT_DRIVE_FOLDER_ID = "1sxBCtzxb7J_Hkw_9o_klPkQHHXLyMtIk";
-    const SESSION_KEY = "provi_session"; // {user,pass,ymLastSync}
-
-    const $ = (id) => document.getElementById(id);
-    const logLogin = (obj) => {
-      $("loginDebug").textContent = (typeof obj === "string") ? obj : JSON.stringify(obj, null, 2);
+    const APP = {
+      apiUrlKey: 'provi_wc_v2_api_url',
+      tokenKey: 'provi_wc_v2_token',
+      userKey: 'provi_wc_v2_user'
     };
 
-    function getSession(){
-      try { return JSON.parse(localStorage.getItem(SESSION_KEY) || "{}"); }
-      catch { return {}; }
-    }
-    function setSession(s){ localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }
-    function clearSession(){ localStorage.removeItem(SESSION_KEY); }
+    const STATUS_LIST = ['NEW','IN_PROGRESS','WAITING','BLOCKED','READY_INSTALL','INSTALLED','DONE','CANCELLED'];
+    const PRIORITY_LIST = ['LOW','NORMAL','HIGH','URGENT'];
 
-    function refreshUI(){
-      const s = getSession();
-      const loggedIn = !!(s.user && s.pass);
+    const $ = id => document.getElementById(id);
+    const state = {
+      apiUrl: localStorage.getItem(APP.apiUrlKey) || '',
+      token: localStorage.getItem(APP.tokenKey) || '',
+      user: readJson(localStorage.getItem(APP.userKey), null),
+      users: [],
+      workTypes: [],
+      templates: [],
+      tasks: [],
+      currentTaskId: ''
+    };
 
-      const who = $("who");
-      who.textContent = loggedIn ? `Logged in: ${s.user}` : "Not logged in";
-      who.classList.toggle("ok", loggedIn);
-      who.classList.toggle("bad", !loggedIn);
+    function readJson(s, fallback){ try{return JSON.parse(s)}catch{return fallback} }
+    function esc(s){ return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+    function toast(msg){ const t=$('toast'); t.textContent=msg; t.style.display='block'; clearTimeout(toast._t); toast._t=setTimeout(()=>t.style.display='none',1800); }
+    function setLoading(btn, loading){ if(!btn) return; btn.disabled=!!loading; btn.dataset.oldText = btn.dataset.oldText || btn.textContent; btn.textContent = loading ? 'Loading...' : btn.dataset.oldText; }
+    function progressHtml(pct){ const p=Number(pct||0); return `<div><b>${p}%</b><div class="progress"><div style="width:${Math.max(0,Math.min(100,p))}%"></div></div></div>`; }
+    function badge(text, cls=''){ return `<span class="badge ${cls}">${esc(text || '-')}</span>`; }
 
-      $("btnLogout").classList.toggle("hidden", !loggedIn);
-      $("overlay").classList.toggle("hidden", loggedIn);
-      $("userHint").textContent = loggedIn ? `Welcome, ${s.user}` : "Login เพื่อเริ่มใช้งาน";
-      $("nav").style.opacity = loggedIn ? "1" : ".55";
-    }
-
-    function requireLoginOrWarn(){
-      const s = getSession();
-      if (s.user && s.pass) return true;
-      alert("กรุณา Login ก่อน");
-      return false;
-    }
-
-    function openDriveFolder(){
-      window.open(`https://drive.google.com/drive/folders/${ROOT_DRIVE_FOLDER_ID}`, "_blank");
-    }
-
-    /** ===== JSONP helper (avoid CORS) ===== */
-    function jsonp(url){
-      return new Promise((resolve, reject)=>{
-        const cb = "cb_" + Math.random().toString(16).slice(2);
-        const s = document.createElement("script");
-        const timer = setTimeout(()=>{ cleanup(); reject(new Error("JSONP_TIMEOUT")); }, 15000);
-
-        function cleanup(){
-          clearTimeout(timer);
-          try{ delete window[cb]; }catch(_){}
-          s.remove();
-        }
-
-        window[cb] = (data)=>{ cleanup(); resolve(data); };
-        s.src = url + (url.includes("?") ? "&" : "?") + "callback=" + cb;
-        s.onerror = ()=>{ cleanup(); reject(new Error("JSONP_LOAD_FAIL")); };
-        document.body.appendChild(s);
+    function apiCall(mode, body={}){
+      if(!state.apiUrl) return Promise.reject(new Error('NO_API_URL'));
+      return new Promise((resolve, reject) => {
+        const cb = 'cb_' + Math.random().toString(16).slice(2);
+        const script = document.createElement('script');
+        const payload = encodeURIComponent(JSON.stringify(body));
+        const timer = setTimeout(() => cleanup(() => reject(new Error('JSONP_TIMEOUT'))), 25000);
+        function cleanup(done){ clearTimeout(timer); try{ delete window[cb]; }catch(_){} if(script.parentNode) script.parentNode.removeChild(script); if(done) done(); }
+        window[cb] = data => cleanup(() => data && data.ok ? resolve(data) : reject(new Error((data && data.error) || 'API_ERROR')));
+        script.onerror = () => cleanup(() => reject(new Error('JSONP_LOAD_FAIL')));
+        script.src = `${state.apiUrl}?mode=${encodeURIComponent(mode)}&payload=${payload}&callback=${cb}`;
+        document.head.appendChild(script);
       });
     }
 
-    async function doLogin(){
-      const user = ($("userPick").value || "").trim();
-      const pass = ($("pass").value || "").trim();
-
-      if(!user || !pass){
-        logLogin("กรอก username + password ให้ครบ");
-        return;
-      }
-
-      $("btnLogin").disabled = true;
-      logLogin("Checking credentials...");
-
+    async function login(){
+      const apiUrl = $('apiUrlInput').value.trim();
+      const username = $('loginUsername').value.trim();
+      const password = $('loginPassword').value.trim();
+      if(!apiUrl || !username || !password){ $('loginMsg').textContent='กรอก API URL, username, password ให้ครบ'; return; }
+      state.apiUrl = apiUrl;
+      localStorage.setItem(APP.apiUrlKey, apiUrl);
+      setLoading($('btnLogin'), true);
       try{
-        const payload = encodeURIComponent(JSON.stringify({ user, pass }));
-        const url = `${API_URL}?mode=login&payload=${payload}`;
-        const res = await jsonp(url);
-
-        if(!res || !res.ok){
-          const err = (res && res.error) ? res.error : "UNKNOWN";
-          logLogin({ ok:false, error: err, res });
-          alert("Login ไม่ผ่าน: " + err);
-          return;
-        }
-
-        setSession({ user, pass, ymLastSync: "" });
-        $("pass").value = "";
-        logLogin({ ok:true, user });
-        refreshUI();
-
-      }catch(e){
-        logLogin({ ok:false, error: e.message || String(e) });
-        alert("Login error: " + (e.message || e));
-      }finally{
-        $("btnLogin").disabled = false;
-      }
+        const res = await apiCall('login', {username, password});
+        state.token = res.token;
+        state.user = res.user;
+        localStorage.setItem(APP.tokenKey, state.token);
+        localStorage.setItem(APP.userKey, JSON.stringify(state.user));
+        $('loginScreen').classList.add('hidden');
+        await bootstrap();
+        toast('Login สำเร็จ');
+      }catch(e){ $('loginMsg').textContent = 'Login failed: ' + e.message; }
+      finally{ setLoading($('btnLogin'), false); }
     }
 
-    function init(){
-      $("btnLogout").onclick = () => { clearSession(); refreshUI(); };
+    function logout(){
+      localStorage.removeItem(APP.tokenKey); localStorage.removeItem(APP.userKey);
+      state.token=''; state.user=null; state.tasks=[];
+      $('loginScreen').classList.remove('hidden');
+      refreshTopbar();
+    }
 
-      $("btnLogin").onclick = doLogin;
+    async function bootstrap(){
+      refreshTopbar();
+      const res = await apiCall('bootstrap', {token: state.token});
+      state.users = res.users || [];
+      state.workTypes = res.workTypes || [];
+      state.templates = res.checklistTemplates || [];
+      fillSelects();
+      renderAdmin();
+      await loadTasks();
+    }
 
-      // Enter key submit (user + pass)
-      $("userPick").addEventListener("keydown", (e)=>{ if(e.key === "Enter") doLogin(); });
-      $("pass").addEventListener("keydown", (e)=>{ if(e.key === "Enter") doLogin(); });
+    async function loadTasks(){
+      const res = await apiCall('getTasks', {token: state.token, filters: getFilters()});
+      state.tasks = res.tasks || [];
+      renderDashboard();
+      renderTasks();
+    }
 
-      $("openDrive").onclick = (e)=>{
-        e.preventDefault();
-        if(requireLoginOrWarn()) openDriveFolder();
+    function getFilters(){
+      return {
+        keyword: $('filterKeyword')?.value || '',
+        ownerUserId: $('filterOwner')?.value || '',
+        typeId: $('filterType')?.value || '',
+        status: $('filterStatus')?.value || '',
+        priority: $('filterPriority')?.value || ''
       };
+    }
 
-      refreshUI();
-      logLogin("Ready. Please login.");
+    function fillSelects(){
+      const userOptions = ['<option value="">All</option>'].concat(state.users.map(u=>`<option value="${esc(u.userId)}">${esc(u.displayName || u.username)}</option>`)).join('');
+      const userOptionsNoAll = state.users.map(u=>`<option value="${esc(u.userId)}">${esc(u.displayName || u.username)}</option>`).join('');
+      const typeOptions = ['<option value="">All</option>'].concat(state.workTypes.map(w=>`<option value="${esc(w.typeId)}">${esc(w.typeName)}</option>`)).join('');
+      const typeOptionsNoAll = state.workTypes.map(w=>`<option value="${esc(w.typeId)}">${esc(w.typeName)}</option>`).join('');
+      $('filterOwner').innerHTML = userOptions;
+      $('filterType').innerHTML = typeOptions;
+      $('filterStatus').innerHTML = '<option value="">All</option>' + STATUS_LIST.map(s=>`<option>${s}</option>`).join('');
+      $('filterPriority').innerHTML = '<option value="">All</option>' + PRIORITY_LIST.map(s=>`<option>${s}</option>`).join('');
+      $('newOwner').innerHTML = userOptionsNoAll;
+      $('newType').innerHTML = typeOptionsNoAll;
+      if(state.user) $('newOwner').value = state.user.userId;
+    }
+
+    function refreshTopbar(){
+      $('apiStatus').textContent = state.apiUrl ? 'API: connected' : 'API: not set';
+      $('apiStatus').className = 'pill ' + (state.apiUrl ? 'ok' : 'bad');
+      $('userPill').textContent = state.user ? `${state.user.displayName || state.user.username} · ${state.user.role}` : 'Not logged in';
+      $('userPill').className = 'pill ' + (state.user ? 'ok' : 'bad');
+      $('btnLogout').classList.toggle('hidden', !state.user);
+    }
+
+    function renderDashboard(){
+      const tasks = state.tasks;
+      const mine = state.user ? tasks.filter(t=>String(t.ownerUserId)===String(state.user.userId)).length : 0;
+      const blocked = tasks.filter(t=>t.status==='BLOCKED' || t.blockerTag).length;
+      const done = tasks.filter(t=>t.status==='DONE').length;
+      const due7 = tasks.filter(t=>isWithinDays(t.dueDate, 7)).length;
+      const install7 = tasks.filter(t=>isWithinDays(t.installDate, 7)).length;
+      const kpis = [
+        ['ทั้งหมด', tasks.length], ['ของฉัน', mine], ['Blocked', blocked], ['Due 7 วัน', due7], ['Install 7 วัน', install7], ['Done', done]
+      ];
+      $('kpiGrid').innerHTML = kpis.map(k=>`<div class="kpi"><div class="num">${k[1]}</div><div class="label">${esc(k[0])}</div></div>`).join('');
+      $('recentTasksBody').innerHTML = tasks.slice(0,10).map(taskRowRecent).join('') || emptyRow(8, 'ยังไม่มีงาน');
+    }
+
+    function renderTasks(){
+      $('tasksBody').innerHTML = state.tasks.map(taskRowFull).join('') || emptyRow(10, 'ไม่พบงานตาม filter');
+    }
+
+    function renderAdmin(){
+      $('adminUsersBody').innerHTML = state.users.map(u=>`<tr><td>${esc(u.username)}</td><td>${esc(u.displayName)}</td><td>${badge(u.role)}</td><td>${esc(u.team)}</td><td>${esc(u.active)}</td></tr>`).join('') || emptyRow(5,'No users');
+      $('adminTypesBody').innerHTML = state.workTypes.map(w=>`<tr><td>${badge(w.typeName)}</td><td>${esc(w.description)}</td><td>${esc(w.active)}</td></tr>`).join('') || emptyRow(3,'No work types');
+    }
+
+    function taskRowRecent(t){
+      return `<tr><td><span class="linkish" data-task="${esc(t.taskId)}">${esc(t.title)}</span><div class="muted">${esc(t.cid || '')} ${esc(t.sof || '')}</div></td><td>${esc(t.ownerName)}</td><td>${badge(t.typeName)}</td><td>${badge(t.status,'status-'+t.status)}</td><td>${badge(t.priority,'priority-'+t.priority)}</td><td>${progressHtml(t.progressPercent)}</td><td>${esc(t.dueDate)}</td><td>${esc(t.installDate)}</td></tr>`;
+    }
+    function taskRowFull(t){
+      return `<tr><td><span class="linkish" data-task="${esc(t.taskId)}">${esc(t.title)}</span><div class="muted">${esc(t.customerName)} ${esc(t.serviceName)}</div></td><td>${esc(t.ownerName)}</td><td>${badge(t.typeName)}</td><td>${badge(t.status,'status-'+t.status)}</td><td>${badge(t.priority,'priority-'+t.priority)}</td><td>${progressHtml(t.progressPercent)}</td><td>${esc(t.cid || '-')}<div class="muted">${esc(t.sof || '')}</div></td><td>${esc(t.dueDate || '-')}</td><td>${esc(t.installDate || '-')}</td><td>${esc(t.updatedAt || '-')}</td></tr>`;
+    }
+    function emptyRow(col, text){ return `<tr><td colspan="${col}" class="muted">${esc(text)}</td></tr>`; }
+
+    function isWithinDays(dateStr, days){
+      if(!dateStr) return false;
+      const d = new Date(dateStr + 'T00:00:00'); if(isNaN(d)) return false;
+      const now = new Date(); now.setHours(0,0,0,0);
+      const diff = (d - now) / 86400000;
+      return diff >= 0 && diff <= days;
+    }
+
+    async function createTask(){
+      const body = {
+        token: state.token,
+        title: $('newTitle').value,
+        typeId: $('newType').value,
+        ownerUserId: $('newOwner').value,
+        status: $('newStatus').value,
+        priority: $('newPriority').value,
+        sof: $('newSof').value,
+        cid: $('newCid').value,
+        customerName: $('newCustomer').value,
+        serviceName: $('newService').value,
+        dueDate: $('newDue').value,
+        installDate: $('newInstall').value,
+        remark: $('newRemark').value
+      };
+      if(!body.title || !body.typeId || !body.ownerUserId){ toast('กรอก Title, Type, Owner ให้ครบ'); return; }
+      setLoading($('btnCreateTask'), true);
+      try{
+        await apiCall('createTask', body);
+        closeModal('create');
+        clearCreateForm();
+        await loadTasks();
+        toast('สร้างงานแล้ว');
+      }catch(e){ toast('Create failed: ' + e.message); }
+      finally{ setLoading($('btnCreateTask'), false); }
+    }
+
+    function clearCreateForm(){
+      ['newTitle','newSof','newCid','newCustomer','newService','newDue','newInstall','newRemark'].forEach(id=>$(id).value='');
+      $('newPriority').value='NORMAL'; $('newStatus').value='NEW'; if(state.user) $('newOwner').value=state.user.userId;
+    }
+
+    async function openTaskDetail(taskId){
+      state.currentTaskId = taskId;
+      $('detailSteps').innerHTML = '<div class="muted">Loading...</div>';
+      openModal('detail');
+      try{
+        const res = await apiCall('getTaskDetail', {token: state.token, taskId});
+        renderDetail(res.task, res.steps || [], res.logs || [], res.comments || []);
+      }catch(e){ $('detailSteps').innerHTML = `<div class="muted">Load failed: ${esc(e.message)}</div>`; }
+    }
+
+    function renderDetail(task, steps, logs, comments){
+      $('detailTitle').textContent = task.title || 'Task Detail';
+      $('detailSub').textContent = `${task.taskId} · ${task.status} · ${task.priority}`;
+      $('detailKpis').innerHTML = [
+        ['Status', task.status], ['Priority', task.priority], ['Progress', (task.progressPercent || 0) + '%'], ['Owner', findUserName(task.ownerUserId)]
+      ].map(k=>`<div class="kpi"><div class="label">${esc(k[0])}</div><div style="font-weight:1000;margin-top:4px;">${esc(k[1])}</div></div>`).join('');
+      $('detailSteps').innerHTML = steps.map(s=>`
+        <label class="step">
+          <input type="checkbox" ${isTrue(s.done) ? 'checked' : ''} data-step-id="${esc(s.stepId)}" />
+          <div><div class="name">${esc(s.stepNo)}. ${esc(s.stepName)}</div><div class="meta">${isTrue(s.done) ? 'Done by ' + esc(findUserName(s.doneBy)) + ' at ' + esc(s.doneAt) : 'Pending'} ${s.note ? ' · ' + esc(s.note) : ''}</div></div>
+        </label>`).join('') || '<div class="muted">ไม่มี checklist</div>';
+      $('detailLogs').innerHTML = logs.map(l=>`<div style="margin-bottom:8px;"><b>${esc(l.action)}</b> <span class="muted">${esc(l.createdAt)} · ${esc(findUserName(l.actorUserId))}</span><div class="muted">${esc(l.detail)}</div></div>`).join('') || '<div class="muted">ยังไม่มี log</div>';
+      $('detailComments').innerHTML = comments.map(c=>`<div style="margin-bottom:8px;"><b>${esc(findUserName(c.actorUserId))}</b> <span class="muted">${esc(c.createdAt)}</span><div>${esc(c.comment)}</div></div>`).join('') || '<div class="muted">ยังไม่มี comment</div>';
+    }
+
+    async function updateStep(el){
+      const stepId = el.dataset.stepId;
+      const done = el.checked;
+      el.disabled = true;
+      try{
+        await apiCall('updateStep', {token: state.token, stepId, done});
+        await openTaskDetail(state.currentTaskId);
+        await loadTasks();
+        toast('อัปเดต checklist แล้ว');
+      }catch(e){ toast('Update step failed: ' + e.message); el.checked = !done; }
+      finally{ el.disabled = false; }
+    }
+
+    async function addComment(){
+      const comment = $('commentInput').value.trim();
+      if(!comment) return;
+      try{
+        await apiCall('addComment', {token: state.token, taskId: state.currentTaskId, comment});
+        $('commentInput').value = '';
+        await openTaskDetail(state.currentTaskId);
+        toast('เพิ่ม comment แล้ว');
+      }catch(e){ toast('Comment failed: ' + e.message); }
+    }
+
+    function findUserName(userId){ const u=state.users.find(x=>String(x.userId)===String(userId)); return u ? (u.displayName || u.username) : (userId || '-'); }
+    function isTrue(v){ return v === true || String(v).toUpperCase() === 'TRUE'; }
+
+    function openModal(name){ $(name+'ModalBack').classList.add('show'); }
+    function closeModal(name){ $(name+'ModalBack').classList.remove('show'); }
+    function switchPage(page){
+      document.querySelectorAll('[id^="page-"]').forEach(x=>x.classList.add('hidden'));
+      $('page-'+page).classList.remove('hidden');
+      document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active', b.dataset.page===page));
+    }
+
+    function bindEvents(){
+      $('btnLogin').onclick = login;
+      $('btnLogout').onclick = logout;
+      $('btnRefreshDash').onclick = loadTasks;
+      $('btnRefreshTasks').onclick = loadTasks;
+      $('btnRefreshAdmin').onclick = bootstrap;
+      $('btnOpenCreate').onclick = () => openModal('create');
+      $('btnOpenCreate2').onclick = () => openModal('create');
+      $('btnCreateTask').onclick = createTask;
+      $('btnAddComment').onclick = addComment;
+      $('btnClearFilters').onclick = () => { ['filterKeyword','filterOwner','filterType','filterStatus','filterPriority'].forEach(id=>$(id).value=''); loadTasks(); };
+      ['filterKeyword','filterOwner','filterType','filterStatus','filterPriority'].forEach(id=>$(id).addEventListener(id==='filterKeyword'?'input':'change', debounce(loadTasks, 300)));
+      document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>switchPage(b.dataset.page));
+      document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeModal(b.dataset.close));
+      document.body.addEventListener('click', e=>{ const t=e.target.closest('[data-task]'); if(t) openTaskDetail(t.dataset.task); });
+      $('detailSteps').addEventListener('change', e=>{ if(e.target.matches('input[type="checkbox"][data-step-id]')) updateStep(e.target); });
+      ['loginUsername','loginPassword'].forEach(id=>$(id).addEventListener('keydown', e=>{ if(e.key==='Enter') login(); }));
+    }
+    function debounce(fn, ms){ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args),ms); }; }
+
+    async function init(){
+      bindEvents();
+      $('apiUrlInput').value = state.apiUrl;
+      refreshTopbar();
+      if(state.apiUrl && state.token && state.user){
+        $('loginScreen').classList.add('hidden');
+        try{ await bootstrap(); }catch(e){ toast('Session expired / API error: ' + e.message); logout(); }
+      }
     }
     init();
   </script>
