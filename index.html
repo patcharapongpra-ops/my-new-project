@@ -72,8 +72,11 @@
     .completion-panel .item .label{font-size:11px;color:var(--muted);font-weight:800;margin-bottom:4px}
     .completion-panel .item .value{font-weight:1000;font-size:13px}
     .lock-note{border:1px solid rgba(255,208,137,.35);background:rgba(255,208,137,.08);color:#ffeac7;border-radius:12px;padding:10px;margin:10px 0;font-size:12px}
-    .quick-status{min-width:145px;padding:7px 8px;border-radius:10px;font-size:11px}
-    .quick-action-cell{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+    .inline-status,.inline-date{width:100%;padding:7px 8px;border-radius:10px;font-size:11px;background:#0f1722;border:1px solid rgba(36,52,73,.75);color:var(--text)}
+    .inline-wrap{display:flex;align-items:center;gap:6px}
+    .inline-saving{font-size:10px;color:var(--muted)}
+    .inline-ok{color:#9ff0b8}
+    .inline-err{color:#ffb5c4}
     .legend-item{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
     .legend-dot{width:10px;height:10px;border-radius:999px;background:var(--muted)}
     .legend-dot.install{background:var(--ok)}
@@ -125,7 +128,7 @@
     .toast{position:fixed;right:16px;bottom:16px;background:#0e1520;border:1px solid rgba(36,52,73,.9);padding:10px 12px;border-radius:12px;z-index:90;display:none}
     .login-screen{position:fixed;inset:0;z-index:80;display:grid;place-items:center;background:rgba(0,0,0,.48);backdrop-filter:blur(8px);padding:16px}
     .login-card{width:min(520px,100%);border:1px solid rgba(36,52,73,.85);background:rgba(16,24,38,.94);border-radius:20px;padding:18px;box-shadow:0 35px 90px rgba(0,0,0,.55)}
-    @media(max-width:1100px){.layout{grid-template-columns:1fr}.sidebar{position:relative;top:auto}.nav{flex-direction:row;overflow:auto}.nav button{white-space:nowrap;width:auto}.kpi-grid{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:1fr 1fr}.filters .filter-actions{grid-column:1/-1}.form-grid{grid-template-columns:1fr}.admin-layout{grid-template-columns:1fr}.type-list{max-height:none}.dash-grid{grid-template-columns:1fr}.calendar-grid{gap:5px}.calendar-day{min-height:108px;padding:6px}.cal-event{font-size:10px;padding:5px}.completion-panel{grid-template-columns:1fr}.quick-action-cell{display:block}.quick-status{width:100%;margin-top:6px}}
+    @media(max-width:1100px){.layout{grid-template-columns:1fr}.sidebar{position:relative;top:auto}.nav{flex-direction:row;overflow:auto}.nav button{white-space:nowrap;width:auto}.kpi-grid{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:1fr 1fr}.filters .filter-actions{grid-column:1/-1}.form-grid{grid-template-columns:1fr}.admin-layout{grid-template-columns:1fr}.type-list{max-height:none}.dash-grid{grid-template-columns:1fr}.calendar-grid{gap:5px}.calendar-day{min-height:108px;padding:6px}.cal-event{font-size:10px;padding:5px}.completion-panel{grid-template-columns:1fr}.inline-status,.inline-date{font-size:10px;padding:5px}}
     @media(max-width:640px){.topbar-inner{align-items:flex-start}.brand small{display:none}.kpi-grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr}.container{padding:10px}.card{padding:12px}}
   </style>
 </head>
@@ -218,7 +221,7 @@
             <div><label>Priority</label><select id="filterPriority"></select></div>
             <div class="filter-actions" style="display:flex;align-items:flex-end;gap:8px;"><button class="btn" id="btnClearFilters">Clear</button></div>
           </div>
-          <div class="table-wrap"><table><thead><tr><th>Task</th><th>Owner</th><th>Type</th><th>Status</th><th>Priority</th><th>Progress</th><th>CID/SOF</th><th>Due</th><th>Install</th><th>Quick Action</th><th>Updated</th></tr></thead><tbody id="tasksBody"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Task</th><th>Owner</th><th>Type</th><th>Status</th><th>Priority</th><th>Progress</th><th>CID/SOF</th><th>Due Date</th><th>Install Date</th><th>Updated</th></tr></thead><tbody id="tasksBody"></tbody></table></div>
         </section>
 
         <section class="card hidden" id="page-calendar">
@@ -710,7 +713,7 @@
       return d.getTime() < todayDate().getTime();
     }
 
-    function renderTasks(){ $('tasksBody').innerHTML = state.tasks.map(taskRowFull).join('') || emptyRow(11, 'ไม่พบงานตาม filter'); }
+    function renderTasks(){ $('tasksBody').innerHTML = state.tasks.map(taskRowFull).join('') || emptyRow(10, 'ไม่พบงานตาม filter'); }
 
     function renderAdmin(){
       if(!canAdmin()) return;
@@ -741,49 +744,61 @@
       return `<tr class="${isOverdue(t) && !isClosedStatus(t.status) ? 'overdue-row' : ''}"><td><span class="linkish" data-task="${esc(t.taskId)}">${esc(t.title)}</span><div class="muted">${esc(t.cid || '')} ${esc(t.sof || '')}</div></td><td>${esc(t.ownerName)}</td><td>${badge(t.typeName)}</td><td>${badge(t.status,'status-'+t.status)}</td><td>${badge(t.priority,'priority-'+t.priority)}</td><td>${progressHtml(t.progressPercent)}</td><td>${esc(t.dueDate)}</td><td>${esc(t.installDate)}</td></tr>`;
     }
     function taskRowFull(t){
+      const editable = !isViewer() && !(isClosedStatus(t.status) && !canAdmin() && !canLeader());
+
       return `<tr class="${isOverdue(t) && !isClosedStatus(t.status) ? 'overdue-row' : ''}">
-        <td><span class="linkish" data-task="${esc(t.taskId)}">${esc(t.title)}</span><div class="muted">${esc(t.customerName)} ${esc(t.serviceName)}</div></td>
+        <td>
+          <span class="linkish" data-task="${esc(t.taskId)}">${esc(t.title)}</span>
+          <div class="muted">${esc(t.customerName)} ${esc(t.serviceName)}</div>
+        </td>
+
         <td>${esc(t.ownerName)}</td>
+
         <td>${badge(t.typeName)}</td>
-        <td>${badge(t.status,'status-'+t.status)}</td>
+
+        <td>
+          ${editable ? `
+            <select class="inline-status" data-inline-status="${esc(t.taskId)}">
+              ${STATUS_LIST.map(s=>`<option value="${s}" ${String(t.status)===s?'selected':''}>${s}</option>`).join('')}
+            </select>
+          ` : badge(t.status,'status-'+t.status)}
+        </td>
+
         <td>${badge(t.priority,'priority-'+t.priority)}</td>
+
         <td>${progressHtml(t.progressPercent)}</td>
-        <td>${esc(t.cid || '-')}<div class="muted">${esc(t.sof || '')}</div></td>
-        <td>${esc(t.dueDate || '-')}</td>
-        <td>${esc(t.installDate || '-')}</td>
-        <td>${quickActionHtml(t)}</td>
+
+        <td>
+          ${esc(t.cid || '-')}
+          <div class="muted">${esc(t.sof || '')}</div>
+        </td>
+
+        <td>
+          ${editable ? `
+            <div class="inline-wrap">
+              <input type="date" class="inline-date" data-inline-due="${esc(t.taskId)}" value="${esc(normalizeDateInput(t.dueDate))}">
+            </div>
+          ` : esc(t.dueDate || '-')}
+        </td>
+
+        <td>
+          ${editable ? `
+            <div class="inline-wrap">
+              <input type="date" class="inline-date" data-inline-install="${esc(t.taskId)}" value="${esc(normalizeDateInput(t.installDate))}">
+            </div>
+          ` : esc(t.installDate || '-')}
+        </td>
+
         <td>${esc(t.updatedAt || '-')}</td>
       </tr>`;
     }
 
-    function quickActionHtml(t){
-      if(isViewer()) return '<span class="muted">View only</span>';
-      if(isClosedStatus(t.status)) return `<span class="muted">${esc(t.status)}</span>`;
-      return `<div class="quick-action-cell">
-        <select class="quick-status" data-quick-status="${esc(t.taskId)}">
-          ${STATUS_LIST.map(s=>`<option value="${s}" ${String(t.status)===s?'selected':''}>${s}</option>`).join('')}
-        </select>
-      </div>`;
+    function normalizeDateInput(value){
+      if(!value) return '';
+      return String(value).slice(0,10);
     }
-    function emptyRow(col, text){ return `<tr><td colspan="${col}" class="muted">${esc(text)}</td></tr>`; }
-    function isWithinDays(dateStr, days){ if(!dateStr) return false; const d = new Date(dateStr + 'T00:00:00'); if(isNaN(d)) return false; const now = new Date(); now.setHours(0,0,0,0); const diff = (d - now) / 86400000; return diff >= 0 && diff <= days; }
 
-    async function createTask(){
-      const body = {token: state.token,title:$('newTitle').value,typeId:$('newType').value,ownerUserId:$('newOwner').value,status:$('newStatus').value,priority:$('newPriority').value,sof:$('newSof').value,cid:$('newCid').value,customerName:$('newCustomer').value,serviceName:$('newService').value,dueDate:$('newDue').value,installDate:$('newInstall').value,remark:$('newRemark').value};
-      if(!body.title || !body.typeId || !body.ownerUserId){ toast('กรอก Title, Type, Owner ให้ครบ'); return; }
-      setLoading($('btnCreateTask'), true);
-      try{ await apiCall('createTask', body); closeModal('create'); clearCreateForm(); await loadTasks(); toast('สร้างงานแล้ว'); }
-      catch(e){ toast('Create failed: ' + e.message); }
-      finally{ setLoading($('btnCreateTask'), false); }
-    }
-    function clearCreateForm(){ ['newTitle','newSof','newCid','newCustomer','newService','newDue','newInstall','newRemark'].forEach(id=>$(id).value=''); $('newPriority').value='NORMAL'; $('newStatus').value='NEW'; if(state.user) $('newOwner').value=state.user.userId; }
-
-    async function openTaskDetail(taskId){
-      state.currentTaskId = taskId; $('detailSteps').innerHTML = '<div class="muted">Loading...</div>'; openModal('detail');
-      try{ const res = await apiCall('getTaskDetail', {token: state.token, taskId}); renderDetail(res.task, res.steps || [], res.logs || [], res.comments || []); }
-      catch(e){ $('detailSteps').innerHTML = `<div class="muted">Load failed: ${esc(e.message)}</div>`; }
-    }
-    function renderDetail(task, steps, logs, comments){
+function renderDetail(task, steps, logs, comments){
       state.currentTask = task; applyRoleUI();
       const closed = isClosedStatus(task.status);
       const archived = isTrue(task.archived);
@@ -867,25 +882,41 @@
     async function deleteWorkType(typeId){ if(!confirm('Delete work type? งานเดิมจะยังอยู่ แต่จะไม่เลือกประเภทนี้สำหรับงานใหม่')) return; try{ await apiCall('deleteWorkType',{token:state.token,typeId}); await bootstrap(); toast('ลบ Work Type แล้ว'); }catch(e){ toast('Delete work type failed: '+e.message); } }
     function autoColorFromText(text){ const palette=['#ff7a18','#38bdf8','#22c55e','#a855f7','#ef4444','#f59e0b','#14b8a6','#64748b']; const s=String(text||'new'); let sum=0; for(let i=0;i<s.length;i++) sum+=s.charCodeAt(i); return palette[sum%palette.length]; }
 
-    async function quickUpdateStatus(taskId, status, el){
-      if(!taskId || !status) return;
+    async function inlineUpdateTask(taskId, payload, el){
+      if(!taskId) return;
+
       const task = state.tasks.find(t=>String(t.taskId)===String(taskId));
       if(!task) return;
-      const oldStatus = task.status;
+
+      const old = {
+        status: task.status,
+        dueDate: task.dueDate,
+        installDate: task.installDate
+      };
+
       el.disabled = true;
+
       try{
-        await apiCall('updateTask', {token: state.token, taskId, status});
+        await apiCall('updateTask', Object.assign({
+          token: state.token,
+          taskId
+        }, payload));
+
         await loadTasks();
-        toast('อัปเดตสถานะเป็น ' + status);
-      }catch(e){
-        toast('Quick update failed: ' + e.message);
-        el.value = oldStatus;
+
+        toast('Saved');
+      }catch(err){
+        if(payload.status !== undefined) el.value = old.status || '';
+        if(payload.dueDate !== undefined) el.value = normalizeDateInput(old.dueDate);
+        if(payload.installDate !== undefined) el.value = normalizeDateInput(old.installDate);
+
+        toast('Save failed: ' + err.message);
       }finally{
         el.disabled = false;
       }
     }
 
-    function findUserName(userId){ const u=state.users.find(x=>String(x.userId)===String(userId)); return u ? (u.displayName || u.username) : (userId || '-'); }
+function findUserName(userId){ const u=state.users.find(x=>String(x.userId)===String(userId)); return u ? (u.displayName || u.username) : (userId || '-'); }
     function isTrue(v){ return v === true || String(v).toUpperCase() === 'TRUE'; }
     function openModal(name){ $(name+'ModalBack').classList.add('show'); }
     function closeModal(name){ $(name+'ModalBack').classList.remove('show'); }
@@ -917,10 +948,29 @@
         const dw=e.target.closest('[data-del-worktype]'); if(dw) deleteWorkType(dw.dataset.delWorktype);
         const task=e.target.closest('[data-task]'); if(task) openTaskDetail(task.dataset.task);
       });
-            document.body.addEventListener('change', e=>{
-        const qs = e.target.closest('[data-quick-status]');
-        if(qs) quickUpdateStatus(qs.dataset.quickStatus, qs.value, qs);
+            document.body.addEventListener('change', async e=>{
+        const statusEl = e.target.closest('[data-inline-status]');
+        if(statusEl){
+          await inlineUpdateTask(statusEl.dataset.inlineStatus, {
+            status: statusEl.value
+          }, statusEl);
+        }
+
+        const dueEl = e.target.closest('[data-inline-due]');
+        if(dueEl){
+          await inlineUpdateTask(dueEl.dataset.inlineDue, {
+            dueDate: dueEl.value
+          }, dueEl);
+        }
+
+        const installEl = e.target.closest('[data-inline-install]');
+        if(installEl){
+          await inlineUpdateTask(installEl.dataset.inlineInstall, {
+            installDate: installEl.value
+          }, installEl);
+        }
       });
+
 $('detailSteps').addEventListener('change', e=>{ if(e.target.matches('input[type="checkbox"][data-step-id]')){ if(isViewer()){ e.target.checked=!e.target.checked; toast('Viewer ไม่มีสิทธิ์แก้ checklist'); return; } updateStep(e.target); } });
       ['loginUsername','loginPassword'].forEach(id=>$(id).addEventListener('keydown', e=>{ if(e.key==='Enter') login(); }));
     }
