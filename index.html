@@ -310,11 +310,38 @@
     </div>
   </div>
 
+  <div class="modal-backdrop" id="editModalBack">
+    <div class="modal small">
+      <div class="section-head">
+        <div><h2>แก้ไขงาน</h2><div class="muted">แก้ข้อมูลหลักของ task โดยไม่กระทบ checklist/log เดิม</div></div>
+        <div class="spacer"></div><button class="btn" data-close="edit">Close</button>
+      </div>
+      <div class="form-grid">
+        <div class="full"><label>Title *</label><input id="editTitle" /></div>
+        <div><label>Owner</label><select id="editOwner"></select></div>
+        <div><label>Status</label><select id="editStatus"></select></div>
+        <div><label>Priority</label><select id="editPriority"></select></div>
+        <div><label>SOF</label><input id="editSof" /></div>
+        <div><label>CID</label><input id="editCid" /></div>
+        <div><label>Customer Name</label><input id="editCustomer" /></div>
+        <div><label>Service Name</label><input id="editService" /></div>
+        <div><label>Due Date</label><input id="editDue" type="date" /></div>
+        <div><label>Install Date</label><input id="editInstall" type="date" /></div>
+        <div class="full"><label>Blocker Tag</label><input id="editBlocker" placeholder="เช่น รอ IP / รอของ / รอลูกค้า" /></div>
+        <div class="full"><label>Remark</label><textarea id="editRemark"></textarea></div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px;">
+        <button class="btn" data-close="edit">Cancel</button>
+        <button class="btn primary" id="btnSaveEdit">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-backdrop" id="detailModalBack">
     <div class="modal">
       <div class="section-head">
         <div><h2 id="detailTitle">Task Detail</h2><div class="muted" id="detailSub">-</div></div>
-        <div class="spacer"></div><button class="btn" data-close="detail">Close</button>
+        <div class="spacer"></div><button class="btn" id="btnOpenEdit">Edit Task</button><button class="btn" data-close="detail">Close</button>
       </div>
       <div class="kpi-grid" style="grid-template-columns:repeat(4,minmax(0,1fr));" id="detailKpis"></div>
       <h3>Checklist</h3>
@@ -348,7 +375,8 @@
       workTypes: [],
       templates: [],
       tasks: [],
-      currentTaskId: ''
+      currentTaskId: '',
+      currentTask: null
     };
 
     function readJson(s, fallback){ try{return JSON.parse(s)}catch{return fallback} }
@@ -439,7 +467,10 @@
       $('filterStatus').innerHTML = '<option value="">All</option>' + STATUS_LIST.map(s=>`<option>${s}</option>`).join('');
       $('filterPriority').innerHTML = '<option value="">All</option>' + PRIORITY_LIST.map(s=>`<option>${s}</option>`).join('');
       $('newOwner').innerHTML = userOptionsNoAll;
+      $('editOwner').innerHTML = userOptionsNoAll;
       $('newType').innerHTML = typeOptionsNoAll;
+      $('editStatus').innerHTML = STATUS_LIST.map(s=>`<option>${s}</option>`).join('');
+      $('editPriority').innerHTML = PRIORITY_LIST.map(s=>`<option>${s}</option>`).join('');
       if(state.user) $('newOwner').value = state.user.userId;
     }
 
@@ -534,6 +565,7 @@
     }
 
     function renderDetail(task, steps, logs, comments){
+      state.currentTask = task;
       $('detailTitle').textContent = task.title || 'Task Detail';
       $('detailSub').textContent = `${task.taskId} · ${task.status} · ${task.priority}`;
       $('detailKpis').innerHTML = [
@@ -559,6 +591,60 @@
         toast('อัปเดต checklist แล้ว');
       }catch(e){ toast('Update step failed: ' + e.message); el.checked = !done; }
       finally{ el.disabled = false; }
+    }
+
+    function openEditModal(){
+      const t = state.currentTask;
+      if(!t){ toast('ยังไม่มี task ที่เลือก'); return; }
+      $('editTitle').value = t.title || '';
+      $('editOwner').value = t.ownerUserId || '';
+      $('editStatus').value = t.status || 'NEW';
+      $('editPriority').value = t.priority || 'NORMAL';
+      $('editSof').value = t.sof || '';
+      $('editCid').value = t.cid || '';
+      $('editCustomer').value = t.customerName || '';
+      $('editService').value = t.serviceName || '';
+      $('editDue').value = normalizeDateInput(t.dueDate);
+      $('editInstall').value = normalizeDateInput(t.installDate);
+      $('editBlocker').value = t.blockerTag || '';
+      $('editRemark').value = t.remark || '';
+      openModal('edit');
+    }
+
+    async function saveEditTask(){
+      if(!state.currentTaskId){ toast('ไม่พบ taskId'); return; }
+      const body = {
+        token: state.token,
+        taskId: state.currentTaskId,
+        title: $('editTitle').value,
+        ownerUserId: $('editOwner').value,
+        status: $('editStatus').value,
+        priority: $('editPriority').value,
+        sof: $('editSof').value,
+        cid: $('editCid').value,
+        customerName: $('editCustomer').value,
+        serviceName: $('editService').value,
+        dueDate: $('editDue').value,
+        installDate: $('editInstall').value,
+        blockerTag: $('editBlocker').value,
+        remark: $('editRemark').value
+      };
+      if(!body.title){ toast('Title ห้ามว่าง'); return; }
+      setLoading($('btnSaveEdit'), true);
+      try{
+        await apiCall('updateTask', body);
+        closeModal('edit');
+        await openTaskDetail(state.currentTaskId);
+        await loadTasks();
+        toast('บันทึกการแก้ไขแล้ว');
+      }catch(e){ toast('Save failed: ' + e.message); }
+      finally{ setLoading($('btnSaveEdit'), false); }
+    }
+
+    function normalizeDateInput(v){
+      if(!v) return '';
+      const s = String(v).trim();
+      return /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(s) ? s : '';
     }
 
     async function addComment(){
@@ -593,6 +679,8 @@
       $('btnOpenCreate2').onclick = () => openModal('create');
       $('btnCreateTask').onclick = createTask;
       $('btnAddComment').onclick = addComment;
+      $('btnOpenEdit').onclick = openEditModal;
+      $('btnSaveEdit').onclick = saveEditTask;
       $('btnClearFilters').onclick = () => { ['filterKeyword','filterOwner','filterType','filterStatus','filterPriority'].forEach(id=>$(id).value=''); loadTasks(); };
       ['filterKeyword','filterOwner','filterType','filterStatus','filterPriority'].forEach(id=>$(id).addEventListener(id==='filterKeyword'?'input':'change', debounce(loadTasks, 300)));
       document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>switchPage(b.dataset.page));
