@@ -498,7 +498,7 @@
       state.taskPageSize = res.pageSize || state.taskPageSize || 50;
       state.taskTotal = res.total || 0;
       state.taskTotalPages = res.totalPages || 1;
-      if(!$('page-tasks').classList.contains('hidden')) loadTaskPage(false);
+      renderTasks();
     }
 
     async function loadCalendarTasks(){
