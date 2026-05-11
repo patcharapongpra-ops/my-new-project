@@ -919,7 +919,70 @@
       </div>`;
     }
 
-    async function updateStep(el){ const stepId=el.dataset.stepId; const done=el.checked; el.disabled=true; try{ await apiCall('updateStep',{token:state.token,stepId,done}); await openTaskDetail(state.currentTaskId); await loadTasks(); toast('อัปเดต checklist แล้ว'); }catch(e){ toast('Update step failed: '+e.message); el.checked=!done; }finally{ el.disabled=false; } }
+    function updateCurrentTaskAfterStep(task){
+      if(!task) return;
+
+      state.currentTask = Object.assign({}, state.currentTask || {}, task);
+
+      const idx = state.tasks.findIndex(t => String(t.taskId) === String(task.taskId));
+      if(idx >= 0){
+        state.tasks[idx] = Object.assign({}, state.tasks[idx], task);
+      }
+
+      const archived = isTrue(state.currentTask.archived);
+      $('detailSub').textContent = `${state.currentTask.taskId} · ${state.currentTask.status} · ${state.currentTask.priority}${archived ? ' · ARCHIVED' : ''}`;
+      $('detailKpis').innerHTML = [
+        ['Status', state.currentTask.status],
+        ['Priority', state.currentTask.priority],
+        ['Progress', (state.currentTask.progressPercent || 0) + '%'],
+        ['Owner', findUserName(state.currentTask.ownerUserId)]
+      ].map(k=>`<div class="kpi"><div class="label">${esc(k[0])}</div><div style="font-weight:1000;margin-top:4px;">${esc(k[1])}</div></div>`).join('');
+      $('completionPanel').innerHTML = renderCompletionPanel(state.currentTask);
+
+      const locked = isViewer() || (state.currentTask && isClosedStatus(state.currentTask.status) && !canAdmin() && !canLeader());
+      document.querySelectorAll('#detailSteps input[type="checkbox"][data-step-id]').forEach(cb => cb.disabled = !!locked);
+
+      if(!$('page-tasks').classList.contains('hidden')) renderTasks();
+      if(!$('page-dashboard').classList.contains('hidden')) renderDashboard();
+      if(!$('page-calendar').classList.contains('hidden')) renderCalendar();
+      applyRoleUI();
+    }
+
+    async function updateStep(el){
+      const stepId = el.dataset.stepId;
+      const done = el.checked;
+      const oldChecked = !done;
+      const stepRow = el.closest('.step');
+      const meta = stepRow ? stepRow.querySelector('.meta') : null;
+
+      el.disabled = true;
+      if(meta) meta.textContent = 'Saving...';
+
+      try{
+        const res = await apiCall('updateStep', {token: state.token, stepId, done});
+        const s = res.step || {};
+
+        if(meta){
+          meta.textContent = isTrue(s.done)
+            ? 'Done by ' + findUserName(s.doneBy) + ' at ' + (s.doneAt || '')
+            : 'Pending';
+        }
+
+        updateCurrentTaskAfterStep(res.task || {
+          taskId: state.currentTaskId,
+          progressPercent: res.progressPercent
+        });
+
+        toast('อัปเดต checklist แล้ว');
+      }catch(e){
+        el.checked = oldChecked;
+        if(meta) meta.textContent = oldChecked ? 'Done' : 'Pending';
+        toast('Update step failed: ' + e.message);
+      }finally{
+        const locked = isViewer() || (state.currentTask && isClosedStatus(state.currentTask.status) && !canAdmin() && !canLeader());
+        el.disabled = !!locked;
+      }
+    }
 
     function openEditModal(){
       closeModal('detail'); const t=state.currentTask; if(!t){ toast('ยังไม่มี task ที่เลือก'); return; }
