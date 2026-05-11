@@ -419,7 +419,7 @@
       user: readJson(localStorage.getItem(APP.userKey), null),
       permissions: {},
       users: [], workTypes: [], templates: [],
-      allTasks: [], filteredTasks: [], taskPage: 1, taskPageSize: 50, autoRefreshTimer: null,
+      allTasks: [], filteredTasks: [], calendarTasks: [], taskPage: 1, taskPageSize: 50, taskTotal: 0, taskTotalPages: 1, autoRefreshTimer: null, calendarLoadedKey: '',
       selectedAdminTypeId: '', calendarDate: new Date(), currentTaskId: '', currentTask: null
     };
 
@@ -480,34 +480,61 @@
     async function loadTasks(){
       const res = await apiCall('getTasks', {token: state.token, filters: {}});
       state.allTasks = res.tasks || [];
-      applyTaskFiltersLocal(false);
-      renderVisiblePageOnly();
+      await loadTaskPage(false);
+      if(!$('page-dashboard').classList.contains('hidden')) renderDashboard();
+      if(!$('page-calendar').classList.contains('hidden')) await loadCalendarTasks();
+    }
+
+    async function loadTaskPage(resetPage=true){
+      if(resetPage) state.taskPage = 1;
+      const res = await apiCall('getTasksPage', {
+        token: state.token,
+        filters: getFilters(),
+        page: state.taskPage,
+        pageSize: state.taskPageSize
+      });
+      state.filteredTasks = res.tasks || [];
+      state.taskPage = res.page || state.taskPage || 1;
+      state.taskPageSize = res.pageSize || state.taskPageSize || 50;
+      state.taskTotal = res.total || 0;
+      state.taskTotalPages = res.totalPages || 1;
+      if(!$('page-tasks').classList.contains('hidden')) loadTaskPage(false);
+    }
+
+    async function loadCalendarTasks(){
+      if(!$('calendarGrid')) return;
+      const range = getCalendarRange();
+      const mode = $('calendarMode') ? $('calendarMode').value : 'both';
+      const owner = $('calendarOwner') ? $('calendarOwner').value : '';
+      const key = [range.startDate, range.endDate, mode, owner].join('|');
+      if(state.calendarLoadedKey === key && state.calendarTasks.length) { renderCalendar(); return; }
+      const res = await apiCall('getCalendarTasks', {
+        token: state.token,
+        startDate: range.startDate,
+        endDate: range.endDate,
+        calendarMode: mode,
+        ownerUserId: owner
+      });
+      state.calendarTasks = res.tasks || [];
+      state.calendarLoadedKey = key;
+      renderCalendar();
+    }
+
+    function getCalendarRange(){
+      const base = state.calendarDate || new Date();
+      const y = base.getFullYear();
+      const m = base.getMonth();
+      const first = new Date(y, m, 1);
+      const start = new Date(y, m, 1 - first.getDay());
+      const end = new Date(start);
+      end.setDate(start.getDate() + 42);
+      return {startDate: toDateKey(start), endDate: toDateKey(end)};
     }
 
     function renderVisiblePageOnly(){
       if(!$('page-dashboard').classList.contains('hidden')) renderDashboard();
-      if(!$('page-tasks').classList.contains('hidden')) renderTasks();
-      if(!$('page-calendar').classList.contains('hidden')) renderCalendar();
-    }
-
-    function applyTaskFiltersLocal(resetPage=true){
-      const f = getFilters();
-      let out = state.allTasks.slice();
-      const keyword = String(f.keyword || '').trim().toLowerCase();
-
-      if(keyword){
-        out = out.filter(t => [
-          t.title, t.cid, t.sof, t.customerName, t.serviceName,
-          t.ownerName, t.typeName, t.remark, t.blockerTag
-        ].join(' ').toLowerCase().indexOf(keyword) >= 0);
-      }
-      if(f.ownerUserId) out = out.filter(t => String(t.ownerUserId) === String(f.ownerUserId));
-      if(f.typeId) out = out.filter(t => String(t.typeId) === String(f.typeId));
-      if(f.status) out = out.filter(t => String(t.status) === String(f.status));
-      if(f.priority) out = out.filter(t => String(t.priority) === String(f.priority));
-
-      state.filteredTasks = out;
-      if(resetPage) state.taskPage = 1;
+      if(!$('page-tasks').classList.contains('hidden')) loadTaskPage(false);
+      if(!$('page-calendar').classList.contains('hidden')) loadCalendarTasks();
     }
 
     function hasTaskFilters(){
@@ -516,8 +543,7 @@
     }
 
     function applyTaskFiltersAndRender(){
-      applyTaskFiltersLocal(true);
-      renderTasks();
+      loadTaskPage(true);
     }
 
     function getFilters(){
@@ -617,7 +643,7 @@
 
     function getCalendarEvents(dateKey, mode, ownerUserId){
       const events = [];
-      state.allTasks.forEach(t=>{
+      state.calendarTasks.forEach(t=>{
         if(ownerUserId && String(t.ownerUserId) !== String(ownerUserId)) return;
 
         if((mode === 'both' || mode === 'install') && normalizeDateKey(t.installDate) === dateKey){
@@ -766,12 +792,10 @@
 
     function renderTasks(){
       try{
-        const total = state.filteredTasks.length;
-        const pageSize = Number(state.taskPageSize || 50);
-        const totalPages = Math.max(1, Math.ceil(total / pageSize));
+        const rows = state.filteredTasks || [];
+        const total = Number(state.taskTotal || rows.length || 0);
+        const totalPages = Math.max(1, Number(state.taskTotalPages || 1));
         state.taskPage = Math.min(Math.max(1, Number(state.taskPage || 1)), totalPages);
-        const start = (state.taskPage - 1) * pageSize;
-        const rows = state.filteredTasks.slice(start, start + pageSize);
 
         $('tasksBody').innerHTML = rows.map(taskRowFull).join('') || emptyRow(10, 'ไม่พบงานตาม filter');
         if($('taskPageInfo')) $('taskPageInfo').textContent = `Page ${state.taskPage}/${totalPages} · ${total} tasks`;
@@ -917,23 +941,33 @@
 
     async function openTaskDetail(taskId){
       state.currentTaskId = taskId;
-      $('detailSteps').innerHTML = '<div class="muted">Loading...</div>';
+      $('detailSteps').innerHTML = '<div class="muted">Loading checklist...</div>';
+      $('detailLogs').innerHTML = '<div class="muted">Loading logs...</div>';
+      $('detailComments').innerHTML = '<div class="muted">Loading comments...</div>';
       openModal('detail');
 
       try{
         const res = await apiCall('getTaskDetail', {
           token: state.token,
-          taskId: taskId
+          taskId: taskId,
+          includeActivity: false
         });
 
-        renderDetail(
-          res.task,
-          res.steps || [],
-          res.logs || [],
-          res.comments || []
-        );
+        renderDetail(res.task, res.steps || [], [], []);
+        loadTaskActivity(taskId);
       }catch(e){
         $('detailSteps').innerHTML = '<div class="muted">Load failed: ' + esc(e.message) + '</div>';
+      }
+    }
+
+    async function loadTaskActivity(taskId){
+      try{
+        const res = await apiCall('getTaskActivity', {token: state.token, taskId});
+        if(String(state.currentTaskId) !== String(taskId)) return;
+        renderActivity(res.logs || [], res.comments || []);
+      }catch(e){
+        $('detailLogs').innerHTML = '<div class="muted">Load logs failed: ' + esc(e.message) + '</div>';
+        $('detailComments').innerHTML = '<div class="muted">Load comments failed: ' + esc(e.message) + '</div>';
       }
     }
 
@@ -963,8 +997,12 @@
         <div><div class="name">${esc(s.stepNo)}. ${esc(s.stepName)}</div><div class="meta">${isTrue(s.done) ? 'Done by ' + esc(findUserName(s.doneBy)) + ' at ' + esc(s.doneAt) : 'Pending'} ${s.note ? ' · ' + esc(s.note) : ''}</div></div>
       </label>`).join('') || '<div class="muted">ไม่มี checklist</div>';
 
-      $('detailLogs').innerHTML = logs.map(l=>`<div style="margin-bottom:8px;"><b>${esc(l.action)}</b> <span class="muted">${esc(l.createdAt)} · ${esc(findUserName(l.actorUserId))}</span><div class="muted">${esc(l.detail)}</div></div>`).join('') || '<div class="muted">ยังไม่มี log</div>';
-      $('detailComments').innerHTML = comments.map(c=>`<div style="margin-bottom:8px;"><b>${esc(findUserName(c.actorUserId))}</b> <span class="muted">${esc(c.createdAt)}</span><div>${esc(c.comment)}</div></div>`).join('') || '<div class="muted">ยังไม่มี comment</div>';
+      renderActivity(logs, comments);
+    }
+
+    function renderActivity(logs, comments){
+      $('detailLogs').innerHTML = (logs || []).map(l=>`<div style="margin-bottom:8px;"><b>${esc(l.action)}</b> <span class="muted">${esc(l.createdAt)} · ${esc(findUserName(l.actorUserId))}</span><div class="muted">${esc(l.detail)}</div></div>`).join('') || '<div class="muted">ยังไม่มี log</div>';
+      $('detailComments').innerHTML = (comments || []).map(c=>`<div style="margin-bottom:8px;"><b>${esc(findUserName(c.actorUserId))}</b> <span class="muted">${esc(c.createdAt)}</span><div>${esc(c.comment)}</div></div>`).join('') || '<div class="muted">ยังไม่มี comment</div>';
     }
 
     function renderCompletionPanel(task){
@@ -993,8 +1031,10 @@
       if(fidx >= 0){
         state.filteredTasks[fidx] = Object.assign({}, state.filteredTasks[fidx], task);
       }
-
-      if(rerunFilters) applyTaskFiltersLocal(false);
+      const cidx = state.calendarTasks.findIndex(t => String(t.taskId) === String(task.taskId));
+      if(cidx >= 0){
+        state.calendarTasks[cidx] = Object.assign({}, state.calendarTasks[cidx], task);
+      }
     }
 
     function updateCurrentTaskAfterStep(task){
@@ -1017,7 +1057,7 @@
       const locked = isViewer() || (state.currentTask && isClosedStatus(state.currentTask.status) && !canAdmin() && !canLeader());
       document.querySelectorAll('#detailSteps input[type="checkbox"][data-step-id]').forEach(cb => cb.disabled = !!locked);
 
-      if(!$('page-tasks').classList.contains('hidden')) renderTasks();
+      if(!$('page-tasks').classList.contains('hidden')) loadTaskPage(false);
       if(!$('page-dashboard').classList.contains('hidden')) renderDashboard();
       if(!$('page-calendar').classList.contains('hidden')) renderCalendar();
       applyRoleUI();
@@ -1075,7 +1115,7 @@
       finally{ setLoading($('btnSaveEdit'), false); }
     }
     function normalizeDateInput(v){ if(!v) return ''; return String(v).trim().slice(0,10); }
-    async function addComment(){ const comment=$('commentInput').value.trim(); if(!comment) return; try{ await apiCall('addComment',{token:state.token,taskId:state.currentTaskId,comment}); $('commentInput').value=''; await openTaskDetail(state.currentTaskId); toast('เพิ่ม comment แล้ว'); }catch(e){ toast('Comment failed: '+e.message); } }
+    async function addComment(){ const comment=$('commentInput').value.trim(); if(!comment) return; try{ await apiCall('addComment',{token:state.token,taskId:state.currentTaskId,comment}); $('commentInput').value=''; await loadTaskActivity(state.currentTaskId); toast('เพิ่ม comment แล้ว'); }catch(e){ toast('Comment failed: '+e.message); } }
 
     function openUserModal(userId){
       const u=userId?state.users.find(x=>String(x.userId)===String(userId)):null;
@@ -1144,25 +1184,25 @@ function findUserName(userId){ const u=state.users.find(x=>String(x.userId)===St
     function isTrue(v){ return v === true || String(v).toUpperCase() === 'TRUE'; }
     function openModal(name){ $(name+'ModalBack').classList.add('show'); }
     function closeModal(name){ $(name+'ModalBack').classList.remove('show'); }
-    function switchPage(page){ if(page==='admin' && !canAdmin()){ toast('ไม่มีสิทธิ์เข้า Admin'); page='dashboard'; } document.querySelectorAll('[id^="page-"]').forEach(x=>x.classList.add('hidden')); $('page-'+page).classList.remove('hidden'); document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active', b.dataset.page===page)); if(page==='calendar') renderCalendar(); if(page==='tasks') renderTasks(); applyRoleUI(); }
+    function switchPage(page){ if(page==='admin' && !canAdmin()){ toast('ไม่มีสิทธิ์เข้า Admin'); page='dashboard'; } document.querySelectorAll('[id^="page-"]').forEach(x=>x.classList.add('hidden')); $('page-'+page).classList.remove('hidden'); document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active', b.dataset.page===page)); if(page==='calendar') loadCalendarTasks(); if(page==='tasks') loadTaskPage(false); applyRoleUI(); }
 
     function bindEvents(){
       $('btnLogin').onclick=login; $('btnLogout').onclick=logout; $('btnRefreshDash').onclick=loadTasks; $('btnRefreshTasks').onclick=loadTasks; $('btnRefreshAdmin').onclick=bootstrap;
       $('btnRefreshCalendar').onclick=loadTasks;
-      $('btnCalendarToday').onclick=()=>{ state.calendarDate = new Date(); renderCalendar(); };
-      $('btnCalPrev').onclick=()=>{ state.calendarDate = new Date(state.calendarDate.getFullYear(), state.calendarDate.getMonth()-1, 1); renderCalendar(); };
-      $('btnCalNext').onclick=()=>{ state.calendarDate = new Date(state.calendarDate.getFullYear(), state.calendarDate.getMonth()+1, 1); renderCalendar(); };
-      $('calendarMode').onchange=renderCalendar;
-      $('calendarOwner').onchange=renderCalendar;
+      $('btnCalendarToday').onclick=()=>{ state.calendarDate = new Date(); state.calendarLoadedKey=''; loadCalendarTasks(); };
+      $('btnCalPrev').onclick=()=>{ state.calendarDate = new Date(state.calendarDate.getFullYear(), state.calendarDate.getMonth()-1, 1); state.calendarLoadedKey=''; loadCalendarTasks(); };
+      $('btnCalNext').onclick=()=>{ state.calendarDate = new Date(state.calendarDate.getFullYear(), state.calendarDate.getMonth()+1, 1); state.calendarLoadedKey=''; loadCalendarTasks(); };
+      $('calendarMode').onchange=()=>{ state.calendarLoadedKey=''; loadCalendarTasks(); };
+      $('calendarOwner').onchange=()=>{ state.calendarLoadedKey=''; loadCalendarTasks(); };
       $('btnOpenUser').onclick=()=>openUserModal(''); $('btnSaveUser').onclick=saveUser; $('btnSaveResetPass').onclick=saveResetPassword;
       $('btnOpenTemplate').onclick=()=>openTemplateModal(''); $('btnSaveTemplate').onclick=saveTemplate;
       $('btnOpenWorkType').onclick=()=>openWorkTypeModal(''); $('btnSaveWorkType').onclick=saveWorkType; $('wtTypeName').addEventListener('input',()=>{ if(!$('wtTypeId').value) $('wtColor').value=autoColorFromText($('wtTypeName').value); });
       $('btnOpenCreate').onclick=()=>openModal('create'); $('btnOpenCreate2').onclick=()=>openModal('create'); $('btnCreateTask').onclick=createTask; $('btnAddComment').onclick=addComment; $('btnOpenEdit').onclick=openEditModal; $('btnSaveEdit').onclick=saveEditTask;
-      $('btnClearFilters').onclick=()=>{ ['filterKeyword','filterOwner','filterType','filterStatus','filterPriority'].forEach(id=>$(id).value=''); applyTaskFiltersAndRender(); };
+      $('btnClearFilters').onclick=()=>{ ['filterKeyword','filterOwner','filterType','filterStatus','filterPriority'].forEach(id=>$(id).value=''); loadTaskPage(true); };
       ['filterKeyword','filterOwner','filterType','filterStatus','filterPriority'].forEach(id=>$(id).addEventListener(id==='filterKeyword'?'input':'change', debounce(applyTaskFiltersAndRender,500)));
-      $('btnPagePrev').onclick=()=>{ state.taskPage=Math.max(1,state.taskPage-1); renderTasks(); };
-      $('btnPageNext').onclick=()=>{ state.taskPage=state.taskPage+1; renderTasks(); };
-      $('taskPageSize').onchange=()=>{ state.taskPageSize=Number($('taskPageSize').value||50); state.taskPage=1; renderTasks(); };
+      $('btnPagePrev').onclick=()=>{ state.taskPage=Math.max(1,state.taskPage-1); loadTaskPage(false); };
+      $('btnPageNext').onclick=()=>{ state.taskPage=state.taskPage+1; loadTaskPage(false); };
+      $('taskPageSize').onchange=()=>{ state.taskPageSize=Number($('taskPageSize').value||50); state.taskPage=1; loadTaskPage(true); };
       document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>switchPage(b.dataset.page)); document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeModal(b.dataset.close));
       document.body.addEventListener('click', e=>{
         const eu=e.target.closest('[data-edit-user]'); if(eu) openUserModal(eu.dataset.editUser);
@@ -1218,7 +1258,11 @@ $('detailSteps').addEventListener('change', e=>{ if(e.target.matches('input[type
         if(document.querySelector('.modal-backdrop.show')) return;
         const page = getActivePage();
         if(page === 'admin') return;
-        try{ await loadTasks(); }catch(e){ console.warn('auto refresh failed', e); }
+        try{
+          if(page === 'dashboard') await loadTasks();
+          else if(page === 'tasks') await loadTaskPage(false);
+          else if(page === 'calendar') { state.calendarLoadedKey=''; await loadCalendarTasks(); }
+        }catch(e){ console.warn('auto refresh failed', e); }
       }, 60000);
     }
 
