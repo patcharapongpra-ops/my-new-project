@@ -91,6 +91,10 @@
     .ok-text{color:#d4ffe6;font-weight:1000}
     .warn-text{color:#ffeac7;font-weight:1000}
     .filters{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr auto;gap:10px;margin-bottom:12px}
+    .task-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 10px}
+    .task-filter-note{font-size:12px;color:#ffeac7;border:1px solid rgba(255,208,137,.35);background:rgba(255,208,137,.08);padding:7px 10px;border-radius:999px;display:none}
+    .task-filter-note.show{display:inline-flex}
+    .pager{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
     label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-weight:700}
     input,select,textarea{width:100%;border:1px solid rgba(36,52,73,.9);background:rgba(14,21,32,.95);color:var(--text);padding:10px;border-radius:12px;outline:none}
     textarea{min-height:74px;resize:vertical}
@@ -220,6 +224,15 @@
             <div><label>Status</label><select id="filterStatus"></select></div>
             <div><label>Priority</label><select id="filterPriority"></select></div>
             <div class="filter-actions" style="display:flex;align-items:flex-end;gap:8px;"><button class="btn" id="btnClearFilters">Clear</button></div>
+          </div>
+          <div class="task-toolbar">
+            <span class="task-filter-note" id="taskFilterNote">Tasks filter is active. Calendar/Dashboard still show all visible tasks.</span>
+            <div class="pager">
+              <button class="btn" id="btnPagePrev">‹ Prev</button>
+              <span class="pill" id="taskPageInfo">Page 1/1</span>
+              <button class="btn" id="btnPageNext">Next ›</button>
+              <select id="taskPageSize" style="width:auto;"><option value="25">25/page</option><option value="50" selected>50/page</option><option value="100">100/page</option></select>
+            </div>
           </div>
           <div class="table-wrap"><table><thead><tr><th>Task</th><th>Owner</th><th>Type</th><th>Status</th><th>Priority</th><th>Progress</th><th>CID/SOF</th><th>Due Date</th><th>Install Date</th><th>Updated</th></tr></thead><tbody id="tasksBody"></tbody></table></div>
         </section>
@@ -405,7 +418,8 @@
       token: localStorage.getItem(APP.tokenKey) || '',
       user: readJson(localStorage.getItem(APP.userKey), null),
       permissions: {},
-      users: [], workTypes: [], templates: [], tasks: [],
+      users: [], workTypes: [], templates: [],
+      allTasks: [], filteredTasks: [], taskPage: 1, taskPageSize: 50, autoRefreshTimer: null,
       selectedAdminTypeId: '', calendarDate: new Date(), currentTaskId: '', currentTask: null
     };
 
@@ -449,7 +463,7 @@
 
     function logout(){
       localStorage.removeItem(APP.tokenKey); localStorage.removeItem(APP.userKey);
-      state.token=''; state.user=null; state.tasks=[]; state.permissions={};
+      state.token=''; state.user=null; state.allTasks=[]; state.filteredTasks=[]; state.permissions={};
       $('loginScreen').classList.remove('hidden'); refreshTopbar();
     }
 
@@ -464,9 +478,46 @@
     }
 
     async function loadTasks(){
-      const res = await apiCall('getTasks', {token: state.token, filters: getFilters()});
-      state.tasks = res.tasks || [];
-      renderDashboard(); renderTasks(); renderCalendar();
+      const res = await apiCall('getTasks', {token: state.token, filters: {}});
+      state.allTasks = res.tasks || [];
+      applyTaskFiltersLocal(false);
+      renderVisiblePageOnly();
+    }
+
+    function renderVisiblePageOnly(){
+      if(!$('page-dashboard').classList.contains('hidden')) renderDashboard();
+      if(!$('page-tasks').classList.contains('hidden')) renderTasks();
+      if(!$('page-calendar').classList.contains('hidden')) renderCalendar();
+    }
+
+    function applyTaskFiltersLocal(resetPage=true){
+      const f = getFilters();
+      let out = state.allTasks.slice();
+      const keyword = String(f.keyword || '').trim().toLowerCase();
+
+      if(keyword){
+        out = out.filter(t => [
+          t.title, t.cid, t.sof, t.customerName, t.serviceName,
+          t.ownerName, t.typeName, t.remark, t.blockerTag
+        ].join(' ').toLowerCase().indexOf(keyword) >= 0);
+      }
+      if(f.ownerUserId) out = out.filter(t => String(t.ownerUserId) === String(f.ownerUserId));
+      if(f.typeId) out = out.filter(t => String(t.typeId) === String(f.typeId));
+      if(f.status) out = out.filter(t => String(t.status) === String(f.status));
+      if(f.priority) out = out.filter(t => String(t.priority) === String(f.priority));
+
+      state.filteredTasks = out;
+      if(resetPage) state.taskPage = 1;
+    }
+
+    function hasTaskFilters(){
+      const f = getFilters();
+      return !!(f.keyword || f.ownerUserId || f.typeId || f.status || f.priority);
+    }
+
+    function applyTaskFiltersAndRender(){
+      applyTaskFiltersLocal(true);
+      renderTasks();
     }
 
     function getFilters(){
@@ -566,7 +617,7 @@
 
     function getCalendarEvents(dateKey, mode, ownerUserId){
       const events = [];
-      state.tasks.forEach(t=>{
+      state.allTasks.forEach(t=>{
         if(ownerUserId && String(t.ownerUserId) !== String(ownerUserId)) return;
 
         if((mode === 'both' || mode === 'install') && normalizeDateKey(t.installDate) === dateKey){
@@ -610,7 +661,7 @@
     }
 
     function renderDashboard(){
-      const tasks = state.tasks;
+      const tasks = state.allTasks;
       const openTasks = tasks.filter(t=>!isClosedStatus(t.status)).length;
       const mine = state.user ? tasks.filter(t=>String(t.ownerUserId)===String(state.user.userId)).length : 0;
       const blocked = tasks.filter(t=>t.status==='BLOCKED' || t.blockerTag).length;
@@ -715,7 +766,18 @@
 
     function renderTasks(){
       try{
-        $('tasksBody').innerHTML = state.tasks.map(taskRowFull).join('') || emptyRow(10, 'ไม่พบงานตาม filter');
+        const total = state.filteredTasks.length;
+        const pageSize = Number(state.taskPageSize || 50);
+        const totalPages = Math.max(1, Math.ceil(total / pageSize));
+        state.taskPage = Math.min(Math.max(1, Number(state.taskPage || 1)), totalPages);
+        const start = (state.taskPage - 1) * pageSize;
+        const rows = state.filteredTasks.slice(start, start + pageSize);
+
+        $('tasksBody').innerHTML = rows.map(taskRowFull).join('') || emptyRow(10, 'ไม่พบงานตาม filter');
+        if($('taskPageInfo')) $('taskPageInfo').textContent = `Page ${state.taskPage}/${totalPages} · ${total} tasks`;
+        if($('btnPagePrev')) $('btnPagePrev').disabled = state.taskPage <= 1;
+        if($('btnPageNext')) $('btnPageNext').disabled = state.taskPage >= totalPages;
+        if($('taskFilterNote')) $('taskFilterNote').classList.toggle('show', hasTaskFilters());
       }catch(e){
         $('tasksBody').innerHTML = emptyRow(10, 'Render Tasks error: ' + e.message);
         console.error(e);
@@ -919,15 +981,28 @@
       </div>`;
     }
 
+    function updateTaskInCaches(task, rerunFilters=true){
+      if(!task || !task.taskId) return;
+
+      const idx = state.allTasks.findIndex(t => String(t.taskId) === String(task.taskId));
+      if(idx >= 0){
+        state.allTasks[idx] = Object.assign({}, state.allTasks[idx], task);
+      }
+
+      const fidx = state.filteredTasks.findIndex(t => String(t.taskId) === String(task.taskId));
+      if(fidx >= 0){
+        state.filteredTasks[fidx] = Object.assign({}, state.filteredTasks[fidx], task);
+      }
+
+      if(rerunFilters) applyTaskFiltersLocal(false);
+    }
+
     function updateCurrentTaskAfterStep(task){
       if(!task) return;
 
       state.currentTask = Object.assign({}, state.currentTask || {}, task);
 
-      const idx = state.tasks.findIndex(t => String(t.taskId) === String(task.taskId));
-      if(idx >= 0){
-        state.tasks[idx] = Object.assign({}, state.tasks[idx], task);
-      }
+      updateTaskInCaches(task, false);
 
       const archived = isTrue(state.currentTask.archived);
       $('detailSub').textContent = `${state.currentTask.taskId} · ${state.currentTask.status} · ${state.currentTask.priority}${archived ? ' · ARCHIVED' : ''}`;
@@ -995,7 +1070,7 @@
       const body = {token:state.token,taskId:state.currentTaskId,title:$('editTitle').value,ownerUserId:$('editOwner').value,status:$('editStatus').value,priority:$('editPriority').value,sof:$('editSof').value,cid:$('editCid').value,customerName:$('editCustomer').value,serviceName:$('editService').value,dueDate:$('editDue').value,installDate:$('editInstall').value,blockerTag:$('editBlocker').value,remark:$('editRemark').value};
       if(!body.title){ toast('Title ห้ามว่าง'); return; }
       setLoading($('btnSaveEdit'), true);
-      try{ await apiCall('updateTask', body); closeModal('edit'); await openTaskDetail(state.currentTaskId); await loadTasks(); toast('บันทึกการแก้ไขแล้ว'); }
+      try{ const res = await apiCall('updateTask', body); if(res.task) updateTaskInCaches(res.task, true); closeModal('edit'); await openTaskDetail(state.currentTaskId); renderVisiblePageOnly(); toast('บันทึกการแก้ไขแล้ว'); }
       catch(e){ toast('Save failed: ' + e.message); }
       finally{ setLoading($('btnSaveEdit'), false); }
     }
@@ -1030,7 +1105,7 @@
     async function inlineUpdateTask(taskId, payload, el){
       if(!taskId) return;
 
-      const task = state.tasks.find(t=>String(t.taskId)===String(taskId));
+      const task = state.allTasks.find(t=>String(t.taskId)===String(taskId));
       if(!task) return;
 
       const old = {
@@ -1039,22 +1114,26 @@
         installDate: task.installDate
       };
 
+      const optimistic = Object.assign({}, task, payload, {updatedAt: 'Saving...'});
+      updateTaskInCaches(optimistic, true);
+      renderTasks();
       el.disabled = true;
 
       try{
-        await apiCall('updateTask', Object.assign({
+        const res = await apiCall('updateTask', Object.assign({
           token: state.token,
           taskId
         }, payload));
 
-        await loadTasks();
-
+        updateTaskInCaches(res.task || optimistic, true);
+        renderVisiblePageOnly();
         toast('Saved');
       }catch(err){
+        updateTaskInCaches(Object.assign({}, task, old), true);
         if(payload.status !== undefined) el.value = old.status || '';
         if(payload.dueDate !== undefined) el.value = normalizeDateInput(old.dueDate);
         if(payload.installDate !== undefined) el.value = normalizeDateInput(old.installDate);
-
+        renderTasks();
         toast('Save failed: ' + err.message);
       }finally{
         el.disabled = false;
@@ -1065,7 +1144,7 @@ function findUserName(userId){ const u=state.users.find(x=>String(x.userId)===St
     function isTrue(v){ return v === true || String(v).toUpperCase() === 'TRUE'; }
     function openModal(name){ $(name+'ModalBack').classList.add('show'); }
     function closeModal(name){ $(name+'ModalBack').classList.remove('show'); }
-    function switchPage(page){ if(page==='admin' && !canAdmin()){ toast('ไม่มีสิทธิ์เข้า Admin'); page='dashboard'; } document.querySelectorAll('[id^="page-"]').forEach(x=>x.classList.add('hidden')); $('page-'+page).classList.remove('hidden'); document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active', b.dataset.page===page)); if(page==='calendar') renderCalendar(); applyRoleUI(); }
+    function switchPage(page){ if(page==='admin' && !canAdmin()){ toast('ไม่มีสิทธิ์เข้า Admin'); page='dashboard'; } document.querySelectorAll('[id^="page-"]').forEach(x=>x.classList.add('hidden')); $('page-'+page).classList.remove('hidden'); document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active', b.dataset.page===page)); if(page==='calendar') renderCalendar(); if(page==='tasks') renderTasks(); applyRoleUI(); }
 
     function bindEvents(){
       $('btnLogin').onclick=login; $('btnLogout').onclick=logout; $('btnRefreshDash').onclick=loadTasks; $('btnRefreshTasks').onclick=loadTasks; $('btnRefreshAdmin').onclick=bootstrap;
@@ -1079,8 +1158,11 @@ function findUserName(userId){ const u=state.users.find(x=>String(x.userId)===St
       $('btnOpenTemplate').onclick=()=>openTemplateModal(''); $('btnSaveTemplate').onclick=saveTemplate;
       $('btnOpenWorkType').onclick=()=>openWorkTypeModal(''); $('btnSaveWorkType').onclick=saveWorkType; $('wtTypeName').addEventListener('input',()=>{ if(!$('wtTypeId').value) $('wtColor').value=autoColorFromText($('wtTypeName').value); });
       $('btnOpenCreate').onclick=()=>openModal('create'); $('btnOpenCreate2').onclick=()=>openModal('create'); $('btnCreateTask').onclick=createTask; $('btnAddComment').onclick=addComment; $('btnOpenEdit').onclick=openEditModal; $('btnSaveEdit').onclick=saveEditTask;
-      $('btnClearFilters').onclick=()=>{ ['filterKeyword','filterOwner','filterType','filterStatus','filterPriority'].forEach(id=>$(id).value=''); loadTasks(); };
-      ['filterKeyword','filterOwner','filterType','filterStatus','filterPriority'].forEach(id=>$(id).addEventListener(id==='filterKeyword'?'input':'change', debounce(loadTasks,300)));
+      $('btnClearFilters').onclick=()=>{ ['filterKeyword','filterOwner','filterType','filterStatus','filterPriority'].forEach(id=>$(id).value=''); applyTaskFiltersAndRender(); };
+      ['filterKeyword','filterOwner','filterType','filterStatus','filterPriority'].forEach(id=>$(id).addEventListener(id==='filterKeyword'?'input':'change', debounce(applyTaskFiltersAndRender,500)));
+      $('btnPagePrev').onclick=()=>{ state.taskPage=Math.max(1,state.taskPage-1); renderTasks(); };
+      $('btnPageNext').onclick=()=>{ state.taskPage=state.taskPage+1; renderTasks(); };
+      $('taskPageSize').onchange=()=>{ state.taskPageSize=Number($('taskPageSize').value||50); state.taskPage=1; renderTasks(); };
       document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>switchPage(b.dataset.page)); document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeModal(b.dataset.close));
       document.body.addEventListener('click', e=>{
         const eu=e.target.closest('[data-edit-user]'); if(eu) openUserModal(eu.dataset.editUser);
@@ -1121,8 +1203,27 @@ $('detailSteps').addEventListener('change', e=>{ if(e.target.matches('input[type
     }
     function debounce(fn,ms){ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args),ms); }; }
 
+    function getActivePage(){
+      if(!$('page-dashboard').classList.contains('hidden')) return 'dashboard';
+      if(!$('page-tasks').classList.contains('hidden')) return 'tasks';
+      if(!$('page-calendar').classList.contains('hidden')) return 'calendar';
+      if(!$('page-admin').classList.contains('hidden')) return 'admin';
+      return 'dashboard';
+    }
+
+    function startAutoRefresh(){
+      if(state.autoRefreshTimer) clearInterval(state.autoRefreshTimer);
+      state.autoRefreshTimer = setInterval(async ()=>{
+        if(!state.token || !state.user) return;
+        if(document.querySelector('.modal-backdrop.show')) return;
+        const page = getActivePage();
+        if(page === 'admin') return;
+        try{ await loadTasks(); }catch(e){ console.warn('auto refresh failed', e); }
+      }, 60000);
+    }
+
     async function init(){
-      bindEvents(); $('apiUrlInput').value=state.apiUrl; refreshTopbar();
+      bindEvents(); $('apiUrlInput').value=state.apiUrl; refreshTopbar(); startAutoRefresh();
       if(state.apiUrl && state.token && state.user){ $('loginScreen').classList.add('hidden'); try{ await bootstrap(); }catch(e){ toast('Session expired / API error: '+e.message); logout(); } }
     }
     window.addEventListener('error', function(e){
