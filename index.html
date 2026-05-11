@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Provisioning Work Center v2.3</title>
+  <title>Provisioning Work Center v5</title>
   <style>
     :root{
       --bg:#0b0f14; --panel:#101826; --card:#121a24; --line:#243449;
@@ -352,7 +352,7 @@
     <h3>Checklist</h3><div id="detailSteps" style="margin-bottom:14px;"></div>
     <h3>Comments</h3><div style="display:flex;gap:8px;margin:8px 0;"><input id="commentInput" placeholder="เพิ่ม comment" /><button class="btn primary" id="btnAddComment">Add</button></div>
     <div class="logbox" id="detailComments" style="margin-bottom:14px;"></div>
-    <h3>Logs</h3><div class="logbox" id="detailLogs"></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:8px;"><h3 style="flex:1;">Logs</h3><button class="btn" id="btnLoadArchivedLogs">Load older logs</button></div><div class="logbox" id="detailLogs"></div>
   </div></div>
 
   <!-- User Modal -->
@@ -944,6 +944,7 @@
       $('detailSteps').innerHTML = '<div class="muted">Loading checklist...</div>';
       $('detailLogs').innerHTML = '<div class="muted">Loading logs...</div>';
       $('detailComments').innerHTML = '<div class="muted">Loading comments...</div>';
+      if($('btnLoadArchivedLogs')) $('btnLoadArchivedLogs').disabled = false;
       openModal('detail');
 
       try{
@@ -971,6 +972,27 @@
       }
     }
 
+
+    async function loadArchivedTaskLogs(){
+      const taskId = state.currentTaskId;
+      if(!taskId) return;
+      const btn = $('btnLoadArchivedLogs');
+      setLoading(btn, true);
+      try{
+        const res = await apiCall('getArchivedTaskLogs', {token: state.token, taskId});
+        if(String(state.currentTaskId) !== String(taskId)) return;
+        const logs = res.logs || [];
+        const archivedHtml = logs.map(l=>`<div style="margin-bottom:8px;opacity:.86;"><b>${esc(l.action)}</b> <span class="muted">${esc(l.createdAt)} · ${esc(findUserName(l.actorUserId))} · archived</span><div class="muted">${esc(l.detail)}</div></div>`).join('') || '<div class="muted">ไม่พบ archived logs ของ task นี้</div>';
+        $('detailLogs').insertAdjacentHTML('beforeend', `<div class="lock-note" style="margin-top:10px;">Archived logs older than 14 days</div>${archivedHtml}`);
+        setLoading(btn, false);
+        if(btn) btn.disabled = true;
+        return;
+      }catch(e){
+        toast('Load older logs failed: ' + e.message);
+      }finally{
+        if(btn && !btn.disabled) setLoading(btn, false);
+      }
+    }
     
     function emptyRow(col, text){
       return `<tr><td colspan="${col}" class="muted">${esc(text)}</td></tr>`;
@@ -1197,7 +1219,7 @@ function findUserName(userId){ const u=state.users.find(x=>String(x.userId)===St
       $('btnOpenUser').onclick=()=>openUserModal(''); $('btnSaveUser').onclick=saveUser; $('btnSaveResetPass').onclick=saveResetPassword;
       $('btnOpenTemplate').onclick=()=>openTemplateModal(''); $('btnSaveTemplate').onclick=saveTemplate;
       $('btnOpenWorkType').onclick=()=>openWorkTypeModal(''); $('btnSaveWorkType').onclick=saveWorkType; $('wtTypeName').addEventListener('input',()=>{ if(!$('wtTypeId').value) $('wtColor').value=autoColorFromText($('wtTypeName').value); });
-      $('btnOpenCreate').onclick=()=>openModal('create'); $('btnOpenCreate2').onclick=()=>openModal('create'); $('btnCreateTask').onclick=createTask; $('btnAddComment').onclick=addComment; $('btnOpenEdit').onclick=openEditModal; $('btnSaveEdit').onclick=saveEditTask;
+      $('btnOpenCreate').onclick=()=>openModal('create'); $('btnOpenCreate2').onclick=()=>openModal('create'); $('btnCreateTask').onclick=createTask; $('btnAddComment').onclick=addComment; $('btnOpenEdit').onclick=openEditModal; $('btnSaveEdit').onclick=saveEditTask; if($('btnLoadArchivedLogs')) $('btnLoadArchivedLogs').onclick=loadArchivedTaskLogs;
       $('btnClearFilters').onclick=()=>{ ['filterKeyword','filterOwner','filterType','filterStatus','filterPriority'].forEach(id=>$(id).value=''); loadTaskPage(true); };
       ['filterKeyword','filterOwner','filterType','filterStatus','filterPriority'].forEach(id=>$(id).addEventListener(id==='filterKeyword'?'input':'change', debounce(applyTaskFiltersAndRender,500)));
       $('btnPagePrev').onclick=()=>{ state.taskPage=Math.max(1,state.taskPage-1); loadTaskPage(false); };
