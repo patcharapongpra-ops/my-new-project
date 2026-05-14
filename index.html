@@ -132,6 +132,26 @@
     .toast{position:fixed;right:16px;bottom:16px;background:#0e1520;border:1px solid rgba(36,52,73,.9);padding:10px 12px;border-radius:12px;z-index:90;display:none}
     .login-screen{position:fixed;inset:0;z-index:80;display:grid;place-items:center;background:rgba(0,0,0,.48);backdrop-filter:blur(8px);padding:16px}
     .login-card{width:min(520px,100%);border:1px solid rgba(36,52,73,.85);background:rgba(16,24,38,.94);border-radius:20px;padding:18px;box-shadow:0 35px 90px rgba(0,0,0,.55)}
+
+    .glass-panel{position:relative;overflow:hidden}
+    .glass-panel:before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.07),transparent 42%);pointer-events:none}
+    .topbar{box-shadow:0 10px 40px rgba(0,0,0,.25)}
+    .sidebar,.card,.modal,.login-card{backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+    .card{transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+    .card:hover{border-color:rgba(255,255,255,.12);box-shadow:0 18px 45px rgba(0,0,0,.28)}
+    .btn{transition:transform .16s ease,border-color .16s ease,background .16s ease,box-shadow .16s ease}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(0,0,0,.18)}
+    .btn.primary{box-shadow:0 10px 26px rgba(255,122,24,.18)}
+    .kpi{position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(18,28,43,.88),rgba(12,18,28,.72))}
+    .kpi:after{content:"";position:absolute;right:-24px;top:-24px;width:82px;height:82px;border-radius:999px;background:rgba(255,122,24,.10)}
+    .table-wrap{box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}
+    .comment-preview{min-width:180px;max-width:260px;color:#d7e8ff;font-size:12px;line-height:1.4}
+    .comment-preview .comment-count{display:inline-flex;margin-bottom:5px;border:1px solid rgba(56,189,248,.38);background:rgba(56,189,248,.10);color:#bfefff;border-radius:999px;padding:3px 8px;font-size:11px;font-weight:900}
+    .comment-preview .comment-text{color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .comment-card{border:1px solid rgba(36,52,73,.70);background:linear-gradient(180deg,rgba(16,24,38,.86),rgba(11,15,20,.68));border-radius:14px;padding:10px 12px;margin-bottom:9px}
+    .comment-card .comment-top{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:5px}
+    .comment-card b{color:#f4f8ff}
+
     @media(max-width:1100px){.layout{grid-template-columns:1fr}.sidebar{position:relative;top:auto}.nav{flex-direction:row;overflow:auto}.nav button{white-space:nowrap;width:auto}.kpi-grid{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:1fr 1fr}.filters .filter-actions{grid-column:1/-1}.form-grid{grid-template-columns:1fr}.admin-layout{grid-template-columns:1fr}.type-list{max-height:none}.dash-grid{grid-template-columns:1fr}.calendar-grid{gap:5px}.calendar-day{min-height:108px;padding:6px}.cal-event{font-size:10px;padding:5px}.completion-panel{grid-template-columns:1fr}.inline-status,.inline-date{font-size:10px;padding:5px}}
     @media(max-width:640px){.topbar-inner{align-items:flex-start}.brand small{display:none}.kpi-grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr}.container{padding:10px}.card{padding:12px}}
   </style>
@@ -161,7 +181,7 @@
       </aside>
 
       <main class="main">
-        <section class="card" id="page-dashboard">
+        <section class="card glass-panel" id="page-dashboard">
           <div class="section-head">
             <div><h1>Dashboard รวมทุกคน</h1><div class="muted">ดูภาพรวมงาน, blocker, due date และงานใกล้ install</div></div>
             <div class="spacer"></div>
@@ -196,7 +216,7 @@
           </div>
           <div class="table-wrap" style="margin-bottom:14px;">
             <table>
-              <thead><tr><th>Task</th><th>Owner</th><th>Type</th><th>Status</th><th>Priority</th><th>Due</th><th>Reason</th></tr></thead>
+              <thead><tr><th>Task</th><th>Owner</th><th>Type</th><th>Status</th><th>Priority</th><th>Due</th><th>Comments</th><th>Reason</th></tr></thead>
               <tbody id="attentionTasksBody"></tbody>
             </table>
           </div>
@@ -207,10 +227,10 @@
               <div class="muted">งานล่าสุดตาม updatedAt</div>
             </div>
           </div>
-          <div class="table-wrap"><table><thead><tr><th>งานล่าสุด</th><th>Owner</th><th>Type</th><th>Status</th><th>Priority</th><th>Progress</th><th>Due</th><th>Install</th></tr></thead><tbody id="recentTasksBody"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>งานล่าสุด</th><th>Owner</th><th>Type</th><th>Status</th><th>Priority</th><th>Progress</th><th>Comments</th><th>Due</th><th>Install</th></tr></thead><tbody id="recentTasksBody"></tbody></table></div>
         </section>
 
-        <section class="card hidden" id="page-tasks">
+        <section class="card hidden glass-panel" id="page-tasks">
           <div class="section-head">
             <div><h1>Tasks</h1><div class="muted">ค้นหาและกรองงานทั้งหมดในทีม</div></div>
             <div class="spacer"></div>
@@ -234,10 +254,10 @@
               <select id="taskPageSize" style="width:auto;"><option value="25">25/page</option><option value="50" selected>50/page</option><option value="100">100/page</option></select>
             </div>
           </div>
-          <div class="table-wrap"><table><thead><tr><th>Task</th><th>Owner</th><th>Type</th><th>Status</th><th>Priority</th><th>Progress</th><th>CID/SOF</th><th>Due Date</th><th>Install Date</th><th>Updated</th></tr></thead><tbody id="tasksBody"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Task</th><th>Owner</th><th>Type</th><th>Status</th><th>Priority</th><th>Progress</th><th>Comments</th><th>CID/SOF</th><th>Due Date</th><th>Install Date</th><th>Updated</th></tr></thead><tbody id="tasksBody"></tbody></table></div>
         </section>
 
-        <section class="card hidden" id="page-calendar">
+        <section class="card hidden glass-panel" id="page-calendar">
           <div class="section-head">
             <div>
               <h1>Calendar</h1>
@@ -274,7 +294,7 @@
           <div class="calendar-grid" id="calendarGrid"></div>
         </section>
 
-        <section class="card hidden" id="page-admin">
+        <section class="card hidden glass-panel" id="page-admin">
           <div class="section-head">
             <div><h1>Admin / Master Data</h1><div class="muted">Admin จัดการ Users, Work Types และ Checklist Templates</div></div>
             <div class="spacer"></div><button class="btn" id="btnRefreshAdmin">Refresh</button>
@@ -723,8 +743,8 @@
         return String(a.dueDate || '').localeCompare(String(b.dueDate || ''));
       });
 
-      $('attentionTasksBody').innerHTML = attention.slice(0,12).map(attentionRow).join('') || emptyRow(7, 'ไม่มีงานที่ต้องจับตา');
-      $('recentTasksBody').innerHTML = tasks.slice(0,10).map(taskRowRecent).join('') || emptyRow(8, 'ยังไม่มีงาน');
+      $('attentionTasksBody').innerHTML = attention.slice(0,12).map(attentionRow).join('') || emptyRow(8, 'ไม่มีงานที่ต้องจับตา');
+      $('recentTasksBody').innerHTML = tasks.slice(0,10).map(taskRowRecent).join('') || emptyRow(9, 'ยังไม่มีงาน');
     }
 
     function countBy(items, field){
@@ -742,6 +762,14 @@
       el.innerHTML = rows.slice(0,8).map(r=>`<div class="mini-row"><b>${esc(r.label)}</b><span>${r.count}</span></div>`).join('') || `<div class="empty-panel">${esc(emptyText)}</div>`;
     }
 
+
+    function commentPreview(t){
+      const count = Number(t.commentCount || t.commentsCount || t.totalComments || 0);
+      const latest = t.latestComment || t.lastComment || t.comment || t.remark || '';
+      const label = count > 0 ? `${count} comment${count > 1 ? 's' : ''}` : (latest ? 'note' : 'no comments');
+      return `<div class="comment-preview"><span class="comment-count">${esc(label)}</span><div class="comment-text">${latest ? esc(latest) : 'ยังไม่มี comment'}</div></div>`;
+    }
+
     function attentionRow(t){
       const reasons = [];
       if(isOverdue(t)) reasons.push('Overdue');
@@ -755,6 +783,7 @@
         <td>${badge(t.status,'status-'+t.status)}</td>
         <td>${badge(t.priority,'priority-'+t.priority)}</td>
         <td>${esc(t.dueDate || '-')}</td>
+        <td>${commentPreview(t)}</td>
         <td>${reasons.map(x=>badge(x, x==='Overdue'?'status-BLOCKED':'')).join(' ')}</td>
       </tr>`;
     }
@@ -796,13 +825,13 @@
         const totalPages = Math.max(1, Number(state.taskTotalPages || 1));
         state.taskPage = Math.min(Math.max(1, Number(state.taskPage || 1)), totalPages);
 
-        $('tasksBody').innerHTML = rows.map(taskRowFull).join('') || emptyRow(10, 'ไม่พบงานตาม filter');
+        $('tasksBody').innerHTML = rows.map(taskRowFull).join('') || emptyRow(11, 'ไม่พบงานตาม filter');
         if($('taskPageInfo')) $('taskPageInfo').textContent = `Page ${state.taskPage}/${totalPages} · ${total} tasks`;
         if($('btnPagePrev')) $('btnPagePrev').disabled = state.taskPage <= 1;
         if($('btnPageNext')) $('btnPageNext').disabled = state.taskPage >= totalPages;
         if($('taskFilterNote')) $('taskFilterNote').classList.toggle('show', hasTaskFilters());
       }catch(e){
-        $('tasksBody').innerHTML = emptyRow(10, 'Render Tasks error: ' + e.message);
+        $('tasksBody').innerHTML = emptyRow(11, 'Render Tasks error: ' + e.message);
         console.error(e);
       }
     }
@@ -833,7 +862,7 @@
     }
 
     function taskRowRecent(t){
-      return `<tr class="${isOverdue(t) && !isClosedStatus(t.status) ? 'overdue-row' : ''}"><td><span class="linkish" data-task="${esc(t.taskId)}">${esc(t.title)}</span><div class="muted">${esc(t.cid || '')} ${esc(t.sof || '')}</div></td><td>${esc(t.ownerName)}</td><td>${badge(t.typeName)}</td><td>${badge(t.status,'status-'+t.status)}</td><td>${badge(t.priority,'priority-'+t.priority)}</td><td>${progressHtml(t.progressPercent)}</td><td>${esc(t.dueDate)}</td><td>${esc(t.installDate)}</td></tr>`;
+      return `<tr class="${isOverdue(t) && !isClosedStatus(t.status) ? 'overdue-row' : ''}"><td><span class="linkish" data-task="${esc(t.taskId)}">${esc(t.title)}</span><div class="muted">${esc(t.cid || '')} ${esc(t.sof || '')}</div></td><td>${esc(t.ownerName)}</td><td>${badge(t.typeName)}</td><td>${badge(t.status,'status-'+t.status)}</td><td>${badge(t.priority,'priority-'+t.priority)}</td><td>${progressHtml(t.progressPercent)}</td><td>${commentPreview(t)}</td><td>${esc(t.dueDate)}</td><td>${esc(t.installDate)}</td></tr>`;
     }
     function taskRowFull(t){
       const editable = !isViewer() && !(isClosedStatus(t.status) && !canAdmin() && !canLeader());
@@ -859,6 +888,8 @@
         <td>${badge(t.priority,'priority-'+t.priority)}</td>
 
         <td>${progressHtml(t.progressPercent)}</td>
+
+        <td>${commentPreview(t)}</td>
 
         <td>
           ${esc(t.cid || '-')}
@@ -997,7 +1028,7 @@
     }
 
     function renderActivity(logs, comments){
-      $('detailComments').innerHTML = (comments || []).map(c=>`<div style="margin-bottom:8px;"><b>${esc(findUserName(c.actorUserId))}</b> <span class="muted">${esc(c.createdAt)}</span><div>${esc(c.comment)}</div></div>`).join('') || '<div class="muted">ยังไม่มี comment</div>';
+      $('detailComments').innerHTML = (comments || []).map(c=>`<div class="comment-card"><div class="comment-top"><b>${esc(findUserName(c.actorUserId))}</b><span class="muted">${esc(c.createdAt)}</span></div><div>${esc(c.comment)}</div></div>`).join('') || '<div class="muted">ยังไม่มี comment</div>';
     }
 
     function renderCompletionPanel(task){
@@ -1110,7 +1141,7 @@
       finally{ setLoading($('btnSaveEdit'), false); }
     }
     function normalizeDateInput(v){ if(!v) return ''; return String(v).trim().slice(0,10); }
-    async function addComment(){ const comment=$('commentInput').value.trim(); if(!comment) return; try{ await apiCall('addComment',{token:state.token,taskId:state.currentTaskId,comment}); $('commentInput').value=''; await loadTaskActivity(state.currentTaskId); toast('เพิ่ม comment แล้ว'); }catch(e){ toast('Comment failed: '+e.message); } }
+    async function addComment(){ const comment=$('commentInput').value.trim(); if(!comment) return; try{ await apiCall('addComment',{token:state.token,taskId:state.currentTaskId,comment}); $('commentInput').value=''; await loadTaskComments(state.currentTaskId); toast('เพิ่ม comment แล้ว'); }catch(e){ toast('Comment failed: '+e.message); } }
 
     function openUserModal(userId){
       const u=userId?state.users.find(x=>String(x.userId)===String(userId)):null;
