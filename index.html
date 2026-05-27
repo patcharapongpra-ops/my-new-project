@@ -239,6 +239,65 @@
 
     @media(max-width:1100px){.layout{grid-template-columns:1fr}.sidebar{position:relative;top:auto}.nav{flex-direction:row;overflow:auto}.nav button{white-space:nowrap;width:auto}.kpi-grid{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:1fr 1fr}.filters .filter-actions{grid-column:1/-1}.form-grid{grid-template-columns:1fr}.admin-layout{grid-template-columns:1fr}.type-list{max-height:none}.dash-grid{grid-template-columns:1fr}.calendar-grid{gap:5px}.calendar-day{min-height:108px;padding:6px}.cal-event{font-size:10px;padding:5px}.completion-panel{grid-template-columns:1fr}.inline-status,.inline-date{font-size:10px;padding:5px}}
     @media(max-width:640px){.topbar-inner{align-items:flex-start}.brand small{display:none}.kpi-grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr}.container{padding:10px}.card{padding:12px}}
+
+
+    /* Hotfix v2: prevent horizontal overflow + restore warning/highlight visibility */
+    html,body{max-width:100%;overflow-x:hidden}
+    .topbar-inner,.container,.main,.card,.table-wrap{min-width:0}
+    .layout{grid-template-columns:minmax(220px,248px) minmax(0,1fr)}
+    .brand{min-width:0}.brand>div:last-child{min-width:0;overflow:hidden;text-overflow:ellipsis}.spacer{min-width:8px}
+    .section-head{min-width:0}.section-head>div:first-child{min-width:0}
+
+    /* Tables: keep desktop usable, but never let the page itself overflow */
+    .table-wrap{width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
+    table{width:100%;max-width:none}
+    .data-table{min-width:1040px;table-layout:fixed}
+    .tasks-table{min-width:1060px}.recent-table{min-width:980px}.attention-table{min-width:960px}
+    .data-table th,.data-table td{overflow:hidden;text-overflow:ellipsis}
+    .task-title-cell .linkish,.task-title-cell .muted{overflow:hidden;text-overflow:ellipsis}
+    .comment-preview{overflow:hidden}.comment-preview .comment-count{max-width:100%;overflow:hidden;text-overflow:ellipsis}
+    .inline-status,.inline-date{max-width:100%}
+
+    /* Restore row highlight colors: overdue / due-soon must be visible even in refined theme */
+    tr.overdue-row td{background:linear-gradient(90deg,rgba(255,92,122,.22),rgba(255,92,122,.09))!important;border-left:0!important}
+    tr.overdue-row td:first-child{border-left:4px solid var(--bad)!important}
+    tr.due-soon-row td{background:linear-gradient(90deg,rgba(255,208,137,.18),rgba(255,208,137,.075))!important;border-left:0!important}
+    tr.due-soon-row td:first-child{border-left:4px solid var(--warn)!important}
+    tr.overdue-row:hover td{background:linear-gradient(90deg,rgba(255,92,122,.28),rgba(255,92,122,.12))!important}
+    tr.due-soon-row:hover td{background:linear-gradient(90deg,rgba(255,208,137,.23),rgba(255,208,137,.10))!important}
+
+    /* Restore calendar event color bars */
+    .cal-event.install{border-left:4px solid var(--ok)!important;background:rgba(55,214,122,.10)!important}
+    .cal-event.due{border-left:4px solid rgba(255,208,137,.85)!important;background:rgba(255,208,137,.08)!important}
+    .cal-event.due-soon{border-left:4px solid var(--warn)!important;background:rgba(255,208,137,.15)!important}
+    .cal-event.overdue{border-left:4px solid var(--bad)!important;background:rgba(255,92,122,.16)!important}
+
+    /* Stronger semantic badges */
+    .badge.status-BLOCKED,.badge.priority-URGENT{box-shadow:inset 3px 0 0 rgba(255,92,122,.85);background:rgba(255,92,122,.16);color:#ffe1e8}
+    .badge.status-WAITING{box-shadow:inset 3px 0 0 rgba(255,208,137,.85);background:rgba(255,208,137,.15);color:#fff0d1}
+    .badge.status-READY_INSTALL{box-shadow:inset 3px 0 0 rgba(56,189,248,.85);background:rgba(56,189,248,.14);color:#d0f4ff}
+    .badge.status-DONE{box-shadow:inset 3px 0 0 rgba(55,214,122,.85);background:rgba(55,214,122,.14);color:#defeea}
+
+    @media(max-width:1100px){
+      .layout{grid-template-columns:1fr}.sidebar{width:100%;max-width:100%}.nav{max-width:100%}
+      .kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.filters{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    @media(max-width:900px){
+      .table-wrap{overflow:visible}.data-table,.tasks-table,.recent-table,.attention-table{min-width:0!important;width:100%}
+      .tasks-table tbody tr,.recent-table tbody tr,.attention-table tbody tr{box-shadow:0 12px 30px rgba(0,0,0,.18)}
+      .tasks-table tbody tr.overdue-row,.recent-table tbody tr.overdue-row,.attention-table tbody tr.overdue-row{border-color:rgba(255,92,122,.45);background:rgba(255,92,122,.10)}
+      .tasks-table tbody tr.due-soon-row,.recent-table tbody tr.due-soon-row,.attention-table tbody tr.due-soon-row{border-color:rgba(255,208,137,.42);background:rgba(255,208,137,.08)}
+      .tasks-table tr.overdue-row td:first-child,.recent-table tr.overdue-row td:first-child,.attention-table tr.overdue-row td:first-child{border-left:4px solid var(--bad)!important}
+      .tasks-table tr.due-soon-row td:first-child,.recent-table tr.due-soon-row td:first-child,.attention-table tr.due-soon-row td:first-child{border-left:4px solid var(--warn)!important}
+      .tasks-table td,.recent-table td,.attention-table td{align-items:flex-start;overflow:visible;text-overflow:clip}
+      .tasks-table td:before,.recent-table td:before,.attention-table td:before{flex:0 0 92px}.tasks-table td>*{min-width:0}
+    }
+    @media(max-width:640px){
+      .topbar-inner{padding:12px;gap:8px;flex-wrap:wrap}.brand{max-width:100%;font-size:14px}.container{padding:10px}
+      .section-head{gap:10px}.section-head .spacer{display:none}.section-head .btn{flex:1 1 auto}
+      .filters{grid-template-columns:1fr}.kpi-grid{grid-template-columns:1fr}.calendar-grid{gap:6px}.calendar-day{min-width:0}
+    }
+
   </style>
 </head>
 <body>
