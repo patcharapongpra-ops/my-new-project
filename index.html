@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Provisioning Work Center - UI Refined</title>
+  <title>Provisioning Work Center v5</title>
   <style>
     :root{
       --bg:#0b0f14; --panel:#101826; --card:#121a24; --line:#243449;
@@ -199,188 +199,8 @@
     .inline-status,.inline-date{min-width:0}
     .progress{width:98px}
 
-
-
-    /* UI refinement layer: cleaner SaaS-style dashboard */
-    :root{
-      --bg:#080d13; --panel:#0f1724; --card:#111b29; --line:#203047;
-      --text:#f2f7ff; --muted:#a9bad0; --soft:#d8e6f8;
-      --shadow:0 18px 55px rgba(0,0,0,.26);
-      --radius-xl:22px; --radius-lg:16px; --radius-md:12px;
-    }
-    body{letter-spacing:-.01em;background:
-      radial-gradient(900px 420px at 7% -4%,rgba(255,122,24,.13),transparent 58%),
-      radial-gradient(850px 420px at 94% 10%,rgba(56,189,248,.08),transparent 56%),
-      linear-gradient(180deg,#0a0f16,#070a0f 55%,#05070a)}
-    .topbar{border-bottom:1px solid rgba(255,255,255,.06);background:rgba(7,11,17,.78)}
-    .topbar-inner{padding:14px 20px}.container{padding:20px}.layout{gap:18px;grid-template-columns:248px 1fr}
-    .logo{border-radius:14px;box-shadow:0 12px 28px rgba(255,122,24,.20)}
-    .brand{font-size:15px}.brand small{color:#97aac2;font-weight:650}
-    .sidebar{top:82px;border:0;background:linear-gradient(180deg,rgba(17,27,41,.78),rgba(12,18,28,.58));box-shadow:var(--shadow);padding:16px;border-radius:var(--radius-xl)}
-    .nav-title{margin-left:8px;color:#7f93ad}.nav{gap:4px}.nav button{position:relative;border:0;background:transparent;box-shadow:none;padding:12px 14px;border-radius:14px;color:#bfd0e6;font-weight:850;gap:10px}
-    .nav button:hover{background:rgba(255,255,255,.045);transform:none;box-shadow:none;color:#fff}.nav button.active{border:0;background:rgba(255,122,24,.13);color:#fff}.nav button.active:before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:999px;background:var(--accent)}
-    .nav-ico{width:24px;height:24px;border-radius:9px;display:inline-grid;place-items:center;background:rgba(255,255,255,.055);color:#e8f2ff;font-size:13px}.nav button.active .nav-ico{background:rgba(255,122,24,.20);color:#ffd7bf}
-    .card,.modal,.login-card{border:1px solid rgba(255,255,255,.075);background:linear-gradient(180deg,rgba(17,27,41,.76),rgba(11,18,28,.64));border-radius:var(--radius-xl);box-shadow:var(--shadow)}
-    .card{padding:18px}.card:hover{transform:none;border-color:rgba(255,255,255,.12)}
-    .section-head{margin-bottom:18px;align-items:center}h1{font-size:22px;letter-spacing:-.025em}h2{font-size:18px}h3{font-size:15px;color:#f4f8ff}.muted{color:var(--muted);font-size:12.5px}
-    .btn{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.045);border-radius:13px;padding:9px 13px;font-weight:850;box-shadow:none}.btn:hover{border-color:rgba(255,122,24,.42);background:rgba(255,255,255,.07)}.btn.primary{border:0;background:linear-gradient(180deg,#ff943d,#ff7414);color:#1f1007}.pill{background:rgba(255,255,255,.045);border-color:rgba(255,255,255,.08);color:#bfd0e6}
-    .kpi-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.kpi{border:0;border-radius:18px;padding:16px;background:linear-gradient(180deg,rgba(19,31,48,.88),rgba(13,21,33,.78));box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}.kpi .num{font-size:28px;letter-spacing:-.04em}.kpi .label{font-size:12px;color:#9dafc6}.kpi:after{opacity:.75}
-    .dash-grid{gap:16px;margin:18px 0 20px}.mini-list{gap:7px}.mini-row{border:0;background:rgba(255,255,255,.045);padding:10px 12px}.mini-row b{color:#eef6ff}.mini-row span{color:#b6c8de}
-    .filters{grid-template-columns:2fr repeat(4, minmax(120px,1fr)) auto;gap:12px;background:rgba(255,255,255,.035);padding:12px;border-radius:18px;border:1px solid rgba(255,255,255,.055)}
-    label{color:#a9bad0;font-weight:800}input,select,textarea{border:1px solid rgba(255,255,255,.08);background:rgba(5,9,14,.72);border-radius:13px;color:#f4f8ff}input:focus,select:focus,textarea:focus{border-color:rgba(255,122,24,.68);box-shadow:0 0 0 4px rgba(255,122,24,.12)}
-    .table-wrap{border:1px solid rgba(255,255,255,.07);border-radius:18px;background:rgba(6,10,16,.46);box-shadow:none}table{min-width:980px}th,td{border-bottom:1px solid rgba(255,255,255,.055);padding:13px 12px;font-size:12.5px}th{background:#101928;color:#d9e8fb;font-size:11px;text-transform:uppercase;letter-spacing:.045em}tr:hover td{background:rgba(255,255,255,.035)}
-    .tasks-table col.task-col{width:330px}.tasks-table col.owner-col{width:96px}.tasks-table col.type-col{width:110px}.tasks-table col.status-col{width:132px}.tasks-table col.priority-col{width:86px}.tasks-table col.progress-col{width:110px}.tasks-table col.comments-col{width:132px}.tasks-table col.cid-col{width:84px}.tasks-table col.date-col{width:120px}.tasks-table col.updated-col{width:82px}
-    .badge{border:0;background:rgba(255,255,255,.06);padding:5px 9px;font-weight:850;color:#dbeaff}.badge.status-NEW{background:rgba(56,189,248,.12);color:#bdeeff}.badge.status-IN_PROGRESS,.badge.status-READY_INSTALL{background:rgba(168,85,247,.12);color:#ead7ff}.badge.status-WAITING{background:rgba(255,208,137,.13);color:#ffe5b7}.badge.status-BLOCKED,.badge.priority-URGENT{background:rgba(255,92,122,.14);color:#ffd1dc}.badge.status-DONE{background:rgba(55,214,122,.12);color:#d5ffe5}.badge.priority-HIGH{background:rgba(255,122,24,.13);color:#ffd8bd}.badge.priority-NORMAL{background:rgba(56,189,248,.10);color:#c9efff}
-    .progress{height:7px;border:0;background:rgba(255,255,255,.08);width:92px}.linkish{color:#fff;font-weight:950}.task-title-cell .muted{color:#8fa4be}.comment-preview .comment-count{border:0;background:rgba(56,189,248,.12);color:#c7f1ff}.comment-preview .comment-text{color:#9fb2c9}
-    tr.overdue-row td{background:rgba(255,92,122,.075)!important;border-left:0}tr.due-soon-row td{background:rgba(255,208,137,.055)!important;border-left:0}
-    .calendar-grid{gap:10px}.calendar-day{border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.035);border-radius:16px}.calendar-day.today{border-color:rgba(255,122,24,.70)}.cal-event{border:0;background:rgba(255,255,255,.065);border-radius:12px}.calendar-dow{color:#9eb0c8}.day-count{border:0;background:rgba(255,122,24,.13)}
-    .modal{background:#0d1520}.modal-backdrop{backdrop-filter:blur(10px)}.empty-panel{border:1px dashed rgba(255,255,255,.12);background:rgba(255,255,255,.035);color:#aabbd0;border-radius:18px}.toast{border:1px solid rgba(255,255,255,.10);background:#111b29;box-shadow:var(--shadow)}
-    @media(max-width:900px){.data-table,.tasks-table,.recent-table,.attention-table{min-width:0}.tasks-table col,.recent-table col,.attention-table col{width:auto}.tasks-table thead,.recent-table thead,.attention-table thead{display:none}.tasks-table tbody tr,.recent-table tbody tr,.attention-table tbody tr{display:block;margin:10px;border:1px solid rgba(255,255,255,.07);border-radius:16px;background:rgba(255,255,255,.035);overflow:hidden}.tasks-table td,.recent-table td,.attention-table td{display:flex;justify-content:space-between;gap:16px;border-bottom:1px solid rgba(255,255,255,.05)}.tasks-table td:before,.recent-table td:before,.attention-table td:before{content:attr(data-label);color:#91a5bd;font-weight:900;text-transform:uppercase;font-size:10px;letter-spacing:.05em}.table-wrap{overflow:visible}}
-
     @media(max-width:1100px){.layout{grid-template-columns:1fr}.sidebar{position:relative;top:auto}.nav{flex-direction:row;overflow:auto}.nav button{white-space:nowrap;width:auto}.kpi-grid{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:1fr 1fr}.filters .filter-actions{grid-column:1/-1}.form-grid{grid-template-columns:1fr}.admin-layout{grid-template-columns:1fr}.type-list{max-height:none}.dash-grid{grid-template-columns:1fr}.calendar-grid{gap:5px}.calendar-day{min-height:108px;padding:6px}.cal-event{font-size:10px;padding:5px}.completion-panel{grid-template-columns:1fr}.inline-status,.inline-date{font-size:10px;padding:5px}}
     @media(max-width:640px){.topbar-inner{align-items:flex-start}.brand small{display:none}.kpi-grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr}.container{padding:10px}.card{padding:12px}}
-
-
-    /* Hotfix v2: prevent horizontal overflow + restore warning/highlight visibility */
-    html,body{max-width:100%;overflow-x:hidden}
-    .topbar-inner,.container,.main,.card,.table-wrap{min-width:0}
-    .layout{grid-template-columns:minmax(220px,248px) minmax(0,1fr)}
-    .brand{min-width:0}.brand>div:last-child{min-width:0;overflow:hidden;text-overflow:ellipsis}.spacer{min-width:8px}
-    .section-head{min-width:0}.section-head>div:first-child{min-width:0}
-
-    /* Tables: keep desktop usable, but never let the page itself overflow */
-    .table-wrap{width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
-    table{width:100%;max-width:none}
-    .data-table{min-width:1040px;table-layout:fixed}
-    .tasks-table{min-width:1060px}.recent-table{min-width:980px}.attention-table{min-width:960px}
-    .data-table th,.data-table td{overflow:hidden;text-overflow:ellipsis}
-    .task-title-cell .linkish,.task-title-cell .muted{overflow:hidden;text-overflow:ellipsis}
-    .comment-preview{overflow:hidden}.comment-preview .comment-count{max-width:100%;overflow:hidden;text-overflow:ellipsis}
-    .inline-status,.inline-date{max-width:100%}
-
-    /* Restore row highlight colors: overdue / due-soon must be visible even in refined theme */
-    tr.overdue-row td{background:linear-gradient(90deg,rgba(255,92,122,.22),rgba(255,92,122,.09))!important;border-left:0!important}
-    tr.overdue-row td:first-child{border-left:4px solid var(--bad)!important}
-    tr.due-soon-row td{background:linear-gradient(90deg,rgba(255,208,137,.18),rgba(255,208,137,.075))!important;border-left:0!important}
-    tr.due-soon-row td:first-child{border-left:4px solid var(--warn)!important}
-    tr.overdue-row:hover td{background:linear-gradient(90deg,rgba(255,92,122,.28),rgba(255,92,122,.12))!important}
-    tr.due-soon-row:hover td{background:linear-gradient(90deg,rgba(255,208,137,.23),rgba(255,208,137,.10))!important}
-
-    /* Restore calendar event color bars */
-    .cal-event.install{border-left:4px solid var(--ok)!important;background:rgba(55,214,122,.10)!important}
-    .cal-event.due{border-left:4px solid rgba(255,208,137,.85)!important;background:rgba(255,208,137,.08)!important}
-    .cal-event.due-soon{border-left:4px solid var(--warn)!important;background:rgba(255,208,137,.15)!important}
-    .cal-event.overdue{border-left:4px solid var(--bad)!important;background:rgba(255,92,122,.16)!important}
-
-    /* Stronger semantic badges */
-    .badge.status-BLOCKED,.badge.priority-URGENT{box-shadow:inset 3px 0 0 rgba(255,92,122,.85);background:rgba(255,92,122,.16);color:#ffe1e8}
-    .badge.status-WAITING{box-shadow:inset 3px 0 0 rgba(255,208,137,.85);background:rgba(255,208,137,.15);color:#fff0d1}
-    .badge.status-READY_INSTALL{box-shadow:inset 3px 0 0 rgba(56,189,248,.85);background:rgba(56,189,248,.14);color:#d0f4ff}
-    .badge.status-DONE{box-shadow:inset 3px 0 0 rgba(55,214,122,.85);background:rgba(55,214,122,.14);color:#defeea}
-
-    @media(max-width:1100px){
-      .layout{grid-template-columns:1fr}.sidebar{width:100%;max-width:100%}.nav{max-width:100%}
-      .kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.filters{grid-template-columns:repeat(2,minmax(0,1fr))}
-    }
-    @media(max-width:900px){
-      .table-wrap{overflow:visible}.data-table,.tasks-table,.recent-table,.attention-table{min-width:0!important;width:100%}
-      .tasks-table tbody tr,.recent-table tbody tr,.attention-table tbody tr{box-shadow:0 12px 30px rgba(0,0,0,.18)}
-      .tasks-table tbody tr.overdue-row,.recent-table tbody tr.overdue-row,.attention-table tbody tr.overdue-row{border-color:rgba(255,92,122,.45);background:rgba(255,92,122,.10)}
-      .tasks-table tbody tr.due-soon-row,.recent-table tbody tr.due-soon-row,.attention-table tbody tr.due-soon-row{border-color:rgba(255,208,137,.42);background:rgba(255,208,137,.08)}
-      .tasks-table tr.overdue-row td:first-child,.recent-table tr.overdue-row td:first-child,.attention-table tr.overdue-row td:first-child{border-left:4px solid var(--bad)!important}
-      .tasks-table tr.due-soon-row td:first-child,.recent-table tr.due-soon-row td:first-child,.attention-table tr.due-soon-row td:first-child{border-left:4px solid var(--warn)!important}
-      .tasks-table td,.recent-table td,.attention-table td{align-items:flex-start;overflow:visible;text-overflow:clip}
-      .tasks-table td:before,.recent-table td:before,.attention-table td:before{flex:0 0 92px}.tasks-table td>*{min-width:0}
-    }
-    @media(max-width:640px){
-      .topbar-inner{padding:12px;gap:8px;flex-wrap:wrap}.brand{max-width:100%;font-size:14px}.container{padding:10px}
-      .section-head{gap:10px}.section-head .spacer{display:none}.section-head .btn{flex:1 1 auto}
-      .filters{grid-template-columns:1fr}.kpi-grid{grid-template-columns:1fr}.calendar-grid{gap:6px}.calendar-day{min-width:0}
-    }
-
-
-
-    /* Premium UI layer v3: cleaner, more polished, no workflow changes */
-    :root{
-      --surface-1:rgba(10,16,25,.78);
-      --surface-2:rgba(17,27,42,.74);
-      --surface-3:rgba(255,255,255,.045);
-      --hairline:rgba(255,255,255,.075);
-      --hairline-strong:rgba(255,255,255,.13);
-      --orange-glow:rgba(255,122,24,.22);
-      --blue-glow:rgba(56,189,248,.13);
-    }
-    body:before{
-      content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;
-      background:
-        linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
-        linear-gradient(90deg,rgba(255,255,255,.014) 1px,transparent 1px);
-      background-size:44px 44px;mask-image:linear-gradient(180deg,rgba(0,0,0,.55),transparent 72%);
-    }
-    .topbar{background:linear-gradient(180deg,rgba(8,13,20,.92),rgba(8,13,20,.72));border-bottom:1px solid var(--hairline)}
-    .topbar-inner{max-width:1540px}
-    .logo{background:linear-gradient(145deg,#ff9b45,#ff6d0b 58%,#c8520b);box-shadow:0 14px 34px rgba(255,122,24,.25),inset 0 1px 0 rgba(255,255,255,.35)}
-    .brand{color:#fff}.brand small{color:#9db0c9}
-    .pill{height:30px;border-radius:999px;background:rgba(255,255,255,.052);box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
-    .pill.ok:before,.pill.bad:before{content:"";width:7px;height:7px;border-radius:999px;background:var(--ok);box-shadow:0 0 0 3px rgba(55,214,122,.13)}
-    .pill.bad:before{background:var(--bad);box-shadow:0 0 0 3px rgba(255,92,122,.13)}
-    .container{max-width:1540px}
-    .layout{grid-template-columns:252px minmax(0,1fr);gap:20px}
-    .sidebar{background:linear-gradient(180deg,rgba(19,30,46,.82),rgba(10,16,25,.68));border:1px solid var(--hairline);box-shadow:0 26px 80px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.05)}
-    .nav-title{font-size:10px;font-weight:900;color:#7f92aa;margin-bottom:12px}
-    .nav button{height:46px;font-size:13px;color:#b7c9df}
-    .nav button.active{background:linear-gradient(90deg,rgba(255,122,24,.22),rgba(255,122,24,.07));box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
-    .nav button.active:before{top:8px;bottom:8px;width:4px;box-shadow:0 0 16px rgba(255,122,24,.55)}
-    .nav-ico{background:rgba(255,255,255,.065);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
-    .main{min-width:0}
-    .card,.modal,.login-card{background:linear-gradient(180deg,rgba(18,29,45,.80),rgba(9,15,24,.68));border:1px solid var(--hairline);box-shadow:0 24px 80px rgba(0,0,0,.29),inset 0 1px 0 rgba(255,255,255,.045)}
-    main>.card{padding:22px}
-    .glass-panel:before{background:linear-gradient(135deg,rgba(255,255,255,.07),transparent 34%);opacity:.75}
-    .section-head{padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.055);margin-bottom:18px}
-    .section-head h1{font-size:24px;line-height:1.12;color:#fff}.section-head h3{font-size:16px}
-    .muted{color:#9eb2cc;line-height:1.55}
-    .btn{height:38px;border-radius:12px;background:rgba(255,255,255,.055);color:#edf6ff}
-    .btn:hover{background:rgba(255,255,255,.085);border-color:rgba(255,122,24,.48)}
-    .btn.primary{background:linear-gradient(180deg,#ffa24f,#ff7a18);box-shadow:0 12px 28px rgba(255,122,24,.20),inset 0 1px 0 rgba(255,255,255,.28)}
-    .btn.danger{background:rgba(255,92,122,.13);border-color:rgba(255,92,122,.26)}
-    .kpi-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}
-    .kpi{min-height:104px;padding:18px;border:1px solid rgba(255,255,255,.06);background:linear-gradient(155deg,rgba(25,39,60,.92),rgba(12,20,32,.74));box-shadow:inset 0 1px 0 rgba(255,255,255,.045)}
-    .kpi .num{font-size:31px;position:relative;z-index:1}.kpi .label{font-size:12.5px;color:#a7b9cf;position:relative;z-index:1}
-    .kpi:nth-child(1):after{background:rgba(56,189,248,.13)}.kpi:nth-child(2):after{background:rgba(255,122,24,.13)}.kpi:nth-child(3):after,.kpi:nth-child(6):after{background:rgba(255,92,122,.14)}.kpi:nth-child(8):after{background:rgba(55,214,122,.14)}
-    .dash-grid{gap:18px}.dash-grid>.card{padding:18px;background:linear-gradient(180deg,rgba(14,24,38,.70),rgba(8,14,22,.55))!important}
-    .mini-row{border:1px solid rgba(255,255,255,.045);background:rgba(255,255,255,.04);border-radius:14px}.mini-row:hover{background:rgba(255,255,255,.065)}
-    .filters{background:linear-gradient(180deg,rgba(255,255,255,.047),rgba(255,255,255,.025));border:1px solid rgba(255,255,255,.075);padding:14px;margin-bottom:14px}
-    label{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#9fb3ca}
-    input,select,textarea{background:rgba(3,7,12,.68);border-color:rgba(255,255,255,.085);box-shadow:inset 0 1px 0 rgba(255,255,255,.025)}
-    .task-toolbar{margin-bottom:14px}.pager .pill{height:38px}
-    .table-wrap{border-radius:20px;background:rgba(3,8,14,.50);border-color:rgba(255,255,255,.08);box-shadow:0 18px 50px rgba(0,0,0,.16);overflow-x:auto;overflow-y:hidden}
-    .table-wrap::-webkit-scrollbar{height:10px}.table-wrap::-webkit-scrollbar-track{background:rgba(255,255,255,.035);border-radius:999px}.table-wrap::-webkit-scrollbar-thumb{background:rgba(255,122,24,.42);border-radius:999px;border:2px solid rgba(4,8,14,.95)}
-    th{background:linear-gradient(180deg,#122033,#0e1827);color:#bcd0e8;border-bottom:1px solid rgba(255,255,255,.075)}
-    td{color:#dce9f8}tbody tr:nth-child(even) td{background:rgba(255,255,255,.012)}
-    tr:hover td{background:rgba(255,255,255,.052)!important}.linkish:hover{color:#ffcfad;text-decoration:underline;text-decoration-color:rgba(255,122,24,.45);text-underline-offset:3px}
-    .badge{border-radius:999px;font-size:10.5px;letter-spacing:.015em;text-transform:uppercase;box-shadow:inset 0 1px 0 rgba(255,255,255,.055)}
-    .badge.status-NEW{box-shadow:inset 3px 0 0 rgba(56,189,248,.95)}
-    .progress{height:8px;width:96px;background:rgba(255,255,255,.09);box-shadow:inset 0 1px 3px rgba(0,0,0,.35)}
-    .progress>div{background:linear-gradient(90deg,#ff7a18,#ffc078)}
-    .comment-preview .comment-count{background:rgba(56,189,248,.14);box-shadow:inset 3px 0 0 rgba(56,189,248,.70)}
-    tr.overdue-row td{background:linear-gradient(90deg,rgba(255,92,122,.25),rgba(255,92,122,.105))!important}
-    tr.due-soon-row td{background:linear-gradient(90deg,rgba(255,208,137,.22),rgba(255,208,137,.09))!important}
-    tr.overdue-row td:first-child{box-shadow:inset 4px 0 0 var(--bad)}
-    tr.due-soon-row td:first-child{box-shadow:inset 4px 0 0 var(--warn)}
-    .calendar-head{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:12px;margin-bottom:14px}
-    .calendar-title{font-size:20px;color:#fff}.calendar-legend{margin:10px 0 14px}.legend-item{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.055);border-radius:999px;padding:6px 10px}
-    .calendar-day{min-height:138px;background:linear-gradient(180deg,rgba(255,255,255,.046),rgba(255,255,255,.024));box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
-    .calendar-day.today{box-shadow:0 0 0 3px rgba(255,122,24,.13),inset 0 1px 0 rgba(255,255,255,.04);background:linear-gradient(180deg,rgba(255,122,24,.075),rgba(255,255,255,.026))}
-    .day-num{color:#b7c9e0}.cal-event{box-shadow:inset 0 1px 0 rgba(255,255,255,.045);transition:transform .14s ease,background .14s ease}.cal-event:hover{transform:translateY(-1px);background:rgba(255,255,255,.09)!important}.cal-event .cal-meta{color:#a4b6ce}
-    .modal{padding:20px;border-radius:24px}.modal.small{width:min(740px,96vw)}.step{background:rgba(255,255,255,.035);border-color:rgba(255,255,255,.07)}.logbox{background:rgba(2,6,11,.56);border-color:rgba(255,255,255,.075)}
-    .login-screen{background:radial-gradient(700px 380px at 50% 18%,rgba(255,122,24,.14),transparent 62%),rgba(0,0,0,.56)}.login-card{padding:24px}
-    @media(max-width:1100px){.layout{grid-template-columns:1fr}.sidebar{top:auto}.nav button{height:42px}.kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}main>.card{padding:18px}}
-    @media(max-width:900px){
-      .tasks-table tbody tr,.recent-table tbody tr,.attention-table tbody tr{background:linear-gradient(180deg,rgba(17,27,42,.76),rgba(9,15,24,.62));border-radius:18px;margin:12px 8px}
-      .tasks-table td,.recent-table td,.attention-table td{padding:12px 14px}.tasks-table td:first-child,.recent-table td:first-child,.attention-table td:first-child{display:block}.tasks-table td:first-child:before,.recent-table td:first-child:before,.attention-table td:first-child:before{display:block;margin-bottom:6px}
-    }
-    @media(max-width:640px){main>.card{padding:14px}.section-head{align-items:flex-start}.section-head h1{font-size:21px}.calendar-day{min-height:112px}.topbar-inner .pill{max-width:100%;overflow:hidden;text-overflow:ellipsis}.btn{height:38px}}
-
   </style>
 </head>
 <body>
@@ -399,10 +219,10 @@
       <aside class="sidebar">
         <div class="nav-title">Menu</div>
         <div class="nav">
-          <button class="btn active" data-page="dashboard"><span class="nav-ico">⌁</span><span>Dashboard</span></button>
-          <button class="btn" data-page="tasks"><span class="nav-ico">✓</span><span>Tasks</span></button>
-          <button class="btn" data-page="calendar"><span class="nav-ico">◷</span><span>Calendar</span></button>
-          <button class="btn" data-page="admin" id="navAdmin"><span class="nav-ico">⚙</span><span>Admin</span></button>
+          <button class="btn active" data-page="dashboard">Dashboard</button>
+          <button class="btn" data-page="tasks">Tasks</button>
+          <button class="btn" data-page="calendar">Calendar</button>
+          <button class="btn" data-page="admin" id="navAdmin">Admin</button>
         </div>
         <div class="muted" style="margin-top:12px;">v2.3: Role permissions + User Management</div>
       </aside>
@@ -1011,14 +831,14 @@
       if(t.status === 'BLOCKED') reasons.push('Blocked');
       if(t.blockerTag) reasons.push(t.blockerTag);
       return `<tr class="${rowAlertClass(t)}">
-        <td data-label="Task" class="task-title-cell"><span class="linkish" data-task="${esc(t.taskId)}">${esc(t.title)}</span><div class="muted">${esc(t.cid || '')} ${esc(t.sof || '')}</div></td>
-        <td data-label="Owner">${esc(t.ownerName)}</td>
-        <td data-label="Type">${badge(t.typeName)}</td>
-        <td data-label="Status">${badge(t.status,'status-'+t.status)}</td>
-        <td data-label="Priority">${badge(t.priority,'priority-'+t.priority)}</td>
-        <td data-label="Due">${esc(t.dueDate || '-')}</td>
-        <td data-label="Comments">${commentPreview(t)}</td>
-        <td data-label="Reason">${reasons.map(x=>badge(x, x==='Overdue'?'status-BLOCKED':'')).join(' ')}</td>
+        <td class="task-title-cell"><span class="linkish" data-task="${esc(t.taskId)}">${esc(t.title)}</span><div class="muted">${esc(t.cid || '')} ${esc(t.sof || '')}</div></td>
+        <td>${esc(t.ownerName)}</td>
+        <td>${badge(t.typeName)}</td>
+        <td>${badge(t.status,'status-'+t.status)}</td>
+        <td>${badge(t.priority,'priority-'+t.priority)}</td>
+        <td>${esc(t.dueDate || '-')}</td>
+        <td>${commentPreview(t)}</td>
+        <td>${reasons.map(x=>badge(x, x==='Overdue'?'status-BLOCKED':'')).join(' ')}</td>
       </tr>`;
     }
 
@@ -1113,22 +933,22 @@
     }
 
     function taskRowRecent(t){
-      return `<tr class="${rowAlertClass(t)}"><td data-label="Task" class="task-title-cell"><span class="linkish" data-task="${esc(t.taskId)}">${esc(t.title)}</span><div class="muted">${esc(t.cid || '')} ${esc(t.sof || '')}</div></td><td data-label="Owner">${esc(t.ownerName)}</td><td data-label="Type">${badge(t.typeName)}</td><td data-label="Status">${badge(t.status,'status-'+t.status)}</td><td data-label="Priority">${badge(t.priority,'priority-'+t.priority)}</td><td data-label="Progress">${progressHtml(t.progressPercent)}</td><td data-label="Comments">${commentPreview(t)}</td><td data-label="Due">${esc(t.dueDate)}</td><td data-label="Install">${esc(t.installDate)}</td></tr>`;
+      return `<tr class="${rowAlertClass(t)}"><td class="task-title-cell"><span class="linkish" data-task="${esc(t.taskId)}">${esc(t.title)}</span><div class="muted">${esc(t.cid || '')} ${esc(t.sof || '')}</div></td><td>${esc(t.ownerName)}</td><td>${badge(t.typeName)}</td><td>${badge(t.status,'status-'+t.status)}</td><td>${badge(t.priority,'priority-'+t.priority)}</td><td>${progressHtml(t.progressPercent)}</td><td>${commentPreview(t)}</td><td>${esc(t.dueDate)}</td><td>${esc(t.installDate)}</td></tr>`;
     }
     function taskRowFull(t){
       const editable = !isViewer() && !(isClosedStatus(t.status) && !canAdmin() && !canLeader());
 
       return `<tr class="${rowAlertClass(t)}">
-        <td data-label="Task" class="task-title-cell">
+        <td class="task-title-cell">
           <span class="linkish" data-task="${esc(t.taskId)}">${esc(t.title)}</span>
           <div class="muted">${esc(t.customerName)} ${esc(t.serviceName)}</div>
         </td>
 
-        <td data-label="Owner">${esc(t.ownerName)}</td>
+        <td>${esc(t.ownerName)}</td>
 
-        <td data-label="Type">${badge(t.typeName)}</td>
+        <td>${badge(t.typeName)}</td>
 
-        <td data-label="Status">
+        <td>
           ${editable ? `
             <select class="inline-status" data-inline-status="${esc(t.taskId)}">
               ${STATUS_LIST.map(s=>`<option value="${s}" ${String(t.status)===s?'selected':''}>${s}</option>`).join('')}
@@ -1136,18 +956,18 @@
           ` : badge(t.status,'status-'+t.status)}
         </td>
 
-        <td data-label="Priority">${badge(t.priority,'priority-'+t.priority)}</td>
+        <td>${badge(t.priority,'priority-'+t.priority)}</td>
 
-        <td data-label="Progress">${progressHtml(t.progressPercent)}</td>
+        <td>${progressHtml(t.progressPercent)}</td>
 
-        <td data-label="Comments">${commentPreview(t)}</td>
+        <td>${commentPreview(t)}</td>
 
-        <td data-label="CID/SOF">
+        <td>
           ${esc(t.cid || '-')}
           <div class="muted">${esc(t.sof || '')}</div>
         </td>
 
-        <td data-label="Due">
+        <td>
           ${editable ? `
             <div class="inline-wrap">
               <input type="date" class="inline-date" data-inline-due="${esc(t.taskId)}" value="${esc(normalizeDateInput(t.dueDate))}">
@@ -1155,7 +975,7 @@
           ` : esc(t.dueDate || '-')}
         </td>
 
-        <td data-label="Install">
+        <td>
           ${editable ? `
             <div class="inline-wrap">
               <input type="date" class="inline-date" data-inline-install="${esc(t.taskId)}" value="${esc(normalizeDateInput(t.installDate))}">
@@ -1163,7 +983,7 @@
           ` : esc(t.installDate || '-')}
         </td>
 
-        <td data-label="Updated">${esc(t.updatedAt || '-')}</td>
+        <td>${esc(t.updatedAt || '-')}</td>
       </tr>`;
     }
 
@@ -1556,27 +1376,5 @@ $('detailSteps').addEventListener('change', e=>{ if(e.target.matches('input[type
 
     init();
   </script>
-
-<script>
-  /* UI polish helper: adds mobile labels to generated table cells without changing app logic */
-  (function(){
-    function applyTableLabels(){
-      document.querySelectorAll('table').forEach(function(table){
-        var headers=[].map.call(table.querySelectorAll('thead th'), function(th){ return th.textContent.trim(); });
-        if(!headers.length) return;
-        table.querySelectorAll('tbody tr').forEach(function(row){
-          [].forEach.call(row.children, function(td, i){
-            if(headers[i]) td.setAttribute('data-label', headers[i]);
-          });
-        });
-      });
-    }
-    var raf=0;
-    function schedule(){ cancelAnimationFrame(raf); raf=requestAnimationFrame(applyTableLabels); }
-    window.addEventListener('load', schedule);
-    new MutationObserver(schedule).observe(document.body,{childList:true,subtree:true});
-  })();
-</script>
-
 </body>
 </html>
