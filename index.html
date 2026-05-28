@@ -6,48 +6,48 @@
   <title>Provisioning Work Center v5</title>
   <style>
     :root{
-      --bg:#0b0f14; --panel:#101826; --card:#121a24; --line:#243449;
-      --text:#eaf2ff; --muted:#8fa4be; --accent:#ff7a18; --accent2:#ff9a3c;
-      --ok:#37d67a; --warn:#ffd089; --bad:#ff5c7a; --blue:#38bdf8;
+      --bg:#0b0f19; --panel:#111827; --card:#151f32; --line:#243449;
+      --text:#f1f5f9; --muted:#94a3b8; --accent:#38bdf8; --accent2:#0ea5e9;
+      --ok:#10b981; --warn:#f59e0b; --bad:#ef4444; --blue:#0284c7;
     }
     *{box-sizing:border-box}
     body{
       margin:0; min-height:100vh; color:var(--text);
       font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
       background:
-        radial-gradient(1100px 520px at 8% 0%, rgba(255,122,24,.15), transparent 55%),
-        radial-gradient(900px 480px at 92% 15%, rgba(56,189,248,.08), transparent 55%),
-        linear-gradient(180deg,#0b0f14,#070a0d);
+        radial-gradient(1100px 520px at 8% 0%, rgba(56,189,248,.12), transparent 55%),
+        radial-gradient(900px 480px at 92% 15%, rgba(16,185,129,.06), transparent 55%),
+        linear-gradient(180deg,#0b0f19,#070a12);
     }
     button,input,select,textarea{font:inherit}
     button{cursor:pointer}
     .hidden{display:none!important}
-    .topbar{position:sticky;top:0;z-index:20;border-bottom:1px solid rgba(36,52,73,.75);background:rgba(11,15,20,.82);backdrop-filter:blur(10px)}
+    .topbar{position:sticky;top:0;z-index:20;border-bottom:1px solid rgba(36,52,73,.75);background:rgba(11,15,25,.85);backdrop-filter:blur(10px)}
     .topbar-inner{max-width:1500px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px}
     .brand{display:flex;align-items:center;gap:10px;font-weight:950;letter-spacing:.02em}
-    .logo{width:36px;height:36px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(180deg,var(--accent),#d85f0f);color:#1a0d05;font-weight:1000}
+    .logo{width:36px;height:36px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(180deg,var(--accent),#0369a1);color:#0f172a;font-weight:1000}
     .brand small{display:block;color:var(--muted);font-size:12px;font-weight:700;margin-top:2px}
     .spacer{flex:1}
     .pill{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(36,52,73,.85);background:rgba(16,24,38,.65);color:var(--muted);padding:6px 10px;border-radius:999px;font-size:12px;white-space:nowrap}
-    .pill.ok{border-color:rgba(55,214,122,.45);color:#d4ffe6}.pill.bad{border-color:rgba(255,92,122,.45);color:#ffd1dc}
-    .btn{border:1px solid rgba(36,52,73,.9);background:rgba(16,24,38,.72);color:var(--text);padding:9px 12px;border-radius:12px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;gap:8px}
-    .btn:hover{border-color:rgba(255,122,24,.45)}
-    .btn.primary{background:linear-gradient(180deg,rgba(255,122,24,.95),rgba(216,95,15,.95));border-color:rgba(255,122,24,.55);color:#1a0d05}
-    .btn.danger{background:rgba(255,92,122,.12);border-color:rgba(255,92,122,.35);color:#ffd1dc}
+    .pill.ok{border-color:rgba(16,185,129,.45);color:#d1fae5}.pill.bad{border-color:rgba(239,68,68,.45);color:#fee2e2}
+    .btn{border:1px solid rgba(36,52,73,.9);background:rgba(21,31,50,.72);color:var(--text);padding:9px 12px;border-radius:12px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+    .btn:hover{border-color:rgba(56,189,248,.45)}
+    .btn.primary{background:linear-gradient(180deg,rgba(56,189,248,.95),rgba(14,165,233,.95));border-color:rgba(56,189,248,.55);color:#0f172a}
+    .btn.danger{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.35);color:#fee2e2}
     .btn:disabled{opacity:.5;cursor:not-allowed}
     .container{max-width:1500px;margin:0 auto;padding:16px}
     .layout{display:grid;grid-template-columns:260px 1fr;gap:14px;align-items:start}
-    .sidebar{position:sticky;top:74px;border:1px solid rgba(36,52,73,.75);background:rgba(16,24,38,.60);border-radius:18px;padding:14px}
+    .sidebar{position:sticky;top:74px;border:1px solid rgba(36,52,73,.75);background:rgba(21,31,50,.60);border-radius:18px;padding:14px}
     .nav-title{font-size:11px;color:var(--muted);letter-spacing:.13em;text-transform:uppercase;margin:0 0 10px}
     .nav{display:flex;flex-direction:column;gap:8px}
     .nav button{text-align:left;justify-content:flex-start;width:100%;border-radius:14px;padding:11px 12px}
-    .nav button.active{border-color:rgba(255,122,24,.55);background:rgba(255,122,24,.11)}
+    .nav button.active{border-color:rgba(56,189,248,.55);background:rgba(56,189,248,.11)}
     .main{min-height:640px}
-    .card{border:1px solid rgba(36,52,73,.75);background:rgba(16,24,38,.58);border-radius:18px;padding:14px;box-shadow:0 12px 35px rgba(0,0,0,.20)}
+    .card{border:1px solid rgba(36,52,73,.75);background:rgba(21,31,50,.58);border-radius:18px;padding:14px;box-shadow:0 12px 35px rgba(0,0,0,.20)}
     .section-head{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px}
     h1,h2,h3{margin:0} h1{font-size:20px} h2{font-size:16px} h3{font-size:14px}
     .muted{color:var(--muted);font-size:12px;line-height:1.45}
-    .kpi-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:14px}
+    .kpi-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;margin-bottom:14px}
     .kpi{border:1px solid rgba(36,52,73,.75);background:rgba(15,23,34,.72);border-radius:16px;padding:12px}
     .kpi .num{font-size:24px;font-weight:1000;margin-bottom:3px}.kpi .label{font-size:12px;color:var(--muted)}
     .dash-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:14px 0}
@@ -57,26 +57,24 @@
     .calendar-dow{color:var(--muted);font-size:12px;font-weight:1000;text-align:center;padding:8px 4px}
     .calendar-day{min-height:132px;border:1px solid rgba(36,52,73,.75);background:rgba(14,21,32,.60);border-radius:14px;padding:8px;overflow:hidden}
     .calendar-day.muted-month{opacity:.38}
-    .calendar-day.today{border-color:rgba(255,122,24,.75);box-shadow:0 0 0 3px rgba(255,122,24,.10)}
+    .calendar-day.today{border-color:rgba(56,189,248,.75);box-shadow:0 0 0 3px rgba(56,189,248,.10)}
     .day-num{font-size:12px;color:var(--muted);font-weight:1000;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
     .day-count{font-size:10px;border:1px solid rgba(36,52,73,.75);border-radius:999px;padding:2px 6px;color:#d7e8ff;background:rgba(16,24,38,.8)}
     .cal-event{display:block;width:100%;border:1px solid rgba(36,52,73,.8);background:rgba(16,24,38,.86);color:var(--text);border-radius:10px;padding:6px;margin-top:5px;text-align:left;font-size:11px;line-height:1.25}
-    .cal-event:hover{border-color:rgba(255,122,24,.55)}
+    .cal-event:hover{border-color:rgba(56,189,248,.55)}
     .cal-event.install{border-left:4px solid var(--ok)}
     .cal-event.due{border-left:4px solid var(--warn)}
-    .cal-event.overdue{border-left:4px solid var(--bad);background:rgba(255,92,122,.10)}
+    .cal-event.near-overdue{border-left:4px solid var(--warn);background:rgba(245,158,11,.10)}
+    .cal-event.overdue{border-left:4px solid var(--bad);background:rgba(239,68,68,.10)}
     .cal-event .cal-meta{display:block;color:var(--muted);font-size:10px;margin-top:2px}
     .calendar-legend{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 12px}
     .completion-panel{border:1px solid rgba(36,52,73,.75);background:rgba(14,21,32,.70);border-radius:16px;padding:12px;margin-bottom:14px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
     .completion-panel .item{border:1px solid rgba(36,52,73,.55);background:rgba(15,23,34,.55);border-radius:12px;padding:10px}
     .completion-panel .item .label{font-size:11px;color:var(--muted);font-weight:800;margin-bottom:4px}
     .completion-panel .item .value{font-weight:1000;font-size:13px}
-    .lock-note{border:1px solid rgba(255,208,137,.35);background:rgba(255,208,137,.08);color:#ffeac7;border-radius:12px;padding:10px;margin:10px 0;font-size:12px}
+    .lock-note{border:1px solid rgba(245,158,11,.35);background:rgba(245,158,11,.08);color:#ffeac7;border-radius:12px;padding:10px;margin:10px 0;font-size:12px}
     .inline-status,.inline-date{width:100%;padding:7px 8px;border-radius:10px;font-size:11px;background:#0f1722;border:1px solid rgba(36,52,73,.75);color:var(--text)}
     .inline-wrap{display:flex;align-items:center;gap:6px}
-    .inline-saving{font-size:10px;color:var(--muted)}
-    .inline-ok{color:#9ff0b8}
-    .inline-err{color:#ffb5c4}
     .legend-item{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
     .legend-dot{width:10px;height:10px;border-radius:999px;background:var(--muted)}
     .legend-dot.install{background:var(--ok)}
@@ -86,35 +84,39 @@
     .mini-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid rgba(36,52,73,.65);background:rgba(15,23,34,.55);padding:9px 10px;border-radius:12px}
     .mini-row b{font-size:13px}
     .mini-row span{color:var(--muted);font-size:12px}
-    tr.overdue-row td{background:rgba(255,92,122,.08)!important}
-    .danger-text{color:#ffd1dc;font-weight:1000}
-    .ok-text{color:#d4ffe6;font-weight:1000}
-    .warn-text{color:#ffeac7;font-weight:1000}
-    .filters{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr auto;gap:10px;margin-bottom:12px}
+    
+    /* Overdue & Near Overdue highlighting */
+    tr.overdue-row td{background:rgba(239,68,68,.15)!important}
+    tr.near-overdue-row td{background:rgba(245,158,11,.15)!important}
+    
+    .danger-text{color:#fca5a5;font-weight:1000}
+    .ok-text{color:#d1fae5;font-weight:1000}
+    .warn-text{color:#fef08a;font-weight:1000}
+    .filters{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:10px;margin-bottom:12px}
     .task-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 10px}
-    .task-filter-note{font-size:12px;color:#ffeac7;border:1px solid rgba(255,208,137,.35);background:rgba(255,208,137,.08);padding:7px 10px;border-radius:999px;display:none}
+    .task-filter-note{font-size:12px;color:#ffeac7;border:1px solid rgba(245,158,11,.35);background:rgba(245,158,11,.08);padding:7px 10px;border-radius:999px;display:none}
     .task-filter-note.show{display:inline-flex}
     .pager{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
     label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-weight:700}
     input,select,textarea{width:100%;border:1px solid rgba(36,52,73,.9);background:rgba(14,21,32,.95);color:var(--text);padding:10px;border-radius:12px;outline:none}
     textarea{min-height:74px;resize:vertical}
-    input:focus,select:focus,textarea:focus{border-color:rgba(255,122,24,.70);box-shadow:0 0 0 3px rgba(255,122,24,.13)}
-    .table-wrap{overflow:auto;border:1px solid rgba(36,52,73,.75);border-radius:16px;background:rgba(14,21,32,.72)}
+    input:focus,select:focus,textarea:focus{border-color:rgba(56,189,248,.70);box-shadow:0 0 0 3px rgba(56,189,248,.13)}
+    .table-wrap{overflow:auto;border:1px solid rgba(36,52,73,.75);border-radius:16px;background:rgba(14,21,32,.72);max-width:100%}
     table{width:100%;border-collapse:collapse;min-width:980px}
     th,td{padding:10px 9px;border-bottom:1px solid rgba(36,52,73,.75);font-size:12px;text-align:left;vertical-align:top}
-    th{position:sticky;top:0;background:#101826;color:#cfe3ff;font-weight:1000;z-index:1}
-    tr:hover td{background:rgba(255,122,24,.035)}
-    .linkish{color:#ffd7bf;font-weight:900;cursor:pointer;text-decoration:none}
-    .progress{height:8px;border:1px solid rgba(36,52,73,.8);background:#0b0f14;border-radius:999px;overflow:hidden;margin-top:5px;width:100px}
+    th{position:sticky;top:0;background:#111827;color:#cfe3ff;font-weight:1000;z-index:1;white-space:nowrap}
+    tr:hover td{background:rgba(56,189,248,.035)}
+    .linkish{color:#bae6fd;font-weight:900;cursor:pointer;text-decoration:none}
+    .progress{height:8px;border:1px solid rgba(36,52,73,.8);background:#0b0f14;border-radius:999px;overflow:hidden;margin-top:5px;width:98px}
     .progress>div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%}
     .badge{display:inline-flex;align-items:center;border:1px solid rgba(36,52,73,.75);background:rgba(16,24,38,.7);border-radius:999px;padding:4px 8px;font-size:11px;white-space:nowrap;color:#d7e8ff}
-    .badge.status-BLOCKED,.badge.priority-URGENT{border-color:rgba(255,92,122,.50);color:#ffd1dc;background:rgba(255,92,122,.10)}
-    .badge.status-DONE{border-color:rgba(55,214,122,.50);color:#d4ffe6;background:rgba(55,214,122,.09)}
-    .badge.status-WAITING{border-color:rgba(255,208,137,.50);color:#ffeac7;background:rgba(255,208,137,.08)}
+    .badge.status-BLOCKED,.badge.priority-URGENT{border-color:rgba(239,68,68,.50);color:#fca5a5;background:rgba(239,68,68,.10)}
+    .badge.status-DONE{border-color:rgba(16,185,129,.50);color:#d1fae5;background:rgba(16,185,129,.09)}
+    .badge.status-WAITING{border-color:rgba(245,158,11,.50);color:#fef08a;background:rgba(245,158,11,.08)}
     .admin-layout{display:grid;grid-template-columns:360px 1fr;gap:14px;align-items:start}
     .type-list{display:flex;flex-direction:column;gap:8px;max-height:620px;overflow:auto;padding-right:4px}
     .type-card{width:100%;border:1px solid rgba(36,52,73,.75);background:rgba(15,23,34,.72);color:var(--text);border-radius:16px;padding:12px;text-align:left;display:block}
-    .type-card:hover{border-color:rgba(255,122,24,.45)}.type-card.active{border-color:rgba(255,122,24,.65);background:rgba(255,122,24,.10)}
+    .type-card:hover{border-color:rgba(56,189,248,.45)}.type-card.active{border-color:rgba(56,189,248,.65);background:rgba(56,189,248,.10)}
     .type-card .type-top{display:flex;align-items:center;gap:8px;justify-content:space-between}
     .type-dot{width:12px;height:12px;border-radius:999px;background:#64748b;display:inline-block;box-shadow:0 0 0 4px rgba(255,255,255,.04)}
     .type-name{font-weight:1000;font-size:14px}
@@ -126,7 +128,7 @@
     .modal.small{width:min(720px,96vw)}
     .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.form-grid .full{grid-column:1/-1}
     .step{display:flex;gap:10px;align-items:flex-start;border:1px solid rgba(36,52,73,.75);background:#0b0f14;border-radius:14px;padding:10px;margin-top:8px}
-    .step input[type="checkbox"]{width:18px;height:18px;margin-top:2px;accent-color:#ff7a18}
+    .step input[type="checkbox"]{width:18px;height:18px;margin-top:2px;accent-color:#38bdf8}
     .step .name{font-weight:900;font-size:13px}.step .meta{font-size:11px;color:var(--muted);margin-top:3px}
     .logbox{border:1px solid rgba(36,52,73,.75);background:#0b0f14;border-radius:14px;padding:10px;max-height:220px;overflow:auto}
     .toast{position:fixed;right:16px;bottom:16px;background:#0e1520;border:1px solid rgba(36,52,73,.9);padding:10px 12px;border-radius:12px;z-index:90;display:none}
@@ -134,47 +136,39 @@
     .login-card{width:min(520px,100%);border:1px solid rgba(36,52,73,.85);background:rgba(16,24,38,.94);border-radius:20px;padding:18px;box-shadow:0 35px 90px rgba(0,0,0,.55)}
 
     .glass-panel{position:relative;overflow:hidden}
-    .glass-panel:before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.07),transparent 42%);pointer-events:none}
+    .glass-panel:before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.05),transparent 42%);pointer-events:none}
     .topbar{box-shadow:0 10px 40px rgba(0,0,0,.25)}
     .sidebar,.card,.modal,.login-card{backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
     .card{transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
     .card:hover{border-color:rgba(255,255,255,.12);box-shadow:0 18px 45px rgba(0,0,0,.28)}
     .btn{transition:transform .16s ease,border-color .16s ease,background .16s ease,box-shadow .16s ease}
     .btn:hover{transform:translateY(-1px);box-shadow:0 10px 22px rgba(0,0,0,.18)}
-    .btn.primary{box-shadow:0 10px 26px rgba(255,122,24,.18)}
-    .kpi{position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(18,28,43,.88),rgba(12,18,28,.72))}
-    .kpi:after{content:"";position:absolute;right:-24px;top:-24px;width:82px;height:82px;border-radius:999px;background:rgba(255,122,24,.10)}
-    .table-wrap{box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}
-    .comment-preview{min-width:180px;max-width:260px;color:#d7e8ff;font-size:12px;line-height:1.4}
-    .comment-preview .comment-count{display:inline-flex;margin-bottom:5px;border:1px solid rgba(56,189,248,.38);background:rgba(56,189,248,.10);color:#bfefff;border-radius:999px;padding:3px 8px;font-size:11px;font-weight:900}
-    .comment-preview .comment-text{color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .btn.primary{box-shadow:0 10px 26px rgba(56,189,248,.18)}
+    .kpi{position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(21,31,50,.88),rgba(11,15,25,.72))}
+    .kpi:after{content:"";position:absolute;right:-24px;top:-24px;width:82px;height:82px;border-radius:999px;background:rgba(56,189,248,.08)}
+    .comment-preview{min-width:0;max-width:100%;font-size:11px;line-height:1.35}
+    .comment-preview .comment-count{display:inline-flex;margin-bottom:4px;border:1px solid rgba(56,189,248,.38);background:rgba(56,189,248,.10);color:#bfefff;border-radius:999px;padding:3px 7px;font-size:10px;font-weight:900}
+    .comment-preview .comment-text{color:var(--muted);display:-webkit-box;-webkit-line-clamp:1;word-break:break-word;-webkit-box-orient:vertical;overflow:hidden}
     .comment-card{border:1px solid rgba(36,52,73,.70);background:linear-gradient(180deg,rgba(16,24,38,.86),rgba(11,15,20,.68));border-radius:14px;padding:10px 12px;margin-bottom:9px}
     .comment-card .comment-top{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:5px}
     .comment-card b{color:#f4f8ff}
 
-    /* Balanced data tables */
-    .table-wrap{max-width:100%}
+    /* Column Widths */
     .data-table{table-layout:fixed;min-width:1180px}
     .data-table th,.data-table td{padding:12px 10px;line-height:1.25}
-    .data-table th{white-space:nowrap}
-    .data-table td:nth-child(2),
-    .data-table td:nth-child(3),
-    .data-table td:nth-child(4),
-    .data-table td:nth-child(5),
-    .data-table td:nth-child(8),
-    .data-table td:nth-child(11){white-space:nowrap}
+    .data-table td:nth-child(2),.data-table td:nth-child(3),.data-table td:nth-child(4),.data-table td:nth-child(5){white-space:nowrap}
     .task-title-cell .linkish{display:block;line-height:1.25}
     .task-title-cell .muted{margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-    .tasks-table col.task-col{width:270px}
-    .tasks-table col.owner-col{width:76px}
-    .tasks-table col.type-col{width:118px}
-    .tasks-table col.status-col{width:126px}
-    .tasks-table col.priority-col{width:88px}
-    .tasks-table col.progress-col{width:118px}
-    .tasks-table col.comments-col{width:150px}
-    .tasks-table col.cid-col{width:92px}
-    .tasks-table col.date-col{width:128px}
-    .tasks-table col.updated-col{width:86px}
+    
+    /* Configured Tasks Table columns layout without Priority, Comments, Updated */
+    .tasks-table col.task-col{width:380px}
+    .tasks-table col.owner-col{width:110px}
+    .tasks-table col.type-col{width:140px}
+    .tasks-table col.status-col{width:150px}
+    .tasks-table col.progress-col{width:130px}
+    .tasks-table col.cid-col{width:130px}
+    .tasks-table col.date-col{width:140px}
+
     .recent-table col.task-col{width:310px}
     .recent-table col.owner-col{width:90px}
     .recent-table col.type-col{width:120px}
@@ -183,6 +177,7 @@
     .recent-table col.progress-col{width:120px}
     .recent-table col.comments-col{width:160px}
     .recent-table col.date-col{width:120px}
+
     .attention-table col.task-col{width:330px}
     .attention-table col.owner-col{width:90px}
     .attention-table col.type-col{width:120px}
@@ -191,13 +186,8 @@
     .attention-table col.date-col{width:120px}
     .attention-table col.comments-col{width:170px}
     .attention-table col.reason-col{width:180px}
-    .comment-preview{min-width:0;max-width:100%;font-size:11px;line-height:1.35}
-    .comment-preview .comment-count{margin-bottom:4px;padding:3px 7px;font-size:10px}
-    .comment-preview .comment-text{-webkit-line-clamp:1;word-break:break-word}
-    .inline-status,.inline-date{min-width:0}
-    .progress{width:98px}
 
-    @media(max-width:1100px){.layout{grid-template-columns:1fr}.sidebar{position:relative;top:auto}.nav{flex-direction:row;overflow:auto}.nav button{white-space:nowrap;width:auto}.kpi-grid{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:1fr 1fr}.filters .filter-actions{grid-column:1/-1}.form-grid{grid-template-columns:1fr}.admin-layout{grid-template-columns:1fr}.type-list{max-height:none}.dash-grid{grid-template-columns:1fr}.calendar-grid{gap:5px}.calendar-day{min-height:108px;padding:6px}.cal-event{font-size:10px;padding:5px}.completion-panel{grid-template-columns:1fr}.inline-status,.inline-date{font-size:10px;padding:5px}}
+    @media(max-width:1100px){.layout{grid-template-columns:1fr}.sidebar{position:relative;top:auto}.nav{flex-direction:row;overflow:auto}.nav button{white-space:nowrap;width:auto}.kpi-grid{grid-template-columns:repeat(3,1fr)}.filters{grid-template-columns:1fr 1fr}.filters .filter-actions{grid-column:1/-1}.form-grid{grid-template-columns:1fr} .admin-layout{grid-template-columns:1fr}.type-list{max-height:none}.dash-grid{grid-template-columns:1fr}.calendar-grid{gap:5px}.calendar-day{min-height:108px;padding:6px}.cal-event{font-size:10px;padding:5px}.completion-panel{grid-template-columns:1fr}}
     @media(max-width:640px){.topbar-inner{align-items:flex-start}.brand small{display:none}.kpi-grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr}.container{padding:10px}.card{padding:12px}}
   </style>
 </head>
@@ -278,7 +268,7 @@
 
         <section class="card hidden glass-panel" id="page-tasks">
           <div class="section-head">
-            <div><h1>Tasks</h1><div class="muted">ค้นหาและกรองงานทั้งหมดในทีม</div></div>
+            <div><h1>Tasks</h1><div class="muted">ค้นหาและกรองงานทั้งหมดในทีม (ซ่อนงานที่ DONE/CANCELLED)</div></div>
             <div class="spacer"></div>
             <button class="btn" id="btnRefreshTasks">Refresh</button>
             <button class="btn primary" id="btnOpenCreate2">+ New Task</button>
@@ -288,7 +278,6 @@
             <div><label>Owner</label><select id="filterOwner"></select></div>
             <div><label>Type</label><select id="filterType"></select></div>
             <div><label>Status</label><select id="filterStatus"></select></div>
-            <div><label>Priority</label><select id="filterPriority"></select></div>
             <div class="filter-actions" style="display:flex;align-items:flex-end;gap:8px;"><button class="btn" id="btnClearFilters">Clear</button></div>
           </div>
           <div class="task-toolbar">
@@ -300,7 +289,33 @@
               <select id="taskPageSize" style="width:auto;"><option value="25">25/page</option><option value="50" selected>50/page</option><option value="100">100/page</option></select>
             </div>
           </div>
-          <div class="table-wrap"><table class="data-table tasks-table"><colgroup><col class="task-col"><col class="owner-col"><col class="type-col"><col class="status-col"><col class="priority-col"><col class="progress-col"><col class="comments-col"><col class="cid-col"><col class="date-col"><col class="date-col"><col class="updated-col"></colgroup><thead><tr><th>Task</th><th>Owner</th><th>Type</th><th>Status</th><th>Priority</th><th>Progress</th><th>Comments</th><th>CID/SOF</th><th>Due Date</th><th>Install Date</th><th>Updated</th></tr></thead><tbody id="tasksBody"></tbody></table></div>
+          <div class="table-wrap">
+            <table class="data-table tasks-table">
+              <colgroup>
+                <col class="task-col">
+                <col class="owner-col">
+                <col class="type-col">
+                <col class="status-col">
+                <col class="progress-col">
+                <col class="cid-col">
+                <col class="date-col">
+                <col class="date-col">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>Task</th>
+                  <th>Owner</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                  <th>Progress</th>
+                  <th>CID/SOF</th>
+                  <th>Due Date</th>
+                  <th>Install Date</th>
+                </tr>
+              </thead>
+              <tbody id="tasksBody"></tbody>
+            </table>
+          </div>
         </section>
 
         <section class="card hidden glass-panel" id="page-calendar">
@@ -333,6 +348,7 @@
           <div class="calendar-legend">
             <div class="legend-item"><span class="legend-dot install"></span> Install Date</div>
             <div class="legend-item"><span class="legend-dot due"></span> Due Date</div>
+            <div class="legend-item"><span class="legend-dot" style="background:var(--warn)"></span> Near Overdue (≤ 5 วัน)</div>
             <div class="legend-item"><span class="legend-dot overdue"></span> Overdue</div>
           </div>
 
@@ -378,7 +394,6 @@
     </div>
   </div>
 
-  <!-- Create Task -->
   <div class="modal-backdrop" id="createModalBack"><div class="modal small">
     <div class="section-head"><div><h2>สร้างงานใหม่</h2><div class="muted">เลือกประเภทงาน แล้วระบบจะสร้าง checklist ตาม template ให้อัตโนมัติ</div></div><div class="spacer"></div><button class="btn" data-close="create">Close</button></div>
     <div class="form-grid">
@@ -394,7 +409,6 @@
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px;"><button class="btn" data-close="create">Cancel</button><button class="btn primary" id="btnCreateTask">Create Task</button></div>
   </div></div>
 
-  <!-- Edit Task -->
   <div class="modal-backdrop" id="editModalBack"><div class="modal small">
     <div class="section-head"><div><h2>แก้ไขงาน</h2><div class="muted">แก้ข้อมูลหลักของ task</div></div><div class="spacer"></div><button class="btn" data-close="edit">Close</button></div>
     <div class="form-grid">
@@ -410,7 +424,6 @@
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px;"><button class="btn" data-close="edit">Cancel</button><button class="btn primary" id="btnSaveEdit">Save Changes</button></div>
   </div></div>
 
-  <!-- Detail -->
   <div class="modal-backdrop" id="detailModalBack"><div class="modal">
     <div class="section-head"><div><h2 id="detailTitle">Task Detail</h2><div class="muted" id="detailSub">-</div></div><div class="spacer"></div><button class="btn" id="btnOpenEdit">Edit Task</button><button class="btn" data-close="detail">Close</button></div>
     <div class="kpi-grid" style="grid-template-columns:repeat(4,minmax(0,1fr));" id="detailKpis"></div>
@@ -418,9 +431,8 @@
     <h3>Checklist</h3><div id="detailSteps" style="margin-bottom:14px;"></div>
     <h3>Comments</h3><div style="display:flex;gap:8px;margin:8px 0;"><input id="commentInput" placeholder="เพิ่ม comment" /><button class="btn primary" id="btnAddComment">Add</button></div>
     <div class="logbox" id="detailComments" style="margin-bottom:14px;"></div>
-      </div></div>
+  </div></div>
 
-  <!-- User Modal -->
   <div class="modal-backdrop" id="userModalBack"><div class="modal small">
     <div class="section-head"><div><h2 id="userModalTitle">Add User</h2><div class="muted">เพิ่มหรือแก้ไขผู้ใช้งาน</div></div><div class="spacer"></div><button class="btn" data-close="user">Close</button></div>
     <div class="form-grid">
@@ -435,7 +447,6 @@
     <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:14px;"><button class="btn" data-close="user">Cancel</button><button class="btn primary" id="btnSaveUser">Save User</button></div>
   </div></div>
 
-  <!-- Reset Password -->
   <div class="modal-backdrop" id="resetPassModalBack"><div class="modal small">
     <div class="section-head"><div><h2>Reset Password</h2><div class="muted" id="resetPassUserLabel">-</div></div><div class="spacer"></div><button class="btn" data-close="resetPass">Close</button></div>
     <input id="resetPassUserId" type="hidden" />
@@ -443,7 +454,6 @@
     <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:14px;"><button class="btn" data-close="resetPass">Cancel</button><button class="btn primary" id="btnSaveResetPass">Save Password</button></div>
   </div></div>
 
-  <!-- Work Type -->
   <div class="modal-backdrop" id="workTypeModalBack"><div class="modal small">
     <div class="section-head"><div><h2 id="workTypeModalTitle">Add Work Type</h2><div class="muted">เพิ่มหรือแก้ประเภทงาน</div></div><div class="spacer"></div><button class="btn" data-close="workType">Close</button></div>
     <div class="form-grid">
@@ -455,7 +465,6 @@
     <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:14px;"><button class="btn" data-close="workType">Cancel</button><button class="btn primary" id="btnSaveWorkType">Save Work Type</button></div>
   </div></div>
 
-  <!-- Template -->
   <div class="modal-backdrop" id="templateModalBack"><div class="modal small">
     <div class="section-head"><div><h2 id="templateModalTitle">Add Checklist Template Step</h2><div class="muted">ถ้า Work Type + Step No เดิมมีอยู่แล้ว ระบบจะแก้ step เดิม ไม่สร้างซ้ำ</div></div><div class="spacer"></div><button class="btn" data-close="template">Close</button></div>
     <div class="form-grid">
@@ -558,10 +567,11 @@
         page: state.taskPage,
         pageSize: state.taskPageSize
       });
-      state.filteredTasks = res.tasks || [];
+      // เมื่องาน DONE หรือ CANCELLED จะไม่ให้โชว์ที่ Task
+      state.filteredTasks = (res.tasks || []).filter(t => !isClosedStatus(t.status));
       state.taskPage = res.page || state.taskPage || 1;
       state.taskPageSize = res.pageSize || state.taskPageSize || 50;
-      state.taskTotal = res.total || 0;
+      state.taskTotal = state.filteredTasks.length;
       state.taskTotalPages = res.totalPages || 1;
       renderTasks();
     }
@@ -604,7 +614,7 @@
 
     function hasTaskFilters(){
       const f = getFilters();
-      return !!(f.keyword || f.ownerUserId || f.typeId || f.status || f.priority);
+      return !!(f.keyword || f.ownerUserId || f.typeId || f.status);
     }
 
     function applyTaskFiltersAndRender(){
@@ -616,8 +626,7 @@
         keyword: $('filterKeyword')?.value || '',
         ownerUserId: $('filterOwner')?.value || '',
         typeId: $('filterType')?.value || '',
-        status: $('filterStatus')?.value || '',
-        priority: $('filterPriority')?.value || ''
+        status: $('filterStatus')?.value || ''
       };
     }
 
@@ -628,8 +637,10 @@
       const typeOptionsNoAll = state.workTypes.map(w=>`<option value="${esc(w.typeId)}">${esc(w.typeName)}</option>`).join('');
       $('filterOwner').innerHTML = userOptions; $('filterType').innerHTML = typeOptions;
       if($('calendarOwner')) $('calendarOwner').innerHTML = userOptions;
-      $('filterStatus').innerHTML = '<option value="">All</option>' + STATUS_LIST.map(s=>`<option>${s}</option>`).join('');
-      $('filterPriority').innerHTML = '<option value="">All</option>' + PRIORITY_LIST.map(s=>`<option>${s}</option>`).join('');
+      
+      // เอาสถานะ DONE/CANCELLED ออกจากตัวเลือกในหน้า Task
+      $('filterStatus').innerHTML = '<option value="">All</option>' + STATUS_LIST.filter(s=>!isClosedStatus(s)).map(s=>`<option>${s}</option>`).join('');
+      
       $('newOwner').innerHTML = userOptionsNoAll; $('editOwner').innerHTML = userOptionsNoAll;
       $('newType').innerHTML = typeOptionsNoAll; $('tplType').innerHTML = typeOptionsNoAll;
       $('editStatus').innerHTML = STATUS_LIST.map(s=>`<option>${s}</option>`).join('');
@@ -716,13 +727,18 @@
         }
 
         if((mode === 'both' || mode === 'due') && normalizeDateKey(t.dueDate) === dateKey){
-          events.push({kind:isOverdue(t) && !isClosedStatus(t.status) ? 'overdue' : 'due', task:t});
+          let kind = 'due';
+          if (!isClosedStatus(t.status)) {
+            if (isOverdue(t)) kind = 'overdue';
+            else if (isNearOverdue(t)) kind = 'near-overdue';
+          }
+          events.push({kind: kind, task:t});
         }
       });
 
       return events.sort((a,b)=>{
-        const pa = a.kind === 'overdue' ? 0 : (a.kind === 'due' ? 1 : 2);
-        const pb = b.kind === 'overdue' ? 0 : (b.kind === 'due' ? 1 : 2);
+        const pa = a.kind === 'overdue' ? 0 : (a.kind === 'near-overdue' ? 1 : (a.kind === 'due' ? 2 : 3));
+        const pb = b.kind === 'overdue' ? 0 : (b.kind === 'near-overdue' ? 1 : (b.kind === 'due' ? 2 : 3));
         if(pa !== pb) return pa - pb;
         return String(a.task.priority || '').localeCompare(String(b.task.priority || ''));
       });
@@ -730,10 +746,14 @@
 
     function calendarEventHtml(ev){
       const t = ev.task;
-      const label = ev.kind === 'install' ? 'Install' : (ev.kind === 'overdue' ? 'Overdue' : 'Due');
+      let label = 'Due';
+      if(ev.kind === 'install') label = 'Install';
+      else if(ev.kind === 'overdue') label = 'Overdue';
+      else if(ev.kind === 'near-overdue') label = 'Near Due';
+
       return `<button class="cal-event ${ev.kind}" data-task="${esc(t.taskId)}">
         <b>${esc(label)}:</b> ${esc(t.title || '-')}
-        <span class="cal-meta">${esc(t.ownerName || '-')} · ${esc(t.status || '-')} · ${esc(t.typeName || '-')}</span>
+        <span class="cal-meta">${esc(t.ownerName || '-')} · ${esc(t.status || '-')}</span>
       </button>`;
     }
 
@@ -782,7 +802,7 @@
 
       const attention = tasks.filter(t => {
         if(isClosedStatus(t.status)) return false;
-        return isOverdue(t) || t.status === 'BLOCKED' || t.blockerTag || isToday(t.dueDate);
+        return isOverdue(t) || isNearOverdue(t) || t.status === 'BLOCKED' || t.blockerTag || isToday(t.dueDate);
       }).sort((a,b)=>{
         if(isOverdue(a) && !isOverdue(b)) return -1;
         if(!isOverdue(a) && isOverdue(b)) return 1;
@@ -808,7 +828,6 @@
       el.innerHTML = rows.slice(0,8).map(r=>`<div class="mini-row"><b>${esc(r.label)}</b><span>${r.count}</span></div>`).join('') || `<div class="empty-panel">${esc(emptyText)}</div>`;
     }
 
-
     function commentPreview(t){
       const count = Number(t.commentCount || t.commentsCount || t.totalComments || 0);
       const latest = t.latestComment || t.lastComment || t.comment || t.remark || '';
@@ -819,10 +838,11 @@
     function attentionRow(t){
       const reasons = [];
       if(isOverdue(t)) reasons.push('Overdue');
+      else if(isNearOverdue(t)) reasons.push('Near Overdue');
       if(isToday(t.dueDate)) reasons.push('Due Today');
       if(t.status === 'BLOCKED') reasons.push('Blocked');
       if(t.blockerTag) reasons.push(t.blockerTag);
-      return `<tr class="${isOverdue(t)?'overdue-row':''}">
+      return `<tr class="${getRowClass(t)}">
         <td class="task-title-cell"><span class="linkish" data-task="${esc(t.taskId)}">${esc(t.title)}</span><div class="muted">${esc(t.cid || '')} ${esc(t.sof || '')}</div></td>
         <td>${esc(t.ownerName)}</td>
         <td>${badge(t.typeName)}</td>
@@ -830,7 +850,7 @@
         <td>${badge(t.priority,'priority-'+t.priority)}</td>
         <td>${esc(t.dueDate || '-')}</td>
         <td>${commentPreview(t)}</td>
-        <td>${reasons.map(x=>badge(x, x==='Overdue'?'status-BLOCKED':'')).join(' ')}</td>
+        <td>${reasons.map(x=>badge(x, x==='Overdue'?'status-BLOCKED':(x==='Near Overdue'?'status-WAITING':''))).join(' ')}</td>
       </tr>`;
     }
 
@@ -864,6 +884,23 @@
       return d.getTime() < todayDate().getTime();
     }
 
+    // ฟังก์ชันเช็คงานใกล้ Overdue (ภายใน 5 วัน)
+    function isNearOverdue(t){
+      const d = toDateOnly(t.dueDate);
+      if(!d) return false;
+      const today = todayDate();
+      const diffTime = d.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays >= 0 && diffDays <= 5;
+    }
+
+    function getRowClass(t){
+      if(isClosedStatus(t.status)) return '';
+      if(isOverdue(t)) return 'overdue-row';
+      if(isNearOverdue(t)) return 'near-overdue-row';
+      return '';
+    }
+
     function renderTasks(){
       try{
         const rows = state.filteredTasks || [];
@@ -871,13 +908,13 @@
         const totalPages = Math.max(1, Number(state.taskTotalPages || 1));
         state.taskPage = Math.min(Math.max(1, Number(state.taskPage || 1)), totalPages);
 
-        $('tasksBody').innerHTML = rows.map(taskRowFull).join('') || emptyRow(11, 'ไม่พบงานตาม filter');
+        $('tasksBody').innerHTML = rows.map(taskRowFull).join('') || emptyRow(8, 'ไม่พบงานตาม filter');
         if($('taskPageInfo')) $('taskPageInfo').textContent = `Page ${state.taskPage}/${totalPages} · ${total} tasks`;
         if($('btnPagePrev')) $('btnPagePrev').disabled = state.taskPage <= 1;
         if($('btnPageNext')) $('btnPageNext').disabled = state.taskPage >= totalPages;
         if($('taskFilterNote')) $('taskFilterNote').classList.toggle('show', hasTaskFilters());
       }catch(e){
-        $('tasksBody').innerHTML = emptyRow(11, 'Render Tasks error: ' + e.message);
+        $('tasksBody').innerHTML = emptyRow(8, 'Render Tasks error: ' + e.message);
         console.error(e);
       }
     }
@@ -908,19 +945,20 @@
     }
 
     function taskRowRecent(t){
-      return `<tr class="${isOverdue(t) && !isClosedStatus(t.status) ? 'overdue-row' : ''}"><td class="task-title-cell"><span class="linkish" data-task="${esc(t.taskId)}">${esc(t.title)}</span><div class="muted">${esc(t.cid || '')} ${esc(t.sof || '')}</div></td><td>${esc(t.ownerName)}</td><td>${badge(t.typeName)}</td><td>${badge(t.status,'status-'+t.status)}</td><td>${badge(t.priority,'priority-'+t.priority)}</td><td>${progressHtml(t.progressPercent)}</td><td>${commentPreview(t)}</td><td>${esc(t.dueDate)}</td><td>${esc(t.installDate)}</td></tr>`;
+      return `<tr class="${getRowClass(t)}"><td class="task-title-cell"><span class="linkish" data-task="${esc(t.taskId)}">${esc(t.title)}</span><div class="muted">${esc(t.cid || '')} ${esc(t.sof || '')}</div></td><td>${esc(t.ownerName)}</td><td>${badge(t.typeName)}</td><td>${badge(t.status,'status-'+t.status)}</td><td>${badge(t.priority,'priority-'+t.priority)}</td><td>${progressHtml(t.progressPercent)}</td><td>${commentPreview(t)}</td><td>${esc(t.dueDate)}</td><td>${esc(t.installDate)}</td></tr>`;
     }
+
+    // เมนู Tasks: ปรับคอลัมน์ออกตามสั่ง (ซ่อน Priority, Comments, Updated)
     function taskRowFull(t){
       const editable = !isViewer() && !(isClosedStatus(t.status) && !canAdmin() && !canLeader());
 
-      return `<tr class="${isOverdue(t) && !isClosedStatus(t.status) ? 'overdue-row' : ''}">
+      return `<tr class="${getRowClass(t)}">
         <td class="task-title-cell">
           <span class="linkish" data-task="${esc(t.taskId)}">${esc(t.title)}</span>
           <div class="muted">${esc(t.customerName)} ${esc(t.serviceName)}</div>
         </td>
 
         <td>${esc(t.ownerName)}</td>
-
         <td>${badge(t.typeName)}</td>
 
         <td>
@@ -931,11 +969,7 @@
           ` : badge(t.status,'status-'+t.status)}
         </td>
 
-        <td>${badge(t.priority,'priority-'+t.priority)}</td>
-
         <td>${progressHtml(t.progressPercent)}</td>
-
-        <td>${commentPreview(t)}</td>
 
         <td>
           ${esc(t.cid || '-')}
@@ -957,8 +991,6 @@
             </div>
           ` : esc(t.installDate || '-')}
         </td>
-
-        <td>${esc(t.updatedAt || '-')}</td>
       </tr>`;
     }
 
@@ -966,7 +998,6 @@
       if(!value) return '';
       return String(value).slice(0,10);
     }
-
 
     async function createTask(){
       const body = {
@@ -1113,7 +1144,6 @@
       if(!task) return;
 
       state.currentTask = Object.assign({}, state.currentTask || {}, task);
-
       updateTaskInCaches(task, false);
 
       const archived = isTrue(state.currentTask.archived);
@@ -1186,7 +1216,6 @@
       catch(e){ toast('Save failed: ' + e.message); }
       finally{ setLoading($('btnSaveEdit'), false); }
     }
-    function normalizeDateInput(v){ if(!v) return ''; return String(v).trim().slice(0,10); }
     async function addComment(){ const comment=$('commentInput').value.trim(); if(!comment) return; try{ await apiCall('addComment',{token:state.token,taskId:state.currentTaskId,comment}); $('commentInput').value=''; await loadTaskComments(state.currentTaskId); toast('เพิ่ม comment แล้ว'); }catch(e){ toast('Comment failed: '+e.message); } }
 
     function openUserModal(userId){
@@ -1212,7 +1241,7 @@
     function openWorkTypeModal(typeId){ const w=typeId?state.workTypes.find(x=>String(x.typeId)===String(typeId)):null; $('workTypeModalTitle').textContent=w?'Edit Work Type':'Add Work Type'; $('wtTypeId').value=w?(w.typeId||''):''; $('wtTypeName').value=w?(w.typeName||''):''; $('wtDescription').value=w?(w.description||''):''; $('wtColor').value=w?(w.color||autoColorFromText(w.typeName||'')):autoColorFromText(''); openModal('workType'); }
     async function saveWorkType(){ const payload={token:state.token,typeId:$('wtTypeId').value,typeName:$('wtTypeName').value,description:$('wtDescription').value,color:$('wtColor').value||autoColorFromText($('wtTypeName').value)}; if(!payload.typeName){ toast('กรอก Type Name'); return; } try{ await apiCall('saveWorkType',payload); closeModal('workType'); await bootstrap(); const found=state.workTypes.find(w=>String(w.typeName).toLowerCase()===String(payload.typeName).toLowerCase()); if(found) state.selectedAdminTypeId=found.typeId; renderAdmin(); toast('บันทึก Work Type แล้ว'); }catch(e){ toast('Save work type failed: '+e.message); } }
     async function deleteWorkType(typeId){ if(!confirm('Delete work type? งานเดิมจะยังอยู่ แต่จะไม่เลือกประเภทนี้สำหรับงานใหม่')) return; try{ await apiCall('deleteWorkType',{token:state.token,typeId}); await bootstrap(); toast('ลบ Work Type แล้ว'); }catch(e){ toast('Delete work type failed: '+e.message); } }
-    function autoColorFromText(text){ const palette=['#ff7a18','#38bdf8','#22c55e','#a855f7','#ef4444','#f59e0b','#14b8a6','#64748b']; const s=String(text||'new'); let sum=0; for(let i=0;i<s.length;i++) sum+=s.charCodeAt(i); return palette[sum%palette.length]; }
+    function autoColorFromText(text){ const palette=['#38bdf8','#10b981','#f59e0b','#ef4444','#a855f7','#6366f1','#14b8a6','#64748b']; const s=String(text||'new'); let sum=0; for(let i=0;i<s.length;i++) sum+=s.charCodeAt(i); return palette[sum%palette.length]; }
 
     async function inlineUpdateTask(taskId, payload, el){
       if(!taskId) return;
@@ -1252,7 +1281,7 @@
       }
     }
 
-function findUserName(userId){ const u=state.users.find(x=>String(x.userId)===String(userId)); return u ? (u.displayName || u.username) : (userId || '-'); }
+    function findUserName(userId){ const u=state.users.find(x=>String(x.userId)===String(userId)); return u ? (u.displayName || u.username) : (userId || '-'); }
     function isTrue(v){ return v === true || String(v).toUpperCase() === 'TRUE'; }
     function openModal(name){ $(name+'ModalBack').classList.add('show'); }
     function closeModal(name){ $(name+'ModalBack').classList.remove('show'); }
@@ -1270,8 +1299,8 @@ function findUserName(userId){ const u=state.users.find(x=>String(x.userId)===St
       $('btnOpenTemplate').onclick=()=>openTemplateModal(''); $('btnSaveTemplate').onclick=saveTemplate;
       $('btnOpenWorkType').onclick=()=>openWorkTypeModal(''); $('btnSaveWorkType').onclick=saveWorkType; $('wtTypeName').addEventListener('input',()=>{ if(!$('wtTypeId').value) $('wtColor').value=autoColorFromText($('wtTypeName').value); });
       $('btnOpenCreate').onclick=()=>openModal('create'); $('btnOpenCreate2').onclick=()=>openModal('create'); $('btnCreateTask').onclick=createTask; $('btnAddComment').onclick=addComment; $('btnOpenEdit').onclick=openEditModal; $('btnSaveEdit').onclick=saveEditTask;
-      $('btnClearFilters').onclick=()=>{ ['filterKeyword','filterOwner','filterType','filterStatus','filterPriority'].forEach(id=>$(id).value=''); loadTaskPage(true); };
-      ['filterKeyword','filterOwner','filterType','filterStatus','filterPriority'].forEach(id=>$(id).addEventListener(id==='filterKeyword'?'input':'change', debounce(applyTaskFiltersAndRender,500)));
+      $('btnClearFilters').onclick=()=>{ ['filterKeyword','filterOwner','filterType','filterStatus'].forEach(id=>$(id).value=''); loadTaskPage(true); };
+      ['filterKeyword','filterOwner','filterType','filterStatus'].forEach(id=>$(id).addEventListener(id==='filterKeyword'?'input':'change', debounce(applyTaskFiltersAndRender,500)));
       $('btnPagePrev').onclick=()=>{ state.taskPage=Math.max(1,state.taskPage-1); loadTaskPage(false); };
       $('btnPageNext').onclick=()=>{ state.taskPage=state.taskPage+1; loadTaskPage(false); };
       $('taskPageSize').onchange=()=>{ state.taskPageSize=Number($('taskPageSize').value||50); state.taskPage=1; loadTaskPage(true); };
@@ -1287,30 +1316,24 @@ function findUserName(userId){ const u=state.users.find(x=>String(x.userId)===St
         const dw=e.target.closest('[data-del-worktype]'); if(dw) deleteWorkType(dw.dataset.delWorktype);
         const task=e.target.closest('[data-task]'); if(task) openTaskDetail(task.dataset.task);
       });
-            document.body.addEventListener('change', async e=>{
+      document.body.addEventListener('change', async e=>{
         const statusEl = e.target.closest('[data-inline-status]');
         if(statusEl){
-          await inlineUpdateTask(statusEl.dataset.inlineStatus, {
-            status: statusEl.value
-          }, statusEl);
+          await inlineUpdateTask(statusEl.dataset.inlineStatus, { status: statusEl.value }, statusEl);
         }
 
         const dueEl = e.target.closest('[data-inline-due]');
         if(dueEl){
-          await inlineUpdateTask(dueEl.dataset.inlineDue, {
-            dueDate: dueEl.value
-          }, dueEl);
+          await inlineUpdateTask(dueEl.dataset.inlineDue, { dueDate: dueEl.value }, dueEl);
         }
 
         const installEl = e.target.closest('[data-inline-install]');
         if(installEl){
-          await inlineUpdateTask(installEl.dataset.inlineInstall, {
-            installDate: installEl.value
-          }, installEl);
+          await inlineUpdateTask(installEl.dataset.inlineInstall, { installDate: installEl.value }, installEl);
         }
       });
 
-$('detailSteps').addEventListener('change', e=>{ if(e.target.matches('input[type="checkbox"][data-step-id]')){ if(isViewer()){ e.target.checked=!e.target.checked; toast('Viewer ไม่มีสิทธิ์แก้ checklist'); return; } updateStep(e.target); } });
+      $('detailSteps').addEventListener('change', e=>{ if(e.target.matches('input[type="checkbox"][data-step-id]')){ if(isViewer()){ e.target.checked=!e.target.checked; toast('Viewer ไม่มีสิทธิ์แก้ checklist'); return; } updateStep(e.target); } });
       ['loginUsername','loginPassword'].forEach(id=>$(id).addEventListener('keydown', e=>{ if(e.key==='Enter') login(); }));
     }
     function debounce(fn,ms){ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args),ms); }; }
